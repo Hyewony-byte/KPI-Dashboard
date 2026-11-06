@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>제타 주요지표 큐레이션 주간 리뷰 대시보드</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            },
+            status: {
+              up: '#dc2626',      // Korean market standard: red for increase / positive in sales
+              down: '#2563eb',    // blue for decrease
+              good: '#16a34a',    // green for quality improvement (e.g. error rate drop)
+              warn: '#ea580c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Pretendard', sans-serif; }
+    /* Custom scrollbar for data tables */
+    ::-webkit-scrollbar { height: 6px; width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+      .print-shadow-none { box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP HEADER / NAV -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <i class="fa-solid fa-chart-line text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">제타 주요지표 주간 리뷰</h1>
+            <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">운영 KPI</span>
+          </div>
+          <p class="text-xs text-slate-500">ZETTA Executive Weekly Performance Analytics</p>
+        </div>
+      </div>
+
+      <!-- Action Tools -->
+      <div class="flex items-center flex-wrap gap-2 text-sm no-print">
+        <!-- Target Week Selector -->
+        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
+          <span class="text-xs font-medium text-slate-500 px-2">리뷰 주차:</span>
+          <select id="weekSelector" onchange="onSelectWeek(this.value)" class="bg-white text-xs font-semibold text-slate-800 py-1 px-2.5 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm cursor-pointer">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <button onclick="openDataModal()" class="inline-flex items-center px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs rounded-lg shadow-sm transition-all">
+          <i class="fa-solid fa-plus-circle mr-1.5"></i> 주간 데이터 추가/관리
+        </button>
+        <button onclick="window.print()" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs rounded-lg border border-slate-300 shadow-sm transition-all">
+          <i class="fa-solid fa-print mr-1.5 text-slate-400"></i> 인쇄
+        </button>
+        <button onclick="exportToCSV()" class="inline-flex items-center px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs rounded-lg border border-slate-300 shadow-sm transition-all">
+          <i class="fa-solid fa-download mr-1.5 text-slate-400"></i> CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 no-print">
+      <nav class="flex space-x-6 text-sm font-medium">
+        <button onclick="switchTab('summary')" id="tab-summary" class="tab-btn py-3 border-b-2 border-brand-600 text-brand-600 flex items-center space-x-1.5">
+          <i class="fa-solid fa-table-columns text-xs"></i><span>요약 대시보드</span>
+        </button>
+        <button onclick="switchTab('trends')" id="tab-trends" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5">
+          <i class="fa-solid fa-chart-area text-xs"></i><span>트렌드 심층 분석</span>
+        </button>
+        <button onclick="switchTab('table')" id="tab-table" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5">
+          <i class="fa-solid fa-table-list text-xs"></i><span>전체 지표 비교표</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- EXECUTIVE VERBAL BRIEFING BANNER -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div class="space-y-1.5 flex-1">
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase tracking-wider">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1 text-indigo-500"></i> Executive Script
+            </span>
+            <span id="briefingDateBadge" class="text-xs text-slate-500 font-medium">기준일: 2026-11-01</span>
+          </div>
+          <p id="verbalScriptText" class="text-slate-800 text-sm leading-relaxed font-normal bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 select-all">
+            <!-- Dynamic generated text -->
+          </p>
+        </div>
+        <div class="shrink-0 flex flex-col gap-2 no-print">
+          <button onclick="copyScript()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg border border-slate-200 transition-all flex items-center justify-center space-x-1.5">
+            <i class="fa-regular fa-copy"></i>
+            <span id="copyBtnText">구두보고 복사</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: SUMMARY DASHBOARD -->
+    <div id="content-summary" class="space-y-6">
+
+      <!-- TOP 5 KPI CARDS -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+        <!-- Card 1: UV -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 mb-1">
+            <span class="text-xs font-semibold">일평균 UV</span>
+            <i class="fa-regular fa-user text-slate-400 text-xs"></i>
+          </div>
+          <div class="my-1">
+            <div class="flex items-baseline space-x-1">
+              <span id="card-uv-val" class="text-2xl font-bold tracking-tight text-slate-900">-</span>
+              <span class="text-xs text-slate-500 font-medium">명</span>
+            </div>
+            <div id="card-uv-wow" class="text-xs font-semibold mt-1 flex items-center space-x-1">
+              <!-- wow text -->
+            </div>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <span>UV당 PV</span>
+            <span id="card-uv-extra" class="font-semibold text-slate-600">-</span>
+          </div>
+          <div class="w-full h-8 mt-1">
+            <canvas id="sparkline-uv"></canvas>
+          </div>
+        </div>
+
+        <!-- Card 2: PV -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 mb-1">
+            <span class="text-xs font-semibold">일평균 PV</span>
+            <i class="fa-regular fa-file-lines text-slate-400 text-xs"></i>
+          </div>
+          <div class="my-1">
+            <div class="flex items-baseline space-x-1">
+              <span id="card-pv-val" class="text-2xl font-bold tracking-tight text-slate-900">-</span>
+              <span class="text-xs text-slate-500 font-medium">건</span>
+            </div>
+            <div id="card-pv-wow" class="text-xs font-semibold mt-1 flex items-center space-x-1">
+              <!-- wow text -->
+            </div>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <span>전주 절대치</span>
+            <span id="card-pv-extra" class="font-semibold text-slate-600">-</span>
+          </div>
+          <div class="w-full h-8 mt-1">
+            <canvas id="sparkline-pv"></canvas>
+          </div>
+        </div>
+
+        <!-- Card 3: 구매전환율 -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 mb-1">
+            <span class="text-xs font-semibold">구매전환율 (CVR)</span>
+            <span id="badge-cvr" class="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">목표 달성</span>
+          </div>
+          <div class="my-1">
+            <div class="flex items-baseline space-x-1">
+              <span id="card-cvr-val" class="text-2xl font-bold tracking-tight text-slate-900">-</span>
+              <span class="text-xs text-slate-500 font-medium">%</span>
+            </div>
+            <div id="card-cvr-wow" class="text-xs font-semibold mt-1 flex items-center space-x-1">
+              <!-- wow text -->
+            </div>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <span>일평균 주문건</span>
+            <span id="card-cvr-extra" class="font-semibold text-slate-600">-</span>
+          </div>
+          <div class="w-full h-8 mt-1">
+            <canvas id="sparkline-cvr"></canvas>
+          </div>
+        </div>
+
+        <!-- Card 4: 검색 실패율 -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 mb-1">
+            <span class="text-xs font-semibold">검색 실패율</span>
+            <span id="badge-search" class="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">개선</span>
+          </div>
+          <div class="my-1">
+            <div class="flex items-baseline space-x-1">
+              <span id="card-search-val" class="text-2xl font-bold tracking-tight text-slate-900">-</span>
+              <span class="text-xs text-slate-500 font-medium">%</span>
+            </div>
+            <div id="card-search-wow" class="text-xs font-semibold mt-1 flex items-center space-x-1">
+              <!-- wow text -->
+            </div>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <span>총 검색수</span>
+            <span id="card-search-extra" class="font-semibold text-slate-600">-</span>
+          </div>
+          <div class="w-full h-8 mt-1">
+            <canvas id="sparkline-search"></canvas>
+          </div>
+        </div>
+
+        <!-- Card 5: 주문금액 -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 mb-1">
+            <span class="text-xs font-semibold">전체 주문금액</span>
+            <i class="fa-solid fa-won-sign text-slate-400 text-xs"></i>
+          </div>
+          <div class="my-1">
+            <div class="flex items-baseline space-x-1">
+              <span id="card-rev-val" class="text-2xl font-bold tracking-tight text-slate-900">-</span>
+              <span class="text-xs text-slate-500 font-medium">억원</span>
+            </div>
+            <div id="card-rev-wow" class="text-xs font-semibold mt-1 flex items-center space-x-1">
+              <!-- wow text -->
+            </div>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <span>건당 구매수량</span>
+            <span id="card-rev-extra" class="font-semibold text-slate-600">-</span>
+          </div>
+          <div class="w-full h-8 mt-1">
+            <canvas id="sparkline-rev"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RECENT 3 WEEKS COMPARISON MATRIX TABLE -->
+      <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">최근 주차별 지표 상세 현황</h2>
+            <p class="text-xs text-slate-500 mt-0.5">최근 3주간 일평균 주요 실적 및 전주 대비(WoW) 증감률 분석</p>
+          </div>
+          <span class="text-xs text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i>검색 지표는 동일세션 기준 집계</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/75 border-b border-slate-200 text-slate-600 font-semibold">
+                <th class="py-3 px-4 w-28">구분</th>
+                <th class="py-3 px-4 w-40">주요 지표 (일평균)</th>
+                <th id="th-week-1" class="py-3 px-4 text-right">10월 3주차</th>
+                <th id="th-week-2" class="py-3 px-4 text-right">10월 4주차</th>
+                <th id="th-week-3" class="py-3 px-4 text-right bg-blue-50/50 text-brand-700 font-bold">11월 1주차 (당주)</th>
+                <th class="py-3 px-4 text-right w-36">전주 대비 (WoW)</th>
+                <th class="py-3 px-4 text-center w-24">3주 추이</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTableBody" class="divide-y divide-slate-100 text-slate-700">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TAB 2: DEEP TREND CHARTS -->
+    <div id="content-trends" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Chart 1: Traffic Trend -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">트래픽 및 유저 탐색도 추이</h3>
+              <p class="text-xs text-slate-500">일평균 UV vs PV 및 유저당 PV 추이</p>
+            </div>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">일평균</span>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-traffic"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Order & Revenue Trend -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">주문건수 및 매출액 추이</h3>
+              <p class="text-xs text-slate-500">일평균 주문건수 vs 일평균 전체주문금액(백만원)</p>
+            </div>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">전체</span>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-sales"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Search Health & Failure Rate -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-3 lg:col-span-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">검색 엔진 퍼포먼스 및 실패율</h3>
+              <p class="text-xs text-slate-500">전체 검색 볼륨(건) 대비 검색 실패율(%) 및 검색구매비중</p>
+            </div>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">검색 세션</span>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-search"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: COMPLETE DATA MATRIX -->
+    <div id="content-table" class="space-y-6 hidden">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-5 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">전체 등록 데이터 세트</h3>
+            <p class="text-xs text-slate-500">등록된 모든 주차의 원본 지표 및 계산 파생치 목록입니다.</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openDataModal()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs rounded-lg">
+              <i class="fa-solid fa-plus mr-1"></i> 새 주차 등록
+            </button>
+            <button onclick="resetToDefaultData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg">
+              <i class="fa-solid fa-rotate-left mr-1"></i> 샘플 데이터 초기화
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">주차명</th>
+                <th class="py-2.5 px-3">기간</th>
+                <th class="py-2.5 px-3 text-right">일평균 UV</th>
+                <th class="py-2.5 px-3 text-right">일평균 PV</th>
+                <th class="py-2.5 px-3 text-right">UV당 PV</th>
+                <th class="py-2.5 px-3 text-right">주문건수</th>
+                <th class="py-2.5 px-3 text-right">구매전환율</th>
+                <th class="py-2.5 px-3 text-right">검색수</th>
+                <th class="py-2.5 px-3 text-right">실패수</th>
+                <th class="py-2.5 px-3 text-right">실패율</th>
+                <th class="py-2.5 px-3 text-right">주문금액(백만)</th>
+                <th class="py-2.5 px-3 text-right">건당수량</th>
+                <th class="py-2.5 px-3 text-center">관리</th>
+              </tr>
+            </thead>
+            <tbody id="allDataTableBody" class="divide-y divide-slate-100">
+              <!-- populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- DATA MODAL (ADD / EDIT) -->
+  <div id="dataModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 animate-in fade-in duration-150">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 id="modalTitle" class="text-base font-bold text-slate-900">새 주차 지표 데이터 추가</h3>
+          <p class="text-xs text-slate-500">주요 일평균 원본 지표를 입력하면 파생 지표가 자동 산출됩니다.</p>
+        </div>
+        <button onclick="closeDataModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="metricForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="editIndex" value="-1">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">주차 명칭 <span class="text-red-500">*</span></label>
+            <input type="text" id="inputWeekName" required placeholder="예: 11월 2주차" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">집계 기간 <span class="text-red-500">*</span></label>
+            <input type="text" id="inputDateRange" required placeholder="예: 11.02(월)~11.08(일)" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-3 border border-slate-200">
+          <h4 class="font-bold text-slate-800 text-xs flex items-center">
+            <i class="fa-solid fa-users text-brand-600 mr-1.5"></i> 1. 트래픽 & 전환 지표 (일평균)
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">일평균 UV (명)</label>
+              <input type="number" step="any" id="inputUV" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">일평균 PV (건)</label>
+              <input type="number" step="any" id="inputPV" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">주문건수 (건)</label>
+              <input type="number" step="any" id="inputOrderCount" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-3 border border-slate-200">
+          <h4 class="font-bold text-slate-800 text-xs flex items-center">
+            <i class="fa-solid fa-magnifying-glass text-indigo-600 mr-1.5"></i> 2. 검색 품질 및 검색 주문
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">전체 검색수 (실패포함)</label>
+              <input type="number" step="any" id="inputSearchTotal" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">검색 실패수 (건)</label>
+              <input type="number" step="any" id="inputSearchFail" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">검색 주문건수 (건)</label>
+              <input type="number" step="any" id="inputSearchOrders" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-3 border border-slate-200">
+          <h4 class="font-bold text-slate-800 text-xs flex items-center">
+            <i class="fa-solid fa-basket-shopping text-emerald-600 mr-1.5"></i> 3. 매출 및 바스켓 지표
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">전체주문금액 (백만원)</label>
+              <input type="number" step="any" id="inputTotalSales" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">검색주문금액 (백만원)</label>
+              <input type="number" step="any" id="inputSearchSales" placeholder="선택입력" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1 font-medium">건당수량 (개)</label>
+              <input type="number" step="0.1" id="inputBasketCount" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md focus:ring-brand-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeDataModal()" class="px-4 py-2 border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 font-medium">
+            취소
+          </button>
+          <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium shadow-sm transition-all">
+            저장 및 대시보드 반영
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastMessage" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-lg transform transition-all duration-200 opacity-0 translate-y-2 pointer-events-none flex items-center space-x-2">
+    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastText">작업이 완료되었습니다.</span>
+  </div>
+
+  <footer class="mt-auto border-t border-slate-200 py-4 text-center text-xs text-slate-400 bg-white no-print">
+    제타 큐레이션 실적 모니터링 시스템 &bull; 자동 브리핑 생성 엔진 탑재
+  </footer>
+
+  <script>
+    /* ============================================================
+       1. DATA STRUCTURE & INITIALIZATION
+    ============================================================ */
+    const DEFAULT_DATA = [
+      {
+        weekName: "10월 3주차",
+        dateRange: "10.15(목)~10.21(수)",
+        uv: 310790,
+        pv: 4476976,
+        orderCount: 13387,
+        searchTotal: 357186,
+        searchFail: 11138,
+        searchOrders: 27531,
+        totalSales: 649,       // 백만원
+        searchSales: 216,      // 백만원
+        basketCount: 11.3
+      },
+      {
+        weekName: "10월 4주차",
+        dateRange: "10.22(목)~10.28(수)",
+        uv: 172199,
+        pv: 3611820,
+        orderCount: 12174,
+        searchTotal: 342042,
+        searchFail: 10890,
+        searchOrders: 25826,
+        totalSales: 584,       // 백만원
+        searchSales: 202,      // 백만원
+        basketCount: 11.5
+      },
+      {
+        weekName: "11월 1주차",
+        dateRange: "10.29(목)~11.01(일)",
+        uv: 365073,
+        pv: 6008275,
+        orderCount: 20281,
+        searchTotal: 526822,
+        searchFail: 14443,
+        searchOrders: 36489,
+        totalSales: 1104,      // 백만원
+        searchSales: 313,      // 백만원
+        basketCount: 11.8
+      }
+    ];
+
+    let dataset = [];
+    let selectedWeekIndex = 0;
+    let sparklineInstances = {};
+    let trendChartInstances = {};
+
+    // Load from LocalStorage or use Default
+    function initData() {
+      const stored = localStorage.getItem('zeta_weekly_metrics_data');
+      if (stored) {
+        try {
+          dataset = JSON.parse(stored);
+        } catch (e) {
+          dataset = [...DEFAULT_DATA];
+        }
+      } else {
+        dataset = [...DEFAULT_DATA];
+      }
+      selectedWeekIndex = dataset.length - 1; // Default to latest week
+    }
+
+    function saveData() {
+      localStorage.setItem('zeta_weekly_metrics_data', JSON.stringify(dataset));
+    }
+
+    function resetToDefaultData() {
+      if (confirm('샘플 데이터(10월 3주차 ~ 11월 1주차)로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        saveData();
+        selectedWeekIndex = dataset.length - 1;
+        renderAll();
+        showToast('초기 데이터로 재설정되었습니다.');
+      }
+    }
+
+    /* ============================================================
+       2. METRIC HELPERS & CALCULATIONS
+    ============================================================ */
+    function calcDerived(item) {
+      const uv = Number(item.uv) || 1;
+      const pv = Number(item.pv) || 0;
+      const orderCount = Number(item.orderCount) || 0;
+      const searchTotal = Number(item.searchTotal) || 1;
+      const searchFail = Number(item.searchFail) || 0;
+      const searchSales = Number(item.searchSales) || 0;
+      const totalSales = Number(item.totalSales) || 1;
+
+      return {
+        uvPerPv: (pv / uv).toFixed(1),
+        cvr: ((orderCount / uv) * 100).toFixed(1),
+        searchFailRate: ((searchFail / searchTotal) * 100).toFixed(1),
+        searchRevenueShare: ((searchSales / totalSales) * 100).toFixed(1),
+        searchOrderShare: ((item.searchOrders / orderCount) * 100).toFixed(1)
+      };
+    }
+
+    function formatNumber(num) {
+      if (num === null || num === undefined || isNaN(num)) return '-';
+      return Math.round(num).toLocaleString('ko-KR');
+    }
+
+    function formatDecimal(num, decimals = 1) {
+      if (num === null || num === undefined || isNaN(num)) return '-';
+      return Number(num).toFixed(decimals);
+    }
+
+    // Format Korean verbal amounts: 365,073 -> "36.5만", 6,008,275 -> "601만"
+    function formatKoreanMan(num) {
+      if (num >= 100000000) {
+        return (num / 100000000).toFixed(1) + '억';
+      }
+      if (num >= 10000) {
+        return (num / 10000).toFixed(1) + '만';
+      }
+      return num.toLocaleString();
+    }
+
+    /* ============================================================
+       3. UI RENDERING ENGINES
+    ============================================================ */
+    function renderWeekSelector() {
+      const selector = document.getElementById('weekSelector');
+      selector.innerHTML = '';
+      dataset.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${item.weekName} (${item.dateRange})`;
+        if (idx === selectedWeekIndex) opt.selected = true;
+        selector.appendChild(opt);
+      });
+    }
+
+    function onSelectWeek(val) {
+      selectedWeekIndex = parseInt(val, 10);
+      renderAll();
+    }
+
+    function renderExecutiveBriefing(current, prev) {
+      const curDerived = calcDerived(current);
+      const prevDerived = prev ? calcDerived(prev) : null;
+
+      document.getElementById('briefingDateBadge').textContent = `기준일: ${current.dateRange}`;
+
+      if (!prev) {
+        document.getElementById('verbalScriptText').innerHTML = 
+          `<strong>[${current.weekName} 브리핑]</strong> 일평균 UV <strong>${formatKoreanMan(current.uv)}</strong>, PV <strong>${formatKoreanMan(current.pv)}</strong>, 구매전환율 <strong>${curDerived.cvr}%</strong>, 검색 실패율 <strong>${curDerived.searchFailRate}%</strong>를 기록했습니다. (비교 가능한 전주 데이터 없음)`;
+        return;
+      }
+
+      // Calculations for WoW
+      const uvDiffPct = (((current.uv - prev.uv) / prev.uv) * 100).toFixed(1);
+      const pvDiffPct = (((current.pv - prev.pv) / prev.pv) * 100).toFixed(1);
+      const cvrDiff = (parseFloat(curDerived.cvr) - parseFloat(prevDerived.cvr)).toFixed(1);
+      const failDiff = (parseFloat(curDerived.searchFailRate) - parseFloat(prevDerived.searchFailRate)).toFixed(1);
+      const salesDiffPct = (((current.totalSales - prev.totalSales) / prev.totalSales) * 100).toFixed(1);
+      const basketDiff = (parseFloat(current.basketCount) - parseFloat(prev.basketCount)).toFixed(1);
+
+      const uvIcon = uvDiffPct >= 0 ? '▲' : '▼';
+      const pvIcon = pvDiffPct >= 0 ? '▲' : '▼';
+      const cvrIcon = cvrDiff >= 0 ? '▲' : '▼';
+      const failIcon = failDiff <= 0 ? '▼' : '▲'; // for failure rate, down is improvement
+      const salesIcon = salesDiffPct >= 0 ? '▲' : '▼';
+
+      const script = `"${current.weekName} 실적 보고드리겠습니다. 
+일평균 UV <strong>${formatKoreanMan(current.uv)}</strong> (WoW ${uvIcon}${Math.abs(uvDiffPct)}%), PV <strong>${formatKoreanMan(current.pv)}</strong> (WoW ${pvIcon}${Math.abs(pvDiffPct)}%)로 대규모 트래픽이 유입되었으며, 전체 주문금액은 일평균 <strong>${(current.totalSales/100).toFixed(1)}억원</strong> (WoW ${salesIcon}${Math.abs(salesDiffPct)}%)을 달성했습니다.
+탐색 측면에서 UV당 PV는 <strong>${curDerived.uvPerPv}건</strong>, 구매전환율은 <strong>${curDerived.cvr}%</strong> (WoW ${cvrIcon}${Math.abs(cvrDiff)}%p)를 기록했습니다. 
+아울러 검색 실패율은 <strong>${curDerived.searchFailRate}%</strong> (WoW ${failIcon}${Math.abs(failDiff)}%p 개선)로 우수한 탐색 품질을 유지하고 있으며, 건당 구매수량은 <strong>${current.basketCount}개</strong> (WoW ▲${Math.abs(basketDiff)}개)로 지속 상승 흐름에 있습니다."`;
+
+      document.getElementById('verbalScriptText').innerHTML = script;
+    }
+
+    function renderKpiCards(current, prev) {
+      const curDerived = calcDerived(current);
+      const prevDerived = prev ? calcDerived(prev) : null;
+
+      // 1. UV
+      document.getElementById('card-uv-val').textContent = formatKoreanMan(current.uv);
+      document.getElementById('card-uv-extra').textContent = `${curDerived.uvPerPv}건`;
+      if (prev) {
+        const uvPct = (((current.uv - prev.uv) / prev.uv) * 100).toFixed(1);
+        const isUp = uvPct >= 0;
+        document.getElementById('card-uv-wow').innerHTML = `
+          <span class="${isUp ? 'text-red-600' : 'text-blue-600'}">
+            ${isUp ? '▲' : '▼'} ${Math.abs(uvPct)}%
+          </span>
+          <span class="text-slate-400 font-normal">전주대비</span>
+        `;
+      } else {
+        document.getElementById('card-uv-wow').textContent = '전주 데이터 없음';
+      }
+
+      // 2. PV
+      document.getElementById('card-pv-val').textContent = formatKoreanMan(current.pv);
+      document.getElementById('card-pv-extra').textContent = prev ? `${formatKoreanMan(prev.pv)}` : '-';
+      if (prev) {
+        const pvPct = (((current.pv - prev.pv) / prev.pv) * 100).toFixed(1);
+        const isUp = pvPct >= 0;
+        document.getElementById('card-pv-wow').innerHTML = `
+          <span class="${isUp ? 'text-red-600' : 'text-blue-600'}">
+            ${isUp ? '▲' : '▼'} ${Math.abs(pvPct)}%
+          </span>
+          <span class="text-slate-400 font-normal">전주대비</span>
+        `;
+      } else {
+        document.getElementById('card-pv-wow').textContent = '전주 데이터 없음';
+      }
+
+      // 3. CVR
+      document.getElementById('card-cvr-val').textContent = curDerived.cvr;
+      document.getElementById('card-cvr-extra').textContent = `${formatNumber(current.orderCount)}건`;
+      if (prev) {
+        const cvrDiff = (parseFloat(curDerived.cvr) - parseFloat(prevDerived.cvr)).toFixed(1);
+        const isUp = cvrDiff >= 0;
+        document.getElementById('card-cvr-wow').innerHTML = `
+          <span class="${isUp ? 'text-red-600' : 'text-blue-600'}">
+            ${isUp ? '▲' : '▼'} ${Math.abs(cvrDiff)}%p
+          </span>
+          <span class="text-slate-400 font-normal">전주대비</span>
+        `;
+        const badge = document.getElementById('badge-cvr');
+        if (parseFloat(curDerived.cvr) >= 5.0) {
+          badge.textContent = '목표 달성';
+          badge.className = 'px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200';
+        } else {
+          badge.textContent = '모니터링';
+          badge.className = 'px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-amber-50 text-amber-700 border border-amber-200';
+        }
+      }
+
+      // 4. 검색 실패율
+      document.getElementById('card-search-val').textContent = curDerived.searchFailRate;
+      document.getElementById('card-search-extra').textContent = `${formatKoreanMan(current.searchTotal)}건`;
+      if (prev) {
+        const failDiff = (parseFloat(curDerived.searchFailRate) - parseFloat(prevDerived.searchFailRate)).toFixed(1);
+        const isGood = failDiff <= 0; // lower is better
+        document.getElementById('card-search-wow').innerHTML = `
+          <span class="${isGood ? 'text-emerald-600' : 'text-red-600'}">
+            ${failDiff <= 0 ? '▼' : '▲'} ${Math.abs(failDiff)}%p
+          </span>
+          <span class="text-slate-400 font-normal">${isGood ? '품질 개선' : '주의'}</span>
+        `;
+        const sBadge = document.getElementById('badge-search');
+        if (isGood) {
+          sBadge.textContent = '품질 개선';
+          sBadge.className = 'px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200';
+        } else {
+          sBadge.textContent = '원인 분석요망';
+          sBadge.className = 'px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-rose-50 text-rose-700 border border-rose-200';
+        }
+      }
+
+      // 5. 전체 주문금액
+      const salesInEok = (current.totalSales / 100).toFixed(1);
+      document.getElementById('card-rev-val').textContent = salesInEok;
+      document.getElementById('card-rev-extra').textContent = `${current.basketCount}개`;
+      if (prev) {
+        const revPct = (((current.totalSales - prev.totalSales) / prev.totalSales) * 100).toFixed(1);
+        const isUp = revPct >= 0;
+        document.getElementById('card-rev-wow').innerHTML = `
+          <span class="${isUp ? 'text-red-600' : 'text-blue-600'}">
+            ${isUp ? '▲' : '▼'} ${Math.abs(revPct)}%
+          </span>
+          <span class="text-slate-400 font-normal">전주대비</span>
+        `;
+      }
+
+      renderSparklines();
+    }
+
+    function renderSparklines() {
+      // Build small sparklines for all dataset items up to selectedWeekIndex
+      const sliceData = dataset.slice(0, selectedWeekIndex + 1);
+      const labels = sliceData.map(d => d.weekName);
+
+      const configs = [
+        { id: 'sparkline-uv', data: sliceData.map(d => d.uv), color: '#3b82f6' },
+        { id: 'sparkline-pv', data: sliceData.map(d => d.pv), color: '#6366f1' },
+        { id: 'sparkline-cvr', data: sliceData.map(d => calcDerived(d).cvr), color: '#10b981' },
+        { id: 'sparkline-search', data: sliceData.map(d => calcDerived(d).searchFailRate), color: '#f59e0b' },
+        { id: 'sparkline-rev', data: sliceData.map(d => d.totalSales), color: '#ec4899' },
+      ];
+
+      configs.forEach(cfg => {
+        if (sparklineInstances[cfg.id]) {
+          sparklineInstances[cfg.id].destroy();
+        }
+        const ctx = document.getElementById(cfg.id);
+        if (!ctx) return;
+        
+        sparklineInstances[cfg.id] = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: cfg.data,
+              borderColor: cfg.color,
+              borderWidth: 2,
+              pointRadius: 2,
+              pointBackgroundColor: cfg.color,
+              tension: 0.35,
+              fill: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: {
+              x: { display: false },
+              y: { display: false }
+            }
+          }
+        });
+      });
+    }
+
+    /* ============================================================
+       4. COMPARISON MATRIX TABLE (LAST 3 WEEKS VIEW)
+    ============================================================ */
+    function renderComparisonTable() {
+      const tbody = document.getElementById('comparisonTableBody');
+      tbody.innerHTML = '';
+
+      // Determine 3 weeks window ending at selectedWeekIndex
+      const end = selectedWeekIndex;
+      const start = Math.max(0, end - 2);
+      const weeksWindow = dataset.slice(start, end + 1);
+
+      // Pad headers if less than 3
+      const th1 = document.getElementById('th-week-1');
+      const th2 = document.getElementById('th-week-2');
+      const th3 = document.getElementById('th-week-3');
+
+      const col0 = weeksWindow[0] || null;
+      const col1 = weeksWindow.length >= 2 ? weeksWindow[weeksWindow.length - 2] : null;
+      const col2 = weeksWindow[weeksWindow.length - 1]; // Current selected
+
+      th1.textContent = col0 ? `${col0.weekName}` : '-';
+      th2.textContent = col1 ? `${col1.weekName}` : '-';
+      th3.textContent = `${col2.weekName} (당주)`;
+
+      // Row definitions
+      const rows = [
+        {
+          group: '트래픽',
+          name: '일평균 UV',
+          extract: d => d.uv,
+          fmt: v => formatNumber(v),
+          type: 'pct'
+        },
+        {
+          group: '트래픽',
+          name: '일평균 PV',
+          extract: d => d.pv,
+          fmt: v => formatNumber(v),
+          type: 'pct'
+        },
+        {
+          group: '트래픽',
+          name: 'UV 당 PV',
+          extract: d => parseFloat(calcDerived(d).uvPerPv),
+          fmt: v => `${formatDecimal(v, 1)}건`,
+          type: 'diff'
+        },
+        {
+          group: '구매전환',
+          name: '주문건수',
+          extract: d => d.orderCount,
+          fmt: v => `${formatNumber(v)}건`,
+          type: 'pct'
+        },
+        {
+          group: '구매전환',
+          name: '구매전환율 (%)',
+          extract: d => parseFloat(calcDerived(d).cvr),
+          fmt: v => `${formatDecimal(v, 1)}%`,
+          type: 'diff_p'
+        },
+        {
+          group: '검색',
+          name: '전체 검색수',
+          extract: d => d.searchTotal,
+          fmt: v => formatNumber(v),
+          type: 'pct'
+        },
+        {
+          group: '검색',
+          name: '검색 실패수',
+          extract: d => d.searchFail,
+          fmt: v => formatNumber(v),
+          type: 'pct'
+        },
+        {
+          group: '검색',
+          name: '검색실패율 (%)',
+          extract: d => parseFloat(calcDerived(d).searchFailRate),
+          fmt: v => `${formatDecimal(v, 1)}%`,
+          type: 'diff_p_reverse' // lower is green
+        },
+        {
+          group: '검색',
+          name: '검색구매비중 (%)',
+          extract: d => parseFloat(calcDerived(d).searchRevenueShare),
+          fmt: v => `${formatDecimal(v, 1)}%`,
+          type: 'diff_p'
+        },
+        {
+          group: '매출/바스켓',
+          name: '전체주문금액(백만)',
+          extract: d => d.totalSales,
+          fmt: v => `${formatNumber(v)}백만`,
+          type: 'pct'
+        },
+        {
+          group: '매출/바스켓',
+          name: '건당수량 (바스켓)',
+          extract: d => parseFloat(d.basketCount),
+          fmt: v => `${formatDecimal(v, 1)}개`,
+          type: 'diff'
+        }
+      ];
+
+      // Track group rowspan
+      let lastGroup = '';
+
+      rows.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition-colors";
+
+        const val0 = col0 ? r.extract(col0) : null;
+        const val1 = col1 ? r.extract(col1) : null;
+        const val2 = r.extract(col2);
+
+        // WoW difference
+        let wowHtml = '-';
+        if (col1 && val1 !== null && val1 !== 0) {
+          if (r.type === 'pct') {
+            const diffPct = (((val2 - val1) / val1) * 100).toFixed(1);
+            const isUp = diffPct >= 0;
+            wowHtml = `<span class="font-bold ${isUp ? 'text-red-600' : 'text-blue-600'}">${isUp ? '▲' : '▼'} ${Math.abs(diffPct)}%</span>`;
+          } else if (r.type === 'diff_p' || r.type === 'diff_p_reverse') {
+            const diffP = (val2 - val1).toFixed(1);
+            const isUp = diffP >= 0;
+            let color = isUp ? 'text-red-600' : 'text-blue-600';
+            if (r.type === 'diff_p_reverse') {
+              color = isUp ? 'text-red-600' : 'text-emerald-600';
+            }
+            wowHtml = `<span class="font-bold ${color}">${isUp ? '▲' : '▼'} ${Math.abs(diffP)}%p</span>`;
+          } else {
+            const diff = (val2 - val1).toFixed(1);
+            const isUp = diff >= 0;
+            wowHtml = `<span class="font-bold ${isUp ? 'text-red-600' : 'text-blue-600'}">${isUp ? '▲' : '▼'} ${Math.abs(diff)}</span>`;
+          }
+        }
+
+        // Mini sparkline SVG
+        const sparkSvg = createInlineSvgSpark([val0, val1, val2]);
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-semibold text-slate-500 bg-slate-50/50">${r.group}</td>
+          <td class="py-3 px-4 font-medium text-slate-900">${r.name}</td>
+          <td class="py-3 px-4 text-right text-slate-600 font-mono">${val0 !== null ? r.fmt(val0) : '-'}</td>
+          <td class="py-3 px-4 text-right text-slate-600 font-mono">${val1 !== null ? r.fmt(val1) : '-'}</td>
+          <td class="py-3 px-4 text-right font-bold font-mono text-slate-900 bg-blue-50/40">${r.fmt(val2)}</td>
+          <td class="py-3 px-4 text-right">${wowHtml}</td>
+          <td class="py-3 px-4 text-center">${sparkSvg}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function createInlineSvgSpark(values) {
+      const valid = values.filter(v => v !== null && !isNaN(v));
+      if (valid.length < 2) return '<span class="text-slate-300">-</span>';
+      
+      const min = Math.min(...valid);
+      const max = Math.max(...valid);
+      const range = max - min || 1;
+      const width = 60;
+      const height = 18;
+
+      const points = valid.map((v, i) => {
+        const x = (i / (valid.length - 1)) * (width - 8) + 4;
+        const y = height - ((v - min) / range) * (height - 6) - 3;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      return `
+        <svg width="${width}" height="${height}" class="inline-block overflow-visible">
+          <polyline fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
+          <circle cx="${points.split(' ').pop().split(',')[0]}" cy="${points.split(' ').pop().split(',')[1]}" r="2.5" fill="#1d4ed8" />
+        </svg>
+      `;
+    }
+
+    /* ============================================================
+       5. DEEP CHARTS (TAB 2)
+    ============================================================ */
+    function renderTrendCharts() {
+      const labels = dataset.map(d => d.weekName);
+
+      // Chart 1: Traffic (UV & PV)
+      if (trendChartInstances['traffic']) trendChartInstances['traffic'].destroy();
+      const ctxTraffic = document.getElementById('chart-traffic').getContext('2d');
+      trendChartInstances['traffic'] = new Chart(ctxTraffic, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'line',
+              label: 'UV당 PV (건)',
+              data: dataset.map(d => calcDerived(d).uvPerPv),
+              borderColor: '#f59e0b',
+              backgroundColor: '#f59e0b',
+              yAxisID: 'y1',
+              tension: 0.2,
+              borderWidth: 2
+            },
+            {
+              type: 'bar',
+              label: '일평균 UV (명)',
+              data: dataset.map(d => d.uv),
+              backgroundColor: 'rgba(59, 130, 246, 0.8)',
+              borderRadius: 6,
+              yAxisID: 'y'
+            },
+            {
+              type: 'bar',
+              label: '일평균 PV (건)',
+              data: dataset.map(d => d.pv),
+              backgroundColor: 'rgba(99, 102, 241, 0.4)',
+              borderRadius: 6,
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: { position: 'left', grid: { color: '#f1f5f9' }, title: { display: true, text: '건 / 명' } },
+            y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'UV당 PV' } }
+          }
+        }
+      });
+
+      // Chart 2: Sales & Orders
+      if (trendChartInstances['sales']) trendChartInstances['sales'].destroy();
+      const ctxSales = document.getElementById('chart-sales').getContext('2d');
+      trendChartInstances['sales'] = new Chart(ctxSales, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: '전체 주문금액 (백만원)',
+              data: dataset.map(d => d.totalSales),
+              borderColor: '#ec4899',
+              backgroundColor: 'rgba(236, 72, 153, 0.1)',
+              fill: true,
+              tension: 0.3,
+              borderWidth: 2.5,
+              yAxisID: 'y'
+            },
+            {
+              label: '주문건수 (건)',
+              data: dataset.map(d => d.orderCount),
+              borderColor: '#3b82f6',
+              backgroundColor: 'transparent',
+              borderDash: [4, 4],
+              tension: 0.3,
+              borderWidth: 2,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: { position: 'left', grid: { color: '#f1f5f9' }, title: { display: true, text: '주문금액(백만)' } },
+            y1: { position: 'right', grid: { display: false }, title: { display: true, text: '주문건수' } }
+          }
+        }
+      });
+
+      // Chart 3: Search Health
+      if (trendChartInstances['search']) trendChartInstances['search'].destroy();
+      const ctxSearch = document.getElementById('chart-search').getContext('2d');
+      trendChartInstances['search'] = new Chart(ctxSearch, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'line',
+              label: '검색 실패율 (%)',
+              data: dataset.map(d => calcDerived(d).searchFailRate),
+              borderColor: '#ef4444',
+              backgroundColor: '#ef4444',
+              yAxisID: 'y1',
+              borderWidth: 2.5
+            },
+            {
+              type: 'line',
+              label: '검색 구매비중 (%)',
+              data: dataset.map(d => calcDerived(d).searchRevenueShare),
+              borderColor: '#10b981',
+              backgroundColor: '#10b981',
+              yAxisID: 'y1',
+              borderWidth: 2
+            },
+            {
+              type: 'bar',
+              label: '전체 검색수',
+              data: dataset.map(d => d.searchTotal),
+              backgroundColor: '#cbd5e1',
+              borderRadius: 6,
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: { position: 'left', grid: { color: '#f1f5f9' }, title: { display: true, text: '검색 볼륨' } },
+            y1: { position: 'right', grid: { display: false }, title: { display: true, text: '비율 (%)' } }
+          }
+        }
+      });
+    }
+
+    /* ============================================================
+       6. COMPLETE TABLE VIEW (TAB 3)
+    ============================================================ */
+    function renderAllDataTable() {
+      const tbody = document.getElementById('allDataTableBody');
+      tbody.innerHTML = '';
+
+      dataset.forEach((d, idx) => {
+        const derived = calcDerived(d);
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-slate-800">${d.weekName}</td>
+          <td class="py-2.5 px-3 text-slate-500">${d.dateRange}</td>
+          <td class="py-2.5 px-3 text-right font-mono">${formatNumber(d.uv)}</td>
+          <td class="py-2.5 px-3 text-right font-mono">${formatNumber(d.pv)}</td>
+          <td class="py-2.5 px-3 text-right font-mono text-brand-600 font-semibold">${derived.uvPerPv}</td>
+          <td class="py-2.5 px-3 text-right font-mono">${formatNumber(d.orderCount)}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-semibold">${derived.cvr}%</td>
+          <td class="py-2.5 px-3 text-right font-mono">${formatNumber(d.searchTotal)}</td>
+          <td class="py-2.5 px-3 text-right font-mono">${formatNumber(d.searchFail)}</td>
+          <td class="py-2.5 px-3 text-right font-mono text-amber-600 font-semibold">${derived.searchFailRate}%</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold">${formatNumber(d.totalSales)}</td>
+          <td class="py-2.5 px-3 text-right font-mono">${d.basketCount}</td>
+          <td class="py-2.5 px-3 text-center space-x-1 whitespace-nowrap">
+            <button onclick="editWeek(${idx})" class="text-brand-600 hover:text-brand-800 p-1 rounded hover:bg-brand-50" title="수정">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button onclick="deleteWeek(${idx})" class="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50" title="삭제">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ============================================================
+       7. TAB & MODAL CONTROLS
+    ============================================================ */
+    function switchTab(tabId) {
+      ['summary', 'trends', 'table'].forEach(t => {
+        const content = document.getElementById(`content-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tabId) {
+          content.classList.remove('hidden');
+          btn.className = 'tab-btn py-3 border-b-2 border-brand-600 text-brand-600 flex items-center space-x-1.5 font-bold';
+        } else {
+          content.classList.add('hidden');
+          btn.className = 'tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 font-medium';
+        }
+      });
+
+      if (tabId === 'trends') {
+        setTimeout(renderTrendCharts, 50);
+      }
+    }
+
+    function openDataModal(index = -1) {
+      const modal = document.getElementById('dataModal');
+      const form = document.getElementById('metricForm');
+      form.reset();
+
+      if (index >= 0) {
+        document.getElementById('modalTitle').textContent = `[${dataset[index].weekName}] 데이터 수정`;
+        document.getElementById('editIndex').value = index;
+        const d = dataset[index];
+        document.getElementById('inputWeekName').value = d.weekName;
+        document.getElementById('inputDateRange').value = d.dateRange;
+        document.getElementById('inputUV').value = d.uv;
+        document.getElementById('inputPV').value = d.pv;
+        document.getElementById('inputOrderCount').value = d.orderCount;
+        document.getElementById('inputSearchTotal').value = d.searchTotal;
+        document.getElementById('inputSearchFail').value = d.searchFail;
+        document.getElementById('inputSearchOrders').value = d.searchOrders;
+        document.getElementById('inputTotalSales').value = d.totalSales;
+        document.getElementById('inputSearchSales').value = d.searchSales || '';
+        document.getElementById('inputBasketCount').value = d.basketCount;
+      } else {
+        document.getElementById('modalTitle').textContent = '새 주차 지표 데이터 추가';
+        document.getElementById('editIndex').value = -1;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeDataModal() {
+      document.getElementById('dataModal').classList.add('hidden');
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const editIdx = parseInt(document.getElementById('editIndex').value, 10);
+
+      const newItem = {
+        weekName: document.getElementById('inputWeekName').value.trim(),
+        dateRange: document.getElementById('inputDateRange').value.trim(),
+        uv: parseFloat(document.getElementById('inputUV').value),
+        pv: parseFloat(document.getElementById('inputPV').value),
+        orderCount: parseFloat(document.getElementById('inputOrderCount').value),
+        searchTotal: parseFloat(document.getElementById('inputSearchTotal').value),
+        searchFail: parseFloat(document.getElementById('inputSearchFail').value),
+        searchOrders: parseFloat(document.getElementById('inputSearchOrders').value),
+        totalSales: parseFloat(document.getElementById('inputTotalSales').value),
+        searchSales: parseFloat(document.getElementById('inputSearchSales').value) || (parseFloat(document.getElementById('inputTotalSales').value) * 0.3),
+        basketCount: parseFloat(document.getElementById('inputBasketCount').value)
+      };
+
+      if (editIdx >= 0) {
+        dataset[editIdx] = newItem;
+        showToast('데이터가 성공적으로 수정되었습니다.');
+      } else {
+        dataset.push(newItem);
+        selectedWeekIndex = dataset.length - 1;
+        showToast('새 주차 데이터가 추가되었습니다.');
+      }
+
+      saveData();
+      closeDataModal();
+      renderAll();
+    }
+
+    function editWeek(idx) {
+      openDataModal(idx);
+    }
+
+    function deleteWeek(idx) {
+      if (dataset.length <= 1) {
+        alert('최소 1개 이상의 주차 데이터가 존재해야 합니다.');
+        return;
+      }
+      if (confirm(`'${dataset[idx].weekName}' 데이터를 정말 삭제하시겠습니까?`)) {
+        dataset.splice(idx, 1);
+        if (selectedWeekIndex >= dataset.length) {
+          selectedWeekIndex = dataset.length - 1;
+        }
+        saveData();
+        renderAll();
+        showToast('데이터가 삭제되었습니다.');
+      }
+    }
+
+    /* ============================================================
+       8. UTILITIES (COPY SCRIPT, EXPORT CSV, TOAST)
+    ============================================================ */
+    function copyScript() {
+      const scriptEl = document.getElementById('verbalScriptText');
+      const textToCopy = scriptEl.innerText || scriptEl.textContent;
+
+      const textarea = document.createElement('textarea');
+      textarea.value = textToCopy;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        const btnText = document.getElementById('copyBtnText');
+        btnText.textContent = '복사 완료!';
+        showToast('구두 발표 스크립트가 클립보드에 복사되었습니다.');
+        setTimeout(() => {
+          btnText.textContent = '구두보고 복사';
+        }, 2000);
+      } catch (err) {
+        showToast('복사에 실패했습니다. 직접 복사해주세요.');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function exportToCSV() {
+      let csv = "\uFEFF주차,기간,일평균UV,일평균PV,UV당PV,주문건수,구매전환율(%),검색수,검색실패수,검색실패율(%),주문금액(백만),건당수량\n";
+      dataset.forEach(d => {
+        const dr = calcDerived(d);
+        csv += `"${d.weekName}","${d.dateRange}",${d.uv},${d.pv},${dr.uvPerPv},${d.orderCount},${dr.cvr},${d.searchTotal},${d.searchFail},${dr.searchFailRate},${d.totalSales},${d.basketCount}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `제타_주요지표_주간리뷰_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('CSV 파일이 다운로드되었습니다.');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastMessage');
+      const text = document.getElementById('toastText');
+      text.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-2');
+      }, 2500);
+    }
+
+    /* ============================================================
+       9. MASTER RENDER CONTROLLER
+    ============================================================ */
+    function renderAll() {
+      if (!dataset.length) return;
+      
+      const current = dataset[selectedWeekIndex];
+      const prev = selectedWeekIndex > 0 ? dataset[selectedWeekIndex - 1] : null;
+
+      renderWeekSelector();
+      renderExecutiveBriefing(current, prev);
+      renderKpiCards(current, prev);
+      renderComparisonTable();
+      renderAllDataTable();
+    }
+
+    window.onload = function() {
+      initData();
+      renderAll();
+    };
+  </script>
+</body>
+</html>
