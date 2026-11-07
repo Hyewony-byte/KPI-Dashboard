@@ -29,23 +29,26 @@
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2">
         <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
           <span class="text-xs font-medium text-slate-500">리뷰 주차:</span>
           <select id="weekSelector" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
           </select>
         </div>
 
-        <button id="viewRawCaptureBtn" class="hidden items-center space-x-1 px-3 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 text-xs font-semibold rounded-lg border border-amber-200 transition">
-          <span>📷 주요지표 원본 표 보기</span>
+        <!-- 1. 주요 KPI 수치 등록 버튼 -->
+        <button onclick="openKpiModal()" class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+          <span>+ 주요 KPI 등록</span>
         </button>
 
-        <button onclick="openDataModal()" class="flex items-center space-x-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
-          <span>+ 주간 데이터 추가/관리</span>
+        <!-- 2. 배너 효율 캡처 업로드 버튼 -->
+        <button onclick="openBannerModal()" class="flex items-center space-x-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+          <span>🖼️ 배너 캡처 등록</span>
         </button>
 
-        <button onclick="forceResetData()" title="데이터 초기화" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition">
-          ↺ 초기화
+        <!-- 3. 주차 목록 관리 버튼 -->
+        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리 및 삭제">
+          ⚙️
         </button>
 
         <button onclick="window.print()" class="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-200 transition">
@@ -64,6 +67,18 @@
       <button id="tabBtn-banner" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('banner')">메인 배너구좌별 효율</button>
       <button id="tabBtn-trends" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('trends')">트렌드 심층 분석</button>
       <button id="tabBtn-table" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('table')">전체 지표 비교표</button>
+    </div>
+
+    <!-- 데이터 없을 때 안내 화면 (Empty State) -->
+    <div id="emptyState" class="hidden bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
+      <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📊</div>
+      <div class="space-y-1">
+        <h3 class="text-base font-bold text-slate-900">등록된 주차 데이터가 없습니다</h3>
+        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 주요 KPI 등록]</strong> 버튼을 눌러 첫 번째 주간 데이터를 입력해 주세요.</p>
+      </div>
+      <button onclick="openKpiModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+        + 첫 주차 데이터 입력하기
+      </button>
     </div>
 
     <!-- 탭 1: 요약 대시보드 -->
@@ -95,7 +110,7 @@
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
             <h2 class="text-base font-bold text-slate-900">최근 3개 주차 지표 상세 현황</h2>
-            <p class="text-xs text-slate-500 mt-0.5">전주 대비(WoW) 증감률 및 3주 연속 추이 분석</p>
+            <p class="text-xs text-slate-500 mt-0.5">전주 대비(WoW) 증감률 및 주차별 연속 추이</p>
           </div>
           <span class="text-xs text-slate-400">일평균 집계 기준</span>
         </div>
@@ -121,68 +136,29 @@
 
     <!-- 탭 2: 메인 배너구좌별 효율 -->
     <div id="tab-banner" class="space-y-6 hidden">
-
-      <!-- 배너 구좌 총괄 KPI 카드 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="bannerKpiContainer">
-      </div>
-
-      <!-- 이번 주 업로드된 메인배너 효율 캡처 표 원본 뷰어 -->
       <div id="bannerCaptureViewBox" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-        <div class="flex items-center justify-between mb-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
           <div>
-            <h3 class="text-base font-bold text-slate-900" id="bannerCaptureViewTitle">이번 주 메인배너 효율 분석 표</h3>
-            <p class="text-xs text-slate-500 mt-0.5">등록된 메인배너 구좌별 실적 원본 캡처</p>
+            <h3 class="text-base font-bold text-slate-900" id="bannerCaptureViewTitle">메인배너 효율 분석 표 캡처</h3>
+            <p class="text-xs text-slate-500 mt-0.5">해당 주차에 등록된 배너 실적 캡처 이미지</p>
           </div>
-          <span class="text-xs px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded font-medium">구좌별 실적 대조</span>
+          <div class="flex items-center space-x-2">
+            <div id="bannerImgTabButtons" class="flex flex-wrap items-center gap-1.5"></div>
+            <button onclick="openBannerModal()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+              + 캡처 추가/변경
+            </button>
+          </div>
         </div>
-        <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-2 overflow-auto max-h-[600px] flex items-center justify-center">
-          <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded">
-          <p id="noBannerImgText" class="text-xs text-slate-400 py-12 hidden">해당 주차에 등록된 메인배너 효율 캡처 이미지가 없습니다. 상단 [+ 주간 데이터 추가/관리]에서 이미지를 등록해주세요.</p>
+        <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-3 overflow-auto max-h-[700px] flex items-center justify-center min-h-[200px]">
+          <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
+          <div id="noBannerImgText" class="text-center py-10 space-y-2">
+            <p class="text-xs text-slate-500">선택된 주차에 등록된 메인배너 효율 캡처 이미지가 없습니다.</p>
+            <button onclick="openBannerModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+              🖼️ 지금 배너 캡처 이미지 올리기
+            </button>
+          </div>
         </div>
       </div>
-
-      <!-- 구좌별 비교 차트 -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="text-base font-bold text-slate-900" id="bannerChartTitle">메인 롤링배너 구좌별(1번~6번) 클릭수 vs 기획전 주문금액</h3>
-            <p class="text-xs text-slate-500 mt-0.5">상위 구좌 트래픽 및 매출 집중도 현황</p>
-          </div>
-          <span class="text-xs text-slate-400">단위: 클릭수(건), 주문금액(만원)</span>
-        </div>
-        <div class="h-64">
-          <canvas id="chartBannerSlot"></canvas>
-        </div>
-      </div>
-
-      <!-- 상세 테이블 -->
-      <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-          <div>
-            <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">메인 롤링 배너 구좌별 상세 실적</h3>
-            <p class="text-xs text-slate-500 mt-0.5">구좌별 노출수, 클릭률(CTR), 기획전 주문 및 전환율(CVR)</p>
-          </div>
-          <span class="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded font-medium">메인 최상단 구좌</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-slate-100/70 border-b border-slate-200 text-slate-700 font-semibold">
-                <th class="py-3 px-4">구좌 및 배너명</th>
-                <th class="py-3 px-4 text-right">배너 노출</th>
-                <th class="py-3 px-4 text-right">배너 클릭</th>
-                <th class="py-3 px-4 text-right">클릭률(CTR)</th>
-                <th class="py-3 px-4 text-right">기획전 주문수</th>
-                <th class="py-3 px-4 text-right">기획전 주문금액</th>
-                <th class="py-3 px-4 text-right">기획전 전환율</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100" id="mainBannerTableBody">
-            </tbody>
-          </table>
-        </div>
-      </section>
-
     </div>
 
     <!-- 탭 3: 트렌드 심층 분석 차트 -->
@@ -211,7 +187,7 @@
     <div id="tab-table" class="space-y-6 hidden">
       <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="text-base font-bold text-slate-900">누적 주차별 전체 원본 지표 매트릭스</h3>
+          <h3 class="text-base font-bold text-slate-900">누적 주차별 전체 지표 매트릭스</h3>
           <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 font-medium rounded-lg text-slate-700 transition">CSV 다운로드</button>
         </div>
         <div class="overflow-x-auto">
@@ -223,239 +199,168 @@
 
   </main>
 
-  <!-- 데이터 입력 모달 (상단: 주요지표 캡처 / 하단: 메인배너 캡처 완벽 탑재) -->
-  <div id="dataModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
+  <!-- [모달 1] 주요 KPI 수치 입력 전용 모달 -->
+  <div id="kpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
-          <h3 class="text-base font-bold text-slate-900">새 주차 지표 데이터 추가</h3>
-          <p class="text-xs text-slate-500 mt-0.5">주요지표 수치를 입력하고 메인배너 효율 표 이미지를 첨부합니다.</p>
+          <h3 class="text-base font-bold text-slate-900">주간 주요 KPI 수치 등록</h3>
+          <p class="text-xs text-slate-500 mt-0.5">해당 주차의 일평균 실적 지표를 입력합니다.</p>
         </div>
-        <button onclick="closeDataModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+        <button onclick="closeKpiModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
 
-      <div class="p-6 overflow-y-auto space-y-5">
-        <!-- 상단: 주요지표 표 캡처 첨부 -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold text-slate-800">📷 1. 주요지표 원본 표 캡처 (선택)</span>
-            <span class="text-[11px] text-slate-400">대조 확인용</span>
-          </div>
-          <div id="dropZone" class="border-2 border-dashed border-slate-300 rounded-lg p-3 text-center bg-white cursor-pointer hover:bg-slate-50 transition">
-            <input type="file" id="rawImageInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
-            <p class="text-xs font-medium text-slate-700">여기를 클릭하여 주요지표 캡처 이미지를 첨부하세요</p>
-          </div>
-          <div id="imagePreviewContainer" class="mt-2 hidden">
-            <div class="flex items-center justify-between text-xs text-slate-600 mb-1">
-              <span>주요지표 표 미리보기:</span>
-              <button type="button" onclick="clearUploadedImage()" class="text-red-500 hover:underline text-[11px]">삭제</button>
-            </div>
-            <div class="max-h-40 overflow-auto border border-slate-200 rounded-lg bg-slate-900/5 p-1">
-              <img id="imagePreview" src="" alt="주요지표 미리보기" class="w-full object-contain rounded">
-            </div>
-          </div>
-        </div>
-
-        <form id="weekDataForm" onsubmit="saveWeekData(event)" class="space-y-4">
+      <div class="p-6 overflow-y-auto space-y-4">
+        <form id="kpiDataForm" onsubmit="saveKpiData(event)" class="space-y-4">
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">주차 명칭 *</label>
-              <input type="text" id="formWeekName" required placeholder="예: 11월 2주차" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <input type="text" id="formWeekName" required placeholder="예: 11월 1주차" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">집계 기간 *</label>
-              <input type="text" id="formWeekPeriod" required placeholder="예: 11.02(월)~11.08(일)" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <input type="text" id="formWeekPeriod" required placeholder="예: 10.29~11.01" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             </div>
           </div>
 
           <div class="border border-slate-200 rounded-xl p-3.5 space-y-3 bg-slate-50/50">
-            <h4 class="text-xs font-bold text-slate-800">1. 트래픽 & 전환 지표 (일평균)</h4>
+            <h4 class="text-xs font-bold text-slate-800">1. 트래픽 & 주문 지표 (일평균)</h4>
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 UV (명)</label>
-                <input type="number" id="formUV" required placeholder="예: 365073" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formUV" required placeholder="예: 253202" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 PV (건)</label>
-                <input type="number" id="formPV" required placeholder="예: 6008275" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formPV" required placeholder="예: 4598919" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">주문건수 (건)</label>
-                <input type="number" id="formOrders" required placeholder="예: 20281" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formOrders" required placeholder="예: 15043" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
             </div>
           </div>
 
           <div class="border border-slate-200 rounded-xl p-3.5 space-y-3 bg-slate-50/50">
-            <h4 class="text-xs font-bold text-slate-800">2. 검색 품질 및 검색 주문</h4>
+            <h4 class="text-xs font-bold text-slate-800">2. 검색 품질 및 전환</h4>
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">전체 검색수</label>
-                <input type="number" id="formTotalSearch" required placeholder="예: 526822" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formTotalSearch" required placeholder="예: 412007" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 실패수</label>
-                <input type="number" id="formSearchFail" required placeholder="예: 14443" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formSearchFail" required placeholder="예: 13260" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 주문건수</label>
-                <input type="number" id="formSearchOrders" required placeholder="예: 36489" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formSearchOrders" placeholder="선택 (미입력시 추정)" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
             </div>
           </div>
 
           <div class="border border-slate-200 rounded-xl p-3.5 space-y-3 bg-slate-50/50">
-            <h4 class="text-xs font-bold text-slate-800">3. 매출 및 바스켓 지표</h4>
+            <h4 class="text-xs font-bold text-slate-800">3. 매출 및 바스켓</h4>
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">전체주문금액 (백만)</label>
-                <input type="number" id="formRevenue" required placeholder="예: 1104" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formRevenue" required placeholder="예: 790" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">검색주문금액 (백만)</label>
-                <input type="number" id="formSearchRevenue" placeholder="예: 313" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formSearchRevenue" placeholder="예: 271" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">건당수량 (개)</label>
-                <input type="number" step="0.1" id="formBasketItems" required placeholder="예: 11.8" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" step="0.1" id="formBasketItems" required placeholder="예: 10.9" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
             </div>
           </div>
 
-          <!-- 하단: 신규 추가된 메인배너 효율 캡처 업로드 영역 -->
-          <div class="bg-amber-50/50 border border-amber-200/80 rounded-xl p-3.5 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-amber-900 flex items-center space-x-1">
-                <span>🖼️ 4. 메인배너 효율 표 캡처 첨부 (선택)</span>
-              </span>
-              <span class="text-[11px] text-amber-700">배너 탭 자동 연동</span>
-            </div>
-            <div id="bannerDropZone" class="border-2 border-dashed border-amber-300 rounded-lg p-3 text-center bg-white cursor-pointer hover:bg-amber-50/40 transition">
-              <input type="file" id="bannerImageInput" accept="image/*" class="hidden" onchange="handleBannerImageSelected(event)">
-              <p class="text-xs font-medium text-slate-700">여기를 클릭하여 메인배너 효율 표 캡처 이미지를 첨부하세요</p>
-              <p class="text-[11px] text-slate-400 mt-0.5">등록 시 '메인 배너구좌별 효율' 탭에 해당 표가 자동 반영됩니다</p>
-            </div>
-            <div id="bannerPreviewContainer" class="mt-2 hidden">
-              <div class="flex items-center justify-between text-xs text-slate-600 mb-1">
-                <span>메인배너 캡처 미리보기:</span>
-                <button type="button" onclick="clearBannerImage()" class="text-red-500 hover:underline text-[11px]">삭제</button>
-              </div>
-              <div class="max-h-40 overflow-auto border border-slate-200 rounded-lg bg-slate-900/5 p-1">
-                <img id="bannerPreview" src="" alt="배너 표 미리보기" class="w-full object-contain rounded">
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-end space-x-2 pt-3">
-            <button type="button" onclick="closeDataModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
-            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">저장 및 대시보드 반영</button>
+          <div class="flex items-center justify-end space-x-2 pt-2">
+            <button type="button" onclick="closeKpiModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
+            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">지표 저장</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- 원본 캡처 이미지 모달 -->
-  <div id="rawImageModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-        <h3 class="text-sm font-bold text-slate-900" id="rawImageTitle">원본 지표 표 캡처</h3>
-        <button onclick="closeRawImageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+  <!-- [모달 2] 메인배너 효율 캡처 이미지 업로드 전용 모달 -->
+  <div id="bannerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-amber-50/50">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">메인배너 효율 표 캡처 등록</h3>
+          <p class="text-xs text-slate-500 mt-0.5"><span id="targetWeekBadge" class="font-bold text-amber-700"></span>에 등록할 캡처 이미지를 선택하세요.</p>
+        </div>
+        <button onclick="closeBannerModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
-      <div class="p-4 overflow-auto flex-1 bg-slate-100 flex items-center justify-center">
-        <img id="rawImageDetail" src="" alt="원본 표 이미지" class="max-w-full max-h-[75vh] object-contain rounded border border-slate-300 shadow-sm">
+
+      <div class="p-6 space-y-4">
+        <div id="modalBannerDropZone" class="border-2 border-dashed border-amber-300 rounded-xl p-5 text-center bg-amber-50/20 cursor-pointer hover:bg-amber-50/50 transition">
+          <input type="file" id="modalBannerInput" accept="image/*" multiple class="hidden" onchange="handleModalBannerImages(event)">
+          <div class="space-y-1">
+            <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 캡처 이미지를 끌어다 놓으세요</p>
+            <p class="text-[11px] text-slate-400">Ctrl 또는 Shift 키를 누르고 여러 장을 한 번에 선택할 수 있습니다</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between text-xs text-slate-600 mb-2 font-medium">
+            <span>등록 대기 중인 이미지:</span>
+            <span id="modalBannerCountText" class="text-amber-700 font-bold">0장</span>
+          </div>
+          <div id="modalBannerThumbnails" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-200 rounded-lg bg-slate-50">
+            <p class="col-span-3 text-center text-xs text-slate-400 py-6">선택된 이미지가 없습니다.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeBannerModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
+          <button type="button" onclick="saveBannerImages()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">배너 이미지 반영</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 통합 제어 스크립트 -->
-  <script>
-    const DEFAULT_DATA = [
-      {
-        week: "10월 1주차",
-        period: "10.01~10.04",
-        uv: 253202,
-        pv: 4598919,
-        pvPerUv: 18.2,
-        orders: 15043,
-        cvr: 5.9,
-        totalSearch: 412007,
-        searchFail: 13260,
-        searchFailRate: 3.2,
-        revenue: 790,
-        searchRevenue: 271,
-        searchShare: 34.4,
-        searchOrders: 30725,
-        searchCvr: 7.5,
-        basketItems: 10.9,
-        rawImage: null,
-        bannerRawImage: null,
-        bannerData: {
-          mainTotals: { imp: 297116, click: 24240, ctr: 8.2, orders: 3700, rev: 69017972, cvr: 15.3 },
-          mainBanners: [
-            { name: "[메인배너_1번] 261001_CFC이벤트(CFC)", imp: 12568, click: 1537, ctr: 12.2, orders: 0, rev: 0, cvr: 0.0, slot: "1번" },
-            { name: "[메인배너_1번] 261001_가공/HMR(전점)", imp: 51063, click: 5947, ctr: 11.6, orders: 708, rev: 12094990, cvr: 11.9, slot: "1번" },
-            { name: "[메인배너_2번] 261001_가공/HMR(CFC)", imp: 9358, click: 1049, ctr: 11.2, orders: 708, rev: 12094990, cvr: 67.5, slot: "2번" },
-            { name: "[메인배너_2번] 261001_정육/수산(전점)", imp: 37408, click: 3768, ctr: 10.1, orders: 544, rev: 13136421, cvr: 14.4, slot: "2번" },
-            { name: "[메인배너_3번] 261001_과일/채소(전점)", imp: 27103, click: 1865, ctr: 6.9, orders: 316, rev: 4661986, cvr: 17.0, slot: "3번" }
-          ],
-          slotChartData: { clicks: [9765, 6113, 3497, 1802, 1801, 1237], revs: [1415, 2770, 1968, 714, 108, 74] }
-        }
-      },
-      {
-        week: "10월 2주차",
-        period: "10.05~10.11",
-        uv: 192698,
-        pv: 3759762,
-        pvPerUv: 19.5,
-        orders: 12266,
-        cvr: 6.4,
-        totalSearch: 335641,
-        searchFail: 10776,
-        searchFailRate: 3.2,
-        revenue: 615,
-        searchRevenue: 212,
-        searchShare: 34.5,
-        searchOrders: 26438,
-        searchCvr: 7.9,
-        basketItems: 11.2,
-        rawImage: null,
-        bannerRawImage: null,
-        bannerData: {
-          mainTotals: { imp: 242296, click: 22658, ctr: 9.4, orders: 2386, rev: 43317491, cvr: 10.5 },
-          mainBanners: [
-            { name: "[메인배너_1번] 261008_CFC이벤트(CFC)", imp: 15898, click: 1960, ctr: 12.3, orders: 0, rev: 0, cvr: 0.0, slot: "1번" },
-            { name: "[메인배너_1번] 261008_정육(전점)", imp: 54256, click: 8304, ctr: 15.3, orders: 891, rev: 23147203, cvr: 10.7, slot: "1번", highlight: true },
-            { name: "[메인배너_2번] 261008_과일/채소(전점)", imp: 41246, click: 2629, ctr: 6.4, orders: 392, rev: 5024469, cvr: 14.9, slot: "2번" },
-            { name: "[메인배너_2번] 261008_대장주(CFC)", imp: 11746, click: 1404, ctr: 12.0, orders: 301, rev: 4193783, cvr: 21.5, slot: "2번" },
-            { name: "[메인배너_3번] 261008_가공/HMR(전점)", imp: 29507, click: 3821, ctr: 12.9, orders: 331, rev: 4458914, cvr: 8.7, slot: "3번" },
-            { name: "[메인배너_3번] 261008_신선(CFC)", imp: 8063, click: 1026, ctr: 12.7, orders: 232, rev: 4070076, cvr: 22.6, slot: "3번" }
-          ],
-          slotChartData: { clicks: [10264, 4033, 4847, 1466, 378, 1672], revs: [2314, 921, 852, 170, 44, 27] }
-        }
-      }
-    ];
+  <!-- [모달 3] 주차 관리 모달 -->
+  <div id="manageModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
+        <button onclick="closeManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div id="manageWeekList" class="divide-y divide-slate-100 max-h-60 overflow-y-auto border border-slate-200 rounded-lg">
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <button type="button" onclick="clearAllData()" class="text-xs text-red-500 hover:underline">전체 데이터 비우기</button>
+          <button type="button" onclick="closeManageModal()" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg text-slate-700 hover:bg-slate-200">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- 메인 스크립트 -->
+  <script>
+    // 기존 10월 1~2주차 데이터를 완전 삭제하고 빈 배열로 시작
     let dataset = [];
-    let currentUploadedBase64 = null;
-    let currentBannerBase64 = null;
+    let tempBannerList = [];
+    let currentViewBannerImgIdx = 0;
     let chartInstances = {};
 
     function initApp() {
       try {
-        const saved = localStorage.getItem('zeta_kpi_dataset_v4');
+        const saved = localStorage.getItem('zeta_kpi_dataset_v_clean');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].uv) {
+          if (Array.isArray(parsed)) {
             dataset = parsed;
-          } else {
-            dataset = JSON.parse(JSON.stringify(DEFAULT_DATA));
           }
-        } else {
-          dataset = JSON.parse(JSON.stringify(DEFAULT_DATA));
         }
       } catch (e) {
-        dataset = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        dataset = [];
       }
 
       populateWeekSelector();
@@ -464,19 +369,9 @@
 
     function saveData() {
       try {
-        localStorage.setItem('zeta_kpi_dataset_v4', JSON.stringify(dataset));
+        localStorage.setItem('zeta_kpi_dataset_v_clean', JSON.stringify(dataset));
       } catch (e) {
         console.warn("로컬 저장 오류:", e);
-      }
-    }
-
-    function forceResetData() {
-      if (confirm("데이터를 기본 주차 상태로 초기화하시겠습니까?")) {
-        localStorage.removeItem('zeta_kpi_dataset_v4');
-        dataset = JSON.parse(JSON.stringify(DEFAULT_DATA));
-        saveData();
-        populateWeekSelector();
-        onWeekChanged();
       }
     }
 
@@ -484,10 +379,19 @@
       const sel = document.getElementById('weekSelector');
       if (!sel) return;
       sel.innerHTML = '';
+
+      if (dataset.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "등록된 주차 없음";
+        sel.appendChild(opt);
+        return;
+      }
+
       dataset.forEach((d, idx) => {
         const opt = document.createElement('option');
         opt.value = idx;
-        opt.textContent = `${d.week || '주차'} (${d.period || '-'})`;
+        opt.textContent = `${d.week} (${d.period})`;
         if (idx === dataset.length - 1) opt.selected = true;
         sel.appendChild(opt);
       });
@@ -495,37 +399,30 @@
     }
 
     function onWeekChanged() {
-      renderDashboard();
-      renderBannerPerformance();
+      currentViewBannerImgIdx = 0;
+      const isEmpty = dataset.length === 0;
+
+      document.getElementById('emptyState').classList.toggle('hidden', !isEmpty);
+      document.getElementById('tab-summary').classList.toggle('hidden', isEmpty);
+      document.getElementById('tab-trends').classList.toggle('hidden', true);
+      document.getElementById('tab-table').classList.toggle('hidden', true);
+
+      if (!isEmpty) {
+        renderDashboard();
+        renderBannerTab();
+      }
     }
 
     function renderDashboard() {
       const sel = document.getElementById('weekSelector');
-      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
-      if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) {
-        currIdx = dataset.length - 1;
-      }
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) return;
 
-      const curr = dataset[currIdx] || DEFAULT_DATA[1];
+      const curr = dataset[currIdx];
       const prev = currIdx > 0 ? dataset[currIdx - 1] : null;
 
-      const captureBtn = document.getElementById('viewRawCaptureBtn');
-      if (captureBtn) {
-        if (curr && curr.rawImage) {
-          captureBtn.classList.remove('hidden');
-          captureBtn.classList.add('flex');
-          captureBtn.onclick = () => openRawImageModal(curr.week, curr.rawImage);
-        } else {
-          captureBtn.classList.add('hidden');
-          captureBtn.classList.remove('flex');
-        }
-      }
-
-      const badge = document.getElementById('scriptPeriodBadge');
-      if (badge) badge.textContent = `집계 기준: ${curr.period || '-'}`;
-
-      const insightEl = document.getElementById('insightContainer');
-      if (insightEl) insightEl.innerHTML = generateExecutiveInsight(curr, prev);
+      document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period}`;
+      document.getElementById('insightContainer').innerHTML = generateExecutiveInsight(curr, prev);
 
       renderKpiCards(curr, prev);
       renderWeeklyTable(currIdx);
@@ -533,142 +430,57 @@
       renderFullMatrixTable();
     }
 
-    function renderBannerPerformance() {
+    function renderBannerTab() {
       const sel = document.getElementById('weekSelector');
-      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
-      const curr = dataset[currIdx] || DEFAULT_DATA[1];
-      const bData = curr.bannerData || DEFAULT_DATA[1].bannerData;
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) return;
 
-      // 1. 배너 캡처 이미지 동적 노출
+      const curr = dataset[currIdx];
+      const images = curr.bannerImages || [];
+
+      document.getElementById('bannerCaptureViewTitle').textContent = `[${curr.week}] 메인배너 효율 분석 표 캡처 (${images.length}장)`;
       const bannerImg = document.getElementById('bannerCaptureImg');
-      const noImgText = document.getElementById('noBannerImgText');
-      const bannerTitle = document.getElementById('bannerCaptureViewTitle');
-      if (bannerTitle) bannerTitle.textContent = `[${curr.week}] 메인배너 효율 표 원본 분석`;
+      const noImg = document.getElementById('noBannerImgText');
+      const tabBtns = document.getElementById('bannerImgTabButtons');
 
-      if (curr.bannerRawImage) {
-        bannerImg.src = curr.bannerRawImage;
+      tabBtns.innerHTML = '';
+      if (images.length > 0) {
         bannerImg.classList.remove('hidden');
-        noImgText.classList.add('hidden');
+        noImg.classList.add('hidden');
+
+        if (currentViewBannerImgIdx >= images.length) currentViewBannerImgIdx = 0;
+        bannerImg.src = images[currentViewBannerImgIdx];
+
+        images.forEach((_, idx) => {
+          const btn = document.createElement('button');
+          btn.className = `px-2.5 py-1 text-xs rounded-lg font-semibold transition ${idx === currentViewBannerImgIdx ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`;
+          btn.textContent = `표 #${idx + 1}`;
+          btn.onclick = () => {
+            currentViewBannerImgIdx = idx;
+            renderBannerTab();
+          };
+          tabBtns.appendChild(btn);
+        });
       } else {
         bannerImg.classList.add('hidden');
-        noImgText.classList.remove('hidden');
+        noImg.classList.remove('hidden');
       }
-
-      // 2. 배너 KPI 카드
-      const kpiContainer = document.getElementById('bannerKpiContainer');
-      if (kpiContainer) {
-        const mTot = bData.mainTotals;
-        kpiContainer.innerHTML = `
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-            <div class="text-xs text-slate-500 font-medium">${curr.week} 메인배너 총 노출</div>
-            <div class="text-2xl font-extrabold text-slate-900 mt-1">${mTot.imp.toLocaleString()}<span class="text-sm font-normal text-slate-500">회</span></div>
-            <div class="text-xs text-slate-500 mt-1">상위 구좌 중심 노출</div>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-            <div class="text-xs text-slate-500 font-medium">${curr.week} 메인배너 총 클릭수</div>
-            <div class="text-2xl font-extrabold text-slate-900 mt-1">${mTot.click.toLocaleString()}<span class="text-sm font-normal text-slate-500">건</span></div>
-            <div class="text-xs text-blue-600 font-semibold mt-1">평균 CTR ${mTot.ctr.toFixed(1)}%</div>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-            <div class="text-xs text-slate-500 font-medium">기획전 연계 주문건수</div>
-            <div class="text-2xl font-extrabold text-slate-900 mt-1">${mTot.orders.toLocaleString()}<span class="text-sm font-normal text-slate-500">건</span></div>
-            <div class="text-xs text-emerald-600 font-semibold mt-1">전환율(CVR) ${mTot.cvr.toFixed(1)}%</div>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-            <div class="text-xs text-slate-500 font-medium">기획전 총 주문금액</div>
-            <div class="text-2xl font-extrabold text-slate-900 mt-1">${Math.round(mTot.rev/10000).toLocaleString()}<span class="text-sm font-normal text-slate-500">만원</span></div>
-            <div class="text-xs text-blue-600 font-semibold mt-1">1번 구좌 기여도 최고</div>
-          </div>
-        `;
-      }
-
-      // 3. 메인 배너 테이블
-      const mainTbody = document.getElementById('mainBannerTableBody');
-      if (mainTbody) {
-        mainTbody.innerHTML = bData.mainBanners.map(b => `
-          <tr class="hover:bg-slate-50 transition ${b.highlight ? 'bg-amber-50/50 font-semibold' : ''}">
-            <td class="py-2.5 px-4 text-slate-900">${b.name}</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${b.imp.toLocaleString()}</td>
-            <td class="py-2.5 px-4 text-right font-semibold text-slate-800">${b.click.toLocaleString()}</td>
-            <td class="py-2.5 px-4 text-right ${b.ctr >= 12 ? 'text-red-500 font-bold' : 'text-slate-700'}">${b.ctr.toFixed(1)}%</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${b.orders.toLocaleString()}</td>
-            <td class="py-2.5 px-4 text-right font-bold text-slate-900">${b.rev ? Math.round(b.rev/10000).toLocaleString() + '만' : '-'}</td>
-            <td class="py-2.5 px-4 text-right ${b.cvr >= 15 ? 'text-emerald-600 font-bold' : 'text-slate-600'}">${b.cvr.toFixed(1)}%</td>
-          </tr>
-        `).join('') + `
-          <tr class="bg-amber-100/40 font-bold text-slate-900 border-t-2 border-amber-300">
-            <td class="py-3 px-4">[${curr.week}] 메인배너 총합계</td>
-            <td class="py-3 px-4 text-right">${bData.mainTotals.imp.toLocaleString()}</td>
-            <td class="py-3 px-4 text-right text-blue-700">${bData.mainTotals.click.toLocaleString()}</td>
-            <td class="py-3 px-4 text-right text-red-600 font-extrabold">${bData.mainTotals.ctr.toFixed(1)}%</td>
-            <td class="py-3 px-4 text-right">${bData.mainTotals.orders.toLocaleString()}</td>
-            <td class="py-3 px-4 text-right text-slate-900">${Math.round(bData.mainTotals.rev/10000).toLocaleString()}만</td>
-            <td class="py-3 px-4 text-right text-emerald-700">${bData.mainTotals.cvr.toFixed(1)}%</td>
-          </tr>
-        `;
-      }
-
-      renderBannerSlotChart(bData.slotChartData);
-    }
-
-    function renderBannerSlotChart(chartData) {
-      const el = document.getElementById('chartBannerSlot');
-      if (!el || !window.Chart) return;
-      if (chartInstances['chartBannerSlot']) chartInstances['chartBannerSlot'].destroy();
-
-      const slots = ['1번', '2번', '3번', '4번', '5번', '6번'];
-      const clicks = chartData ? chartData.clicks : [10264, 4033, 4847, 1466, 378, 1672];
-      const revs = chartData ? chartData.revs : [2314, 921, 852, 170, 44, 27];
-
-      const ctx = el.getContext('2d');
-      chartInstances['chartBannerSlot'] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: slots.map(s => `메인배너 ${s}`),
-          datasets: [
-            {
-              label: '클릭수 (건)',
-              data: clicks,
-              backgroundColor: '#3b82f6',
-              yAxisID: 'y',
-              borderRadius: 6
-            },
-            {
-              type: 'line',
-              label: '기획전 주문금액 (만원)',
-              data: revs,
-              borderColor: '#ef4444',
-              backgroundColor: '#ef4444',
-              tension: 0.3,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { position: 'left', title: { display: true, text: '클릭수(건)' } },
-            y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '주문금액(만원)' } }
-          }
-        }
-      });
     }
 
     function generateExecutiveInsight(curr, prev) {
       if (!prev) {
-        return `<p><strong>[${curr.week} 기본 현황]</strong> 일평균 UV ${((curr.uv || 0)/10000).toFixed(1)}만, PV ${((curr.pv || 0)/1000000).toFixed(1)}백만, 구매전환율 ${curr.cvr || 0}%를 기록했습니다.</p>`;
+        return `<p><strong>[${curr.week} 등록 완료]</strong> 일평균 UV ${(curr.uv/10000).toFixed(1)}만, PV ${(curr.pv/1000000).toFixed(1)}백만, 구매전환율 ${curr.cvr}%로 첫 주차가 기록되었습니다. 다음 주차가 등록되면 WoW 증감 및 비즈니스 상관관계 진단이 활성화됩니다.</p>`;
       }
 
       const uvDiff = prev.uv ? (((curr.uv - prev.uv) / prev.uv) * 100) : 0;
-      const cvrDiff = (curr.cvr || 0) - (prev.cvr || 0);
+      const cvrDiff = curr.cvr - prev.cvr;
       const revDiff = prev.revenue ? (((curr.revenue - prev.revenue) / prev.revenue) * 100) : 0;
-      const pvPerUvDiff = (curr.pvPerUv || 0) - (prev.pvPerUv || 0);
-      const failDiff = (curr.searchFailRate || 0) - (prev.searchFailRate || 0);
+      const pvPerUvDiff = curr.pvPerUv - prev.pvPerUv;
+      const failDiff = curr.searchFailRate - prev.searchFailRate;
 
       let coreText = "";
       if (uvDiff > 20 && cvrDiff < 0) {
-        coreText = `대형 행사 및 외부 유입 확대로 트래픽(UV +${uvDiff.toFixed(1)}%, 주문금액 +${revDiff.toFixed(1)}%)은 급증했으나, 신규 유저 유입 증가로 전환율(CVR ${curr.cvr}%, ${cvrDiff.toFixed(1)}%p)은 다소 희석되었습니다. <strong>유입 트래픽의 재구매 리텐션 유도</strong>가 주요 과제입니다.`;
+        coreText = `대형 행사 및 외부 유입 확대로 트래픽(UV +${uvDiff.toFixed(1)}%, 주문금액 +${revDiff.toFixed(1)}%)은 급증했으나, 신규 유저 유입 증가로 전환율(CVR ${curr.cvr}%, ${cvrDiff.toFixed(1)}%p)은 소폭 희석되었습니다. <strong>유입 트래픽의 재구매 리텐션 유도</strong>가 주요 과제입니다.`;
       } else if (uvDiff < -15 && cvrDiff > 0.8) {
         coreText = `프로모션 종료 등으로 유입 모수(UV ${uvDiff.toFixed(1)}%)는 조정되었으나, 체류 깊이(UV당 PV ${curr.pvPerUv.toFixed(1)}건, +${pvPerUvDiff.toFixed(1)}건)와 전환율(CVR ${curr.cvr}%, +${cvrDiff.toFixed(1)}%p)이 오르며 <strong>고효율 진성 구매자 중심</strong>으로 압축되었습니다.`;
       } else if (uvDiff > 0 && cvrDiff >= 0) {
@@ -678,7 +490,7 @@
       }
 
       let searchText = failDiff <= 0 
-        ? `검색 실패율은 <strong>${curr.searchFailRate}%</strong>로 전주 대비 개선(▼${Math.abs(failDiff).toFixed(1)}%p)되었으며 안정적인 검색 품질을 보였습니다.`
+        ? `검색 실패율은 <strong>${curr.searchFailRate}%</strong>로 전주 대비 개선(▼${Math.abs(failDiff).toFixed(1)}%p)되었습니다.`
         : `검색 실패율(${curr.searchFailRate}%, ▲${failDiff.toFixed(1)}%p)이 소폭 상승하여 검색어 매핑 점검이 권장됩니다.`;
 
       let basketText = `장바구니 건당 구매수량은 <strong>${curr.basketItems}개</strong>로 안정적인 객단가를 유지 중입니다.`;
@@ -701,61 +513,59 @@
 
     function renderKpiCards(curr, prev) {
       const container = document.getElementById('kpiCardsContainer');
-      if (!container) return;
-
       const calcDiff = (c, p) => p ? (((c - p) / p) * 100).toFixed(1) : 0;
       const calcPDiff = (c, p) => p ? (c - p).toFixed(1) : 0;
 
       const cards = [
         {
           title: "일평균 UV",
-          value: `${((curr.uv || 0) / 10000).toFixed(1)}만`,
-          subValue: `${(curr.uv || 0).toLocaleString()}명`,
+          value: `${(curr.uv / 10000).toFixed(1)}만`,
+          subValue: `${curr.uv.toLocaleString()}명`,
           diff: prev ? calcDiff(curr.uv, prev.uv) : null,
           unit: "%",
           isGood: prev ? (curr.uv >= prev.uv) : true,
-          sparkData: dataset.map(d => d.uv || 0)
+          sparkData: dataset.map(d => d.uv)
         },
         {
           title: "일평균 PV",
-          value: `${((curr.pv || 0) / 1000000).toFixed(1)}백만`,
-          subValue: `UV당 PV ${(curr.pvPerUv || 0).toFixed(1)}건`,
+          value: `${(curr.pv / 1000000).toFixed(1)}백만`,
+          subValue: `UV당 PV ${curr.pvPerUv.toFixed(1)}건`,
           diff: prev ? calcDiff(curr.pv, prev.pv) : null,
           unit: "%",
           isGood: prev ? (curr.pv >= prev.pv) : true,
-          sparkData: dataset.map(d => d.pv || 0)
+          sparkData: dataset.map(d => d.pv)
         },
         {
           title: "구매전환율 (CVR)",
-          value: `${curr.cvr || 0}%`,
-          subValue: `주문 ${(curr.orders || 0).toLocaleString()}건`,
+          value: `${curr.cvr}%`,
+          subValue: `주문 ${curr.orders.toLocaleString()}건`,
           diff: prev ? calcPDiff(curr.cvr, prev.cvr) : null,
           unit: "%p",
           isGood: prev ? (curr.cvr >= prev.cvr) : true,
-          sparkData: dataset.map(d => d.cvr || 0)
+          sparkData: dataset.map(d => d.cvr)
         },
         {
           title: "검색 실패율",
-          value: `${curr.searchFailRate || 0}%`,
-          subValue: `실패 ${(curr.searchFail || 0).toLocaleString()}건`,
+          value: `${curr.searchFailRate}%`,
+          subValue: `실패 ${curr.searchFail.toLocaleString()}건`,
           diff: prev ? calcPDiff(curr.searchFailRate, prev.searchFailRate) : null,
           unit: "%p",
           isGood: prev ? (curr.searchFailRate <= prev.searchFailRate) : true,
-          sparkData: dataset.map(d => d.searchFailRate || 0)
+          sparkData: dataset.map(d => d.searchFailRate)
         },
         {
           title: "전체 주문금액",
-          value: `${((curr.revenue || 0) / 100).toFixed(1)}억`,
-          subValue: `${(curr.revenue || 0).toLocaleString()}백만원`,
+          value: `${(curr.revenue / 100).toFixed(1)}억`,
+          subValue: `${curr.revenue.toLocaleString()}백만원`,
           diff: prev ? calcDiff(curr.revenue, prev.revenue) : null,
           unit: "%",
           isGood: prev ? (curr.revenue >= prev.revenue) : true,
-          sparkData: dataset.map(d => d.revenue || 0)
+          sparkData: dataset.map(d => d.revenue)
         }
       ];
 
       container.innerHTML = cards.map(c => {
-        let diffBadge = "";
+        let diffBadge = `<span class="text-xs text-slate-400 font-medium">비교 대상 없음</span>`;
         if (c.diff !== null) {
           const isPositive = parseFloat(c.diff) >= 0;
           const sign = isPositive ? "▲" : "▼";
@@ -785,7 +595,7 @@
     }
 
     function createSparklineSvg(data, color = '#2563eb') {
-      if (!data || data.length < 2) return '';
+      if (!data || data.length < 2) return '<div class="text-[10px] text-slate-300 text-center">-</div>';
       const min = Math.min(...data);
       const max = Math.max(...data);
       const range = (max - min) || 1;
@@ -806,28 +616,25 @@
 
     function renderWeeklyTable(currIdx) {
       const tbody = document.getElementById('weeklyTableBody');
-      if (!tbody) return;
-
-      const curr = dataset[currIdx] || {};
+      const curr = dataset[currIdx];
       const prev1 = currIdx >= 1 ? dataset[currIdx - 1] : null;
       const prev2 = currIdx >= 2 ? dataset[currIdx - 2] : null;
 
-      document.getElementById('th-week-curr').textContent = curr.week || '-';
+      document.getElementById('th-week-curr').textContent = curr.week;
       document.getElementById('th-week-prev1').textContent = prev1 ? prev1.week : '-';
       document.getElementById('th-week-prev2').textContent = prev2 ? prev2.week : '-';
 
       const rowsConfig = [
-        { group: "트래픽", name: "UV (명)", k: "uv", fmt: n => (n || 0).toLocaleString(), type: "%" },
-        { group: "트래픽", name: "PV (건)", k: "pv", fmt: n => (n || 0).toLocaleString(), type: "%" },
-        { group: "트래픽", name: "UV 당 PV (건)", k: "pvPerUv", fmt: n => (n || 0).toFixed(1), type: "diff" },
-        { group: "구매전환율", name: "주문건수 (건)", k: "orders", fmt: n => (n || 0).toLocaleString(), type: "%" },
-        { group: "구매전환율", name: "전환율 (%)", k: "cvr", fmt: n => `${(n || 0).toFixed(1)}%`, type: "p" },
-        { group: "검색", name: "전체 검색수 (실패포함)", k: "totalSearch", fmt: n => (n || 0).toLocaleString(), type: "%" },
-        { group: "검색", name: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${(n || 0).toFixed(1)}%`, type: "p_inv" },
-        { group: "검색", name: "검색구매비중 (%)", k: "searchShare", fmt: n => `${(n || 0).toFixed(1)}%`, type: "p" },
-        { group: "검색", name: "검색구매전환율 (%)", k: "searchCvr", fmt: n => `${(n || 0).toFixed(1)}%`, type: "p" },
-        { group: "매출/바스켓", name: "전체주문금액 (백만)", k: "revenue", fmt: n => (n || 0).toLocaleString(), type: "%" },
-        { group: "매출/바스켓", name: "건당수량 (개)", k: "basketItems", fmt: n => (n || 0).toFixed(1), type: "diff" }
+        { group: "트래픽", name: "UV (명)", k: "uv", fmt: n => n.toLocaleString(), type: "%" },
+        { group: "트래픽", name: "PV (건)", k: "pv", fmt: n => n.toLocaleString(), type: "%" },
+        { group: "트래픽", name: "UV 당 PV (건)", k: "pvPerUv", fmt: n => n.toFixed(1), type: "diff" },
+        { group: "구매전환율", name: "주문건수 (건)", k: "orders", fmt: n => n.toLocaleString(), type: "%" },
+        { group: "구매전환율", name: "전환율 (%)", k: "cvr", fmt: n => `${n.toFixed(1)}%`, type: "p" },
+        { group: "검색", name: "전체 검색수", k: "totalSearch", fmt: n => n.toLocaleString(), type: "%" },
+        { group: "검색", name: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${n.toFixed(1)}%`, type: "p_inv" },
+        { group: "검색", name: "검색구매비중 (%)", k: "searchShare", fmt: n => `${n.toFixed(1)}%`, type: "p" },
+        { group: "매출/바스켓", name: "전체주문금액 (백만)", k: "revenue", fmt: n => n.toLocaleString(), type: "%" },
+        { group: "매출/바스켓", name: "건당수량 (개)", k: "basketItems", fmt: n => n.toFixed(1), type: "diff" }
       ];
 
       tbody.innerHTML = rowsConfig.map(r => {
@@ -836,7 +643,7 @@
         const valPrev2 = prev2 ? prev2[r.k] : null;
 
         let wowHtml = "-";
-        if (valPrev1 !== null && valPrev1 !== undefined) {
+        if (valPrev1 !== null) {
           if (r.type === "%") {
             const diff = ((valCurr - valPrev1) / valPrev1) * 100;
             const sign = diff >= 0 ? "▲" : "▼";
@@ -859,16 +666,16 @@
           }
         }
 
-        const sparkPoints = [valPrev2, valPrev1, valCurr].filter(v => v !== null && v !== undefined);
+        const sparkPoints = [valPrev2, valPrev1, valCurr].filter(v => v !== null);
         const miniSpark = createSparklineSvg(sparkPoints, '#475569');
 
         return `
           <tr class="hover:bg-slate-50/70 transition">
             <td class="py-2.5 px-4 font-medium text-slate-500">${r.group}</td>
             <td class="py-2.5 px-4 font-semibold text-slate-900">${r.name}</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${valPrev2 !== null && valPrev2 !== undefined ? r.fmt(valPrev2) : '-'}</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${valPrev1 !== null && valPrev1 !== undefined ? r.fmt(valPrev1) : '-'}</td>
-            <td class="py-2.5 px-4 text-right bg-blue-50/30 text-blue-900 font-bold">${valCurr !== undefined ? r.fmt(valCurr) : '-'}</td>
+            <td class="py-2.5 px-4 text-right text-slate-600">${valPrev2 !== null ? r.fmt(valPrev2) : '-'}</td>
+            <td class="py-2.5 px-4 text-right text-slate-600">${valPrev1 !== null ? r.fmt(valPrev1) : '-'}</td>
+            <td class="py-2.5 px-4 text-right bg-blue-50/30 text-blue-900 font-bold">${r.fmt(valCurr)}</td>
             <td class="py-2.5 px-4 text-right">${wowHtml}</td>
             <td class="py-2.5 px-4 text-center"><div class="w-20 h-5 mx-auto">${miniSpark}</div></td>
           </tr>
@@ -877,7 +684,7 @@
     }
 
     function renderCharts() {
-      if (!window.Chart) return;
+      if (!window.Chart || dataset.length === 0) return;
       const labels = dataset.map(d => d.week);
       
       const createOrUpdate = (id, config) => {
@@ -893,8 +700,8 @@
         data: {
           labels,
           datasets: [
-            { label: '일평균 UV', data: dataset.map(d => d.uv || 0), borderColor: '#2563eb', tension: 0.3, yAxisID: 'y' },
-            { label: '주문수', data: dataset.map(d => d.orders || 0), borderColor: '#10b981', tension: 0.3, yAxisID: 'y1' }
+            { label: '일평균 UV', data: dataset.map(d => d.uv), borderColor: '#2563eb', tension: 0.3, yAxisID: 'y' },
+            { label: '주문수', data: dataset.map(d => d.orders), borderColor: '#10b981', tension: 0.3, yAxisID: 'y1' }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
@@ -905,8 +712,8 @@
         data: {
           labels,
           datasets: [
-            { type: 'line', label: '구매전환율 (%)', data: dataset.map(d => d.cvr || 0), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
-            { type: 'bar', label: 'UV당 PV', data: dataset.map(d => d.pvPerUv || 0), backgroundColor: '#94a3b8', yAxisID: 'y1' }
+            { type: 'line', label: '구매전환율 (%)', data: dataset.map(d => d.cvr), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
+            { type: 'bar', label: 'UV당 PV', data: dataset.map(d => d.pvPerUv), backgroundColor: '#94a3b8', yAxisID: 'y1' }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right' } } }
@@ -917,8 +724,8 @@
         data: {
           labels,
           datasets: [
-            { label: '검색 실패율 (%)', data: dataset.map(d => d.searchFailRate || 0), borderColor: '#ef4444', tension: 0.3 },
-            { label: '검색 구매비중 (%)', data: dataset.map(d => d.searchShare || 0), borderColor: '#8b5cf6', tension: 0.3 }
+            { label: '검색 실패율 (%)', data: dataset.map(d => d.searchFailRate), borderColor: '#ef4444', tension: 0.3 },
+            { label: '검색 구매비중 (%)', data: dataset.map(d => d.searchShare), borderColor: '#8b5cf6', tension: 0.3 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -928,7 +735,7 @@
         type: 'bar',
         data: {
           labels,
-          datasets: [{ label: '주문금액 (백만원)', data: dataset.map(d => d.revenue || 0), backgroundColor: '#3b82f6', borderRadius: 6 }]
+          datasets: [{ label: '주문금액 (백만원)', data: dataset.map(d => d.revenue), backgroundColor: '#3b82f6', borderRadius: 6 }]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
@@ -936,22 +743,22 @@
 
     function renderFullMatrixTable() {
       const table = document.getElementById('fullMatrixTable');
-      if (!table) return;
+      if (!table || dataset.length === 0) return;
       let thead = `<tr class="bg-slate-50 text-slate-700 font-semibold border-b"><th class="py-3 px-4">지표명</th>`;
-      dataset.forEach(d => { thead += `<th class="py-3 px-4 text-right">${d.week || '-'}</th>`; });
+      dataset.forEach(d => { thead += `<th class="py-3 px-4 text-right">${d.week}</th>`; });
       thead += `</tr>`;
 
       const keys = [
-        { label: "일평균 UV (명)", k: "uv", fmt: n => (n || 0).toLocaleString() },
-        { label: "일평균 PV (건)", k: "pv", fmt: n => (n || 0).toLocaleString() },
-        { label: "UV당 PV", k: "pvPerUv", fmt: n => (n || 0).toFixed(1) },
-        { label: "주문건수 (건)", k: "orders", fmt: n => (n || 0).toLocaleString() },
-        { label: "구매전환율 (%)", k: "cvr", fmt: n => `${(n || 0).toFixed(1)}%` },
-        { label: "전체 검색수", k: "totalSearch", fmt: n => (n || 0).toLocaleString() },
-        { label: "검색 실패수", k: "searchFail", fmt: n => (n || 0).toLocaleString() },
-        { label: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${(n || 0).toFixed(1)}%` },
-        { label: "전체 주문금액 (백만)", k: "revenue", fmt: n => (n || 0).toLocaleString() },
-        { label: "건당수량 (개)", k: "basketItems", fmt: n => (n || 0).toFixed(1) }
+        { label: "일평균 UV (명)", k: "uv", fmt: n => n.toLocaleString() },
+        { label: "일평균 PV (건)", k: "pv", fmt: n => n.toLocaleString() },
+        { label: "UV당 PV", k: "pvPerUv", fmt: n => n.toFixed(1) },
+        { label: "주문건수 (건)", k: "orders", fmt: n => n.toLocaleString() },
+        { label: "구매전환율 (%)", k: "cvr", fmt: n => `${n.toFixed(1)}%` },
+        { label: "전체 검색수", k: "totalSearch", fmt: n => n.toLocaleString() },
+        { label: "검색 실패수", k: "searchFail", fmt: n => n.toLocaleString() },
+        { label: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${n.toFixed(1)}%` },
+        { label: "전체 주문금액 (백만)", k: "revenue", fmt: n => n.toLocaleString() },
+        { label: "건당수량 (개)", k: "basketItems", fmt: n => n.toFixed(1) }
       ];
 
       let tbody = "";
@@ -978,69 +785,20 @@
         }
       });
       if (tabId === 'banner') {
-        setTimeout(renderBannerPerformance, 50);
+        renderBannerTab();
       }
     }
 
-    // 1. 주요지표 캡처 이미지 핸들러
-    function handleImageSelected(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        currentUploadedBase64 = e.target.result;
-        document.getElementById('imagePreview').src = currentUploadedBase64;
-        document.getElementById('imagePreviewContainer').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
+    // [모달 1] 주요 KPI 폼
+    function openKpiModal() {
+      document.getElementById('kpiDataForm').reset();
+      document.getElementById('kpiModal').classList.remove('hidden');
+    }
+    function closeKpiModal() {
+      document.getElementById('kpiModal').classList.add('hidden');
     }
 
-    function clearUploadedImage() {
-      currentUploadedBase64 = null;
-      document.getElementById('rawImageInput').value = '';
-      document.getElementById('imagePreviewContainer').classList.add('hidden');
-    }
-
-    // 2. 메인배너 효율 표 캡처 이미지 핸들러
-    function handleBannerImageSelected(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        currentBannerBase64 = e.target.result;
-        document.getElementById('bannerPreview').src = currentBannerBase64;
-        document.getElementById('bannerPreviewContainer').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function clearBannerImage() {
-      currentBannerBase64 = null;
-      document.getElementById('bannerImageInput').value = '';
-      document.getElementById('bannerPreviewContainer').classList.add('hidden');
-    }
-
-    function openDataModal() {
-      document.getElementById('dataModal').classList.remove('hidden');
-      clearUploadedImage();
-      clearBannerImage();
-    }
-    function closeDataModal() {
-      document.getElementById('dataModal').classList.add('hidden');
-    }
-
-    function openRawImageModal(week, imgSrc) {
-      document.getElementById('rawImageTitle').textContent = `${week} 원본 지표 표 캡처`;
-      document.getElementById('rawImageDetail').src = imgSrc;
-      document.getElementById('rawImageModal').classList.remove('hidden');
-    }
-    function closeRawImageModal() {
-      document.getElementById('rawImageModal').classList.add('hidden');
-    }
-
-    function saveWeekData(e) {
+    function saveKpiData(e) {
       e.preventDefault();
       const uv = parseInt(document.getElementById('formUV').value) || 0;
       const pv = parseInt(document.getElementById('formPV').value) || 0;
@@ -1058,11 +816,7 @@
       if (isNaN(searchRevenue) || searchRevenue <= 0) {
         searchRevenue = Math.round(revenue * 0.32);
       }
-      if (!searchOrders || searchOrders <= 0) {
-        searchOrders = Math.round(orders * 1.8);
-      }
       const searchShare = revenue > 0 ? parseFloat(((searchRevenue / revenue) * 100).toFixed(1)) : 0;
-      const searchCvr = totalSearch > 0 ? parseFloat(((searchOrders / totalSearch) * 100).toFixed(1)) : 0;
 
       const newEntry = {
         week: document.getElementById('formWeekName').value,
@@ -1070,19 +824,127 @@
         uv, pv, pvPerUv, orders, cvr,
         totalSearch, searchFail, searchFailRate,
         revenue, searchRevenue, searchShare,
-        searchOrders, searchCvr, basketItems,
-        rawImage: currentUploadedBase64,
-        bannerRawImage: currentBannerBase64,
-        bannerData: DEFAULT_DATA[1].bannerData
+        basketItems,
+        bannerImages: []
       };
 
       dataset.push(newEntry);
       saveData();
-      closeDataModal();
+      closeKpiModal();
       populateWeekSelector();
       document.getElementById('weekSelector').value = dataset.length - 1;
       onWeekChanged();
-      document.getElementById('weekDataForm').reset();
+    }
+
+    // [모달 2] 배너 캡처 업로드 모달
+    function openBannerModal() {
+      if (dataset.length === 0) {
+        alert("먼저 [+ 주요 KPI 등록]으로 주차를 등록해주세요.");
+        return;
+      }
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
+      const curr = dataset[currIdx];
+
+      document.getElementById('targetWeekBadge').textContent = `[${curr.week}]`;
+      tempBannerList = curr.bannerImages ? [...curr.bannerImages] : [];
+      renderModalBannerThumbnails();
+      document.getElementById('bannerModal').classList.remove('hidden');
+    }
+    function closeBannerModal() {
+      document.getElementById('bannerModal').classList.add('hidden');
+    }
+
+    function handleModalBannerImages(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          tempBannerList.push(e.target.result);
+          renderModalBannerThumbnails();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderModalBannerThumbnails() {
+      const container = document.getElementById('modalBannerThumbnails');
+      const countText = document.getElementById('modalBannerCountText');
+      countText.textContent = `${tempBannerList.length}장`;
+
+      if (tempBannerList.length > 0) {
+        container.innerHTML = tempBannerList.map((src, idx) => `
+          <div class="relative group border border-slate-200 rounded-lg overflow-hidden bg-white p-1">
+            <img src="${src}" class="w-full h-20 object-contain rounded">
+            <span class="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">표 #${idx + 1}</span>
+            <button type="button" onclick="removeModalBannerThumb(${idx})" class="absolute top-1 right-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded opacity-80 hover:opacity-100">✕</button>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-6">선택된 이미지가 없습니다.</p>`;
+      }
+    }
+
+    function removeModalBannerThumb(idx) {
+      tempBannerList.splice(idx, 1);
+      renderModalBannerThumbnails();
+    }
+
+    function saveBannerImages() {
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
+      if (dataset[currIdx]) {
+        dataset[currIdx].bannerImages = [...tempBannerList];
+        saveData();
+        renderBannerTab();
+        closeBannerModal();
+        alert("배너 캡처 이미지가 성공적으로 반영되었습니다!");
+      }
+    }
+
+    // [모달 3] 주차 관리 및 삭제
+    function openManageModal() {
+      const list = document.getElementById('manageWeekList');
+      if (dataset.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">등록된 주차가 없습니다.</p>`;
+      } else {
+        list.innerHTML = dataset.map((d, idx) => `
+          <div class="flex items-center justify-between p-3 text-xs">
+            <div>
+              <span class="font-bold text-slate-800">${d.week}</span>
+              <span class="text-slate-400 ml-1">(${d.period})</span>
+              <span class="ml-2 text-slate-500">배너 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
+            </div>
+            <button onclick="deleteWeek(${idx})" class="text-red-500 hover:font-bold">삭제</button>
+          </div>
+        `).join('');
+      }
+      document.getElementById('manageModal').classList.remove('hidden');
+    }
+    function closeManageModal() {
+      document.getElementById('manageModal').classList.add('hidden');
+    }
+
+    function deleteWeek(idx) {
+      if (confirm(`'${dataset[idx].week}' 데이터를 삭제하시겠습니까?`)) {
+        dataset.splice(idx, 1);
+        saveData();
+        populateWeekSelector();
+        onWeekChanged();
+        openManageModal();
+      }
+    }
+
+    function clearAllData() {
+      if (confirm("정말 모든 주차 데이터를 완전히 초기화하시겠습니까?")) {
+        dataset = [];
+        saveData();
+        populateWeekSelector();
+        onWeekChanged();
+        closeManageModal();
+      }
     }
 
     function copyInsightScript() {
@@ -1095,6 +957,7 @@
     }
 
     function exportToCSV() {
+      if (dataset.length === 0) return;
       let csv = "주차,집계기간,UV,PV,UV당PV,주문건수,구매전환율(%),전체검색수,검색실패수,검색실패율(%),전체주문금액,건당수량\n";
       dataset.forEach(d => {
         csv += `"${d.week}","${d.period}",${d.uv},${d.pv},${d.pvPerUv},${d.orders},${d.cvr},${d.totalSearch},${d.searchFail},${d.searchFailRate},${d.revenue},${d.basketItems}\n`;
@@ -1103,16 +966,22 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `제타_주간지표_대시보드_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `제타_주간지표_${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
     }
 
-    // 드래그 앤 드롭 연결
-    const dropZone = document.getElementById('dropZone');
-    dropZone.addEventListener('click', () => document.getElementById('rawImageInput').click());
-
-    const bannerDropZone = document.getElementById('bannerDropZone');
-    bannerDropZone.addEventListener('click', () => document.getElementById('bannerImageInput').click());
+    // 드래그앤드롭 이벤트 바인딩
+    const mDropZone = document.getElementById('modalBannerDropZone');
+    mDropZone.addEventListener('click', () => document.getElementById('modalBannerInput').click());
+    mDropZone.addEventListener('dragover', (e) => { e.preventDefault(); mDropZone.classList.add('border-amber-500', 'bg-amber-100/50'); });
+    mDropZone.addEventListener('dragleave', () => { mDropZone.classList.remove('border-amber-500', 'bg-amber-100/50'); });
+    mDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      mDropZone.classList.remove('border-amber-500', 'bg-amber-100/50');
+      if (e.dataTransfer.files.length) {
+        handleModalBannerImages({ target: { files: e.dataTransfer.files } });
+      }
+    });
 
     window.addEventListener('DOMContentLoaded', initApp);
   </script>
