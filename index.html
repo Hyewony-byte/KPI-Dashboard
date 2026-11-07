@@ -44,7 +44,7 @@
         </button>
 
         <button onclick="openBannerModal()" class="flex items-center space-x-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-          <span>🖼️ 배너 캡처/디자인 등록</span>
+          <span>🖼️ 배너 캡처표 등록</span>
         </button>
 
         <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리">
@@ -124,7 +124,7 @@
       </section>
     </div>
 
-    <!-- 탭 2: 메인 배너구좌별 효율 (분석 테이블 + 편집형 코멘트 + 썸네일 모달 완전 연동) -->
+    <!-- 탭 2: 메인 배너구좌별 효율 (코멘트 -> 세부 실적 테이블 -> 차트 -> 접힘 캡처 순) -->
     <div id="tab-banner" class="space-y-6 hidden">
 
       <!-- 1. 주간 메인배너 핵심 코멘트 분석 영역 (자동 작성 + 직접 수정 가능) -->
@@ -145,45 +145,22 @@
         </div>
       </section>
 
-      <!-- 2. 배너 효율 캡처 원본 표 뷰어 -->
-      <div id="bannerCaptureViewBox" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-          <div>
-            <h3 class="text-base font-bold text-slate-900" id="bannerCaptureViewTitle">메인배너 효율 분석 표 캡처</h3>
-            <p class="text-xs text-slate-500 mt-0.5">등록된 배너 실적 캡처 이미지</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <div id="bannerImgTabButtons" class="flex flex-wrap items-center gap-1.5"></div>
-            <button onclick="openBannerModal()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-              + 캡처/디자인 추가
-            </button>
-          </div>
-        </div>
-        <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-3 overflow-auto max-h-[620px] flex items-center justify-center min-h-[200px]">
-          <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
-          <div id="noBannerImgText" class="text-center py-10 space-y-2">
-            <p class="text-xs text-slate-500">선택된 주차에 등록된 메인배너 효율 캡처 이미지가 없습니다.</p>
-            <button onclick="openBannerModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-              🖼️ 지금 배너 캡처 이미지 올리기
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. 주요 배너 항목별 실제 구조화 분석 테이블 (썸네일 + 클릭 확대 지원) -->
+      <!-- 2. 주요 배너 항목별 세부 실적 (배너썸네일 직접 업로드/확대 지원) -->
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
-            <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">주요 배너 구좌별 세부 실적 및 배너 썸네일</h3>
-            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 실제 제작된 배너 이미지가 크게 확대됩니다.</p>
+            <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">주요 배너 구좌별 세부 실적 및 배너썸네일</h3>
+            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 큰 이미지로 확대되며, 미등록 시 썸네일을 직접 업로드할 수 있습니다.</p>
           </div>
           <span class="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded font-medium">구좌별 실적 대조</span>
         </div>
         <div class="overflow-x-auto">
+          <!-- 숨겨진 단일 썸네일 파일 업로더 -->
+          <input type="file" id="singleBannerThumbInput" accept="image/*" class="hidden" onchange="handleSingleThumbUpload(event)">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
               <tr class="bg-slate-100/70 border-b border-slate-200 text-slate-700 font-semibold">
-                <th class="py-3 px-4 w-16 text-center">디자인</th>
+                <th class="py-3 px-4 w-24 text-center">배너썸네일</th>
                 <th class="py-3 px-4">구좌 및 배너명</th>
                 <th class="py-3 px-4 text-right">노출수</th>
                 <th class="py-3 px-4 text-right">클릭수</th>
@@ -200,7 +177,7 @@
         </div>
       </section>
 
-      <!-- 4. 구좌별 클릭수 vs 매출 차트 -->
+      <!-- 3. 구좌별 클릭수 vs 매출 차트 -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -211,6 +188,38 @@
         </div>
         <div class="h-64">
           <canvas id="chartBannerSlot"></canvas>
+        </div>
+      </div>
+
+      <!-- 4. 메인배너 효율 표 원본 캡처 (디폴트: 접힘 아코디언 상태) -->
+      <div id="bannerCaptureAccordion" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <button onclick="toggleBannerCaptureAccordion()" class="w-full px-5 py-4 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/80 transition text-left">
+          <div class="flex items-center space-x-2">
+            <span id="accordionIcon" class="text-slate-500 transition-transform duration-200">▶</span>
+            <h3 class="text-sm font-bold text-slate-900" id="bannerCaptureViewTitle">원본 표 캡처 확인하기 (클릭하여 펼치기)</h3>
+          </div>
+          <span class="text-xs text-slate-400">등록된 실적 표 원본 캡처본</span>
+        </button>
+
+        <div id="bannerCaptureContent" class="hidden p-5 border-t border-slate-200 space-y-3 bg-white">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+            <p class="text-xs text-slate-500">등록된 메인배너 및 스와이프 배너 원본 표 목록입니다.</p>
+            <div class="flex items-center space-x-2">
+              <div id="bannerImgTabButtons" class="flex flex-wrap items-center gap-1.5"></div>
+              <button onclick="openBannerModal()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+                + 캡처표 추가/변경
+              </button>
+            </div>
+          </div>
+          <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-3 overflow-auto max-h-[650px] flex items-center justify-center min-h-[160px]">
+            <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
+            <div id="noBannerImgText" class="text-center py-8 space-y-2">
+              <p class="text-xs text-slate-500">선택된 주차에 등록된 메인배너 효율 캡처 표가 없습니다.</p>
+              <button onclick="openBannerModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+                🖼️ 지금 배너 캡처 이미지 올리기
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -377,13 +386,13 @@
     </div>
   </div>
 
-  <!-- [모달 2] 메인배너 캡처 & 개별 썸네일 등록 모달 -->
+  <!-- [모달 2] 메인배너 캡처표 등록 모달 -->
   <div id="bannerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-amber-50/50">
         <div>
-          <h3 class="text-base font-bold text-slate-900">메인배너 효율 표 캡처 & 썸네일 등록</h3>
-          <p class="text-xs text-slate-500 mt-0.5"><span id="targetWeekBadge" class="font-bold text-amber-700"></span>에 등록할 이미지를 선택하세요.</p>
+          <h3 class="text-base font-bold text-slate-900">메인배너 효율 표 캡처 등록</h3>
+          <p class="text-xs text-slate-500 mt-0.5"><span id="targetWeekBadge" class="font-bold text-amber-700"></span>에 등록할 표 캡처 이미지를 선택하세요.</p>
         </div>
         <button onclick="closeBannerModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
@@ -392,14 +401,14 @@
         <div id="modalBannerDropZone" class="border-2 border-dashed border-amber-300 rounded-xl p-5 text-center bg-amber-50/20 cursor-pointer hover:bg-amber-50/50 transition">
           <input type="file" id="modalBannerInput" accept="image/*" multiple class="hidden" onchange="handleModalBannerImages(event)">
           <div class="space-y-1">
-            <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 캡처 이미지를 끌어다 놓으세요</p>
-            <p class="text-[11px] text-slate-400">표 캡처 이미지 또는 실제 배너 디자인 그래픽을 여러 장 등록할 수 있습니다</p>
+            <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 표 캡처 이미지를 끌어다 놓으세요</p>
+            <p class="text-[11px] text-slate-400">4장의 표 캡처본을 여러 장 한 번에 등록할 수 있습니다</p>
           </div>
         </div>
 
         <div>
           <div class="flex items-center justify-between text-xs text-slate-600 mb-2 font-medium">
-            <span>등록 대기 중인 이미지:</span>
+            <span>등록 대기 중인 표 캡처 이미지:</span>
             <span id="modalBannerCountText" class="text-amber-700 font-bold">0장</span>
           </div>
           <div id="modalBannerThumbnails" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-200 rounded-lg bg-slate-50">
@@ -409,7 +418,7 @@
 
         <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
           <button type="button" onclick="closeBannerModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
-          <button type="button" onclick="saveBannerImages()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">배너 이미지 반영</button>
+          <button type="button" onclick="saveBannerImages()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">배너 캡처표 반영</button>
         </div>
       </div>
     </div>
@@ -423,7 +432,10 @@
           <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
           <h3 class="text-sm font-bold text-slate-900" id="zoomBannerTitle">배너 원본 디자인 확인</h3>
         </div>
-        <button onclick="closeBannerZoomModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+        <div class="flex items-center space-x-2">
+          <button id="zoomReplaceBtn" class="px-2.5 py-1 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 rounded font-semibold transition">이미지 교체</button>
+          <button onclick="closeBannerZoomModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+        </div>
       </div>
       <div class="p-4 overflow-auto flex-1 bg-slate-100 flex items-center justify-center">
         <img id="zoomBannerImage" src="" alt="확대 배너 이미지" class="max-w-full max-h-[75vh] object-contain rounded-lg border border-slate-300 shadow-md">
@@ -458,6 +470,8 @@
     let tempBannerList = [];
     let currentUploadedKpiImage = null;
     let currentViewBannerImgIdx = 0;
+    let currentUploadItemIndex = null; // 단일 썸네일 업로드 타깃 인덱스
+    let isCaptureAccordionOpen = false; // 아코디언 접힘 상태 (디폴트: false)
     let chartInstances = {};
 
     function parseDateWeight(periodStr, weekName) {
@@ -553,7 +567,7 @@
     }
 
     // ========================================================
-    // 메인 배너 효율 탭 렌더링 (코멘트 자동분석/편집 + 세부 테이블 + 썸네일)
+    // 메인 배너 효율 탭 렌더링
     // ========================================================
     function renderBannerTab() {
       const sel = document.getElementById('weekSelector');
@@ -563,8 +577,38 @@
       const curr = dataset[currIdx];
       const images = curr.bannerImages || [];
 
-      // 1. 배너 표 원본 캡처 노출
-      document.getElementById('bannerCaptureViewTitle').textContent = `[${curr.week}] 메인배너 효율 분석 표 캡처 (${images.length}장)`;
+      // 1. 코멘트 영역 렌더링
+      renderBannerComment(curr);
+
+      // 2. 주요 배너 항목별 실제 구조화 분석 테이블 렌더링 (배너썸네일 적용)
+      renderStructuredBannerTable(curr);
+
+      // 3. 슬롯 차트
+      renderBannerSlotChart(curr);
+
+      // 4. 하단 접힘 캡처 표 원본 노출 제어
+      renderBannerCaptureAccordion(curr, images);
+    }
+
+    // 캡처 표 아코디언 토글 제어 (디폴트: 접힘)
+    function toggleBannerCaptureAccordion() {
+      isCaptureAccordionOpen = !isCaptureAccordionOpen;
+      const content = document.getElementById('bannerCaptureContent');
+      const icon = document.getElementById('accordionIcon');
+      const title = document.getElementById('bannerCaptureViewTitle');
+
+      if (isCaptureAccordionOpen) {
+        content.classList.remove('hidden');
+        icon.textContent = '▼';
+        title.textContent = '원본 표 캡처 닫기';
+      } else {
+        content.classList.add('hidden');
+        icon.textContent = '▶';
+        title.textContent = '원본 표 캡처 확인하기 (클릭하여 펼치기)';
+      }
+    }
+
+    function renderBannerCaptureAccordion(curr, images) {
       const bannerImg = document.getElementById('bannerCaptureImg');
       const noImg = document.getElementById('noBannerImgText');
       const tabBtns = document.getElementById('bannerImgTabButtons');
@@ -582,7 +626,7 @@
           btn.textContent = `표 #${idx + 1}`;
           btn.onclick = () => {
             currentViewBannerImgIdx = idx;
-            renderBannerTab();
+            renderBannerCaptureAccordion(curr, images);
           };
           tabBtns.appendChild(btn);
         });
@@ -590,18 +634,8 @@
         bannerImg.classList.add('hidden');
         noImg.classList.remove('hidden');
       }
-
-      // 2. 코멘트 영역 렌더링 (저장된 코멘트가 있으면 유지, 없으면 데이터 기반 자동 작성)
-      renderBannerComment(curr);
-
-      // 3. 주요 배너 항목별 실제 구조화 분석 테이블 렌더링
-      renderStructuredBannerTable(curr, images);
-
-      // 4. 슬롯 차트
-      renderBannerSlotChart(curr);
     }
 
-    // 코멘트 자동 분석 및 편집 로직
     function renderBannerComment(curr) {
       const commentBox = document.getElementById('bannerCommentBox');
       if (curr.bannerComment && curr.bannerComment.trim() !== '') {
@@ -609,7 +643,6 @@
         return;
       }
 
-      // 기본 자동 진단 코멘트 템플릿 생성
       const defaultComment = `
         <p class="font-bold text-slate-900 mb-1">📌 [${curr.week} 메인 홈 배너 구좌 효율 핵심 진단] (자동 분석 기준)</p>
         <p class="text-slate-700 leading-relaxed">• <strong>메인 롤링 1~2번 구좌:</strong> 신선/정육 및 시즌 대형 프로모션 중심의 높은 클릭 점유율 확보 (전체 배너 클릭의 약 50% 이상 견인). CTR 10% 이상 유지 구좌의 기획전 연계 전환율(CVR)이 안정적임.</p>
@@ -629,33 +662,46 @@
       }
     }
 
-    // 실제 장표 기준 주요 배너 항목별 상세 테이블 생성 (썸네일 포함)
-    function renderStructuredBannerTable(curr, images) {
+    // 배너 세부 테이블 렌더링 (배너썸네일 컬럼 + 업로드 버튼 연동)
+    function renderStructuredBannerTable(curr) {
       const tbody = document.getElementById('mainBannerTableBody');
       if (!tbody) return;
 
-      // 주차별 배너 데이터가 등록되어 있지 않을 경우 장표(10월3주/금주) 기반 대표 항목 구조화
-      const bannerList = curr.bannerItems || [
-        { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: images[0] || null },
-        { slot: "1번", name: "[메인배너_1번] 261019_한우데이(전점)", imp: 79017, click: 14964, ctr: 18.9, orders: 2568, rev: 0, cvr: 17.2, thumb: images[1] || images[0] || null },
-        { slot: "2번", name: "[메인배너_2번] 261015_초신선(전점)", imp: 16447, click: 2215, ctr: 13.5, orders: 1708, rev: 29643846, cvr: 77.1, thumb: images[0] || null },
-        { slot: "2번", name: "[메인배너_2번] 261019_초신선(전점)", imp: 64013, click: 7543, ctr: 11.8, orders: 1708, rev: 0, cvr: 22.6, thumb: images[1] || images[0] || null },
-        { slot: "3번", name: "[메인배너_3번] 261015_정육(CFC)", imp: 12357, click: 1569, ctr: 12.7, orders: 1119, rev: 19002591, cvr: 71.3, thumb: images[0] || null },
-        { slot: "3번", name: "[메인배너_3번] 261019_정육(전점)", imp: 47677, click: 5464, ctr: 11.5, orders: 1119, rev: 0, cvr: 20.5, thumb: images[1] || images[0] || null },
-        { slot: "4번", name: "[메인배너_4번] 261015_밥상주치의(CFC)", imp: 10042, click: 599, ctr: 6.0, orders: 37, rev: 601843, cvr: 6.2, thumb: images[0] || null },
-        { slot: "4번", name: "[메인배너_4번] 261015_제타패스(구독)", imp: 16000, click: 577, ctr: 3.6, orders: 56, rev: 1038548, cvr: 9.7, thumb: images[0] || null },
-        { slot: "5번", name: "[메인배너_5번] 261019_코카콜라(광고)", imp: 43008, click: 3083, ctr: 7.2, orders: 66, rev: 641426, cvr: 2.1, thumb: images[0] || null },
-        { slot: "6번", name: "[메인배너_6번] 261015_오리온(광고)", imp: 38547, click: 2150, ctr: 5.6, orders: 56, rev: 297115, cvr: 2.6, thumb: images[0] || null }
-      ];
+      if (!curr.bannerItems) {
+        curr.bannerItems = [
+          { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: null },
+          { slot: "1번", name: "[메인배너_1번] 261019_한우데이(전점)", imp: 79017, click: 14964, ctr: 18.9, orders: 2568, rev: 0, cvr: 17.2, thumb: null },
+          { slot: "2번", name: "[메인배너_2번] 261015_초신선(전점)", imp: 16447, click: 2215, ctr: 13.5, orders: 1708, rev: 29643846, cvr: 77.1, thumb: null },
+          { slot: "2번", name: "[메인배너_2번] 261019_초신선(전점)", imp: 64013, click: 7543, ctr: 11.8, orders: 1708, rev: 0, cvr: 22.6, thumb: null },
+          { slot: "3번", name: "[메인배너_3번] 261015_정육(CFC)", imp: 12357, click: 1569, ctr: 12.7, orders: 1119, rev: 19002591, cvr: 71.3, thumb: null },
+          { slot: "3번", name: "[메인배너_3번] 261019_정육(전점)", imp: 47677, click: 5464, ctr: 11.5, orders: 1119, rev: 0, cvr: 20.5, thumb: null },
+          { slot: "4번", name: "[메인배너_4번] 261015_밥상주치의(CFC)", imp: 10042, click: 599, ctr: 6.0, orders: 37, rev: 601843, cvr: 6.2, thumb: null },
+          { slot: "4번", name: "[메인배너_4번] 261015_제타패스(구독)", imp: 16000, click: 577, ctr: 3.6, orders: 56, rev: 1038548, cvr: 9.7, thumb: null },
+          { slot: "5번", name: "[메인배너_5번] 261019_코카콜라(광고)", imp: 43008, click: 3083, ctr: 7.2, orders: 66, rev: 641426, cvr: 2.1, thumb: null },
+          { slot: "6번", name: "[메인배너_6번] 261015_오리온(광고)", imp: 38547, click: 2150, ctr: 5.6, orders: 56, rev: 297115, cvr: 2.6, thumb: null }
+        ];
+      }
 
-      tbody.innerHTML = bannerList.map((b, idx) => {
-        const thumbHtml = b.thumb
-          ? `<img src="${b.thumb}" onclick="openBannerZoomModal('${b.name}', '${b.thumb}')" class="w-12 h-8 object-cover rounded cursor-pointer border border-slate-200 hover:scale-110 hover:border-blue-500 transition shadow-xs" title="클릭하여 원본 디자인 크게보기">`
-          : `<div class="w-12 h-8 rounded bg-slate-100 flex items-center justify-center text-[10px] text-slate-400 border border-slate-200">배너</div>`;
+      tbody.innerHTML = curr.bannerItems.map((b, idx) => {
+        let thumbContent = '';
+        if (b.thumb) {
+          thumbContent = `
+            <div class="relative group mx-auto w-14 h-9">
+              <img src="${b.thumb}" onclick="openBannerZoomModal('${b.name}', '${b.thumb}', ${idx})" class="w-full h-full object-cover rounded cursor-pointer border border-slate-300 shadow-xs hover:border-blue-500 transition" title="클릭하여 확대">
+              <button onclick="triggerSingleThumbUpload(${idx})" class="absolute -top-1 -right-1 bg-slate-800 text-white text-[9px] w-4 h-4 rounded-full opacity-0 group-hover:opacity-100 transition flex items-center justify-center" title="이미지 변경">✎</button>
+            </div>
+          `;
+        } else {
+          thumbContent = `
+            <button onclick="triggerSingleThumbUpload(${idx})" class="w-14 h-9 mx-auto rounded border border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-100/60 text-amber-700 text-[10px] font-semibold flex items-center justify-center transition shadow-xs">
+              + 등록
+            </button>
+          `;
+        }
 
         return `
-          <tr class="hover:bg-slate-50 transition ${idx < 2 ? 'bg-amber-50/40 font-medium' : ''}">
-            <td class="py-2.5 px-3 text-center">${thumbHtml}</td>
+          <tr class="hover:bg-slate-50 transition ${idx < 2 ? 'bg-amber-50/30 font-medium' : ''}">
+            <td class="py-2.5 px-3 text-center">${thumbContent}</td>
             <td class="py-2.5 px-4 font-semibold text-slate-900">${b.name}</td>
             <td class="py-2.5 px-4 text-right text-slate-600">${b.imp.toLocaleString()}</td>
             <td class="py-2.5 px-4 text-right font-semibold text-slate-800">${b.click.toLocaleString()}</td>
@@ -668,10 +714,37 @@
       }).join('');
     }
 
-    // 썸네일 클릭 시 고화질 확대 모달 열기/닫기
-    function openBannerZoomModal(title, imgSrc) {
+    // 개별 썸네일 업로드 트리거 및 처리
+    function triggerSingleThumbUpload(itemIndex) {
+      currentUploadItemIndex = itemIndex;
+      document.getElementById('singleBannerThumbInput').click();
+    }
+
+    function handleSingleThumbUpload(event) {
+      const file = event.target.files[0];
+      if (!file || currentUploadItemIndex === null) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const sel = document.getElementById('weekSelector');
+        let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
+        if (dataset[currIdx] && dataset[currIdx].bannerItems && dataset[currIdx].bannerItems[currentUploadItemIndex]) {
+          dataset[currIdx].bannerItems[currentUploadItemIndex].thumb = e.target.result;
+          saveData();
+          renderStructuredBannerTable(dataset[currIdx]);
+        }
+        document.getElementById('singleBannerThumbInput').value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openBannerZoomModal(title, imgSrc, itemIndex) {
       document.getElementById('zoomBannerTitle').textContent = title;
       document.getElementById('zoomBannerImage').src = imgSrc;
+      document.getElementById('zoomReplaceBtn').onclick = () => {
+        closeBannerZoomModal();
+        triggerSingleThumbUpload(itemIndex);
+      };
       document.getElementById('bannerZoomModal').classList.remove('hidden');
     }
     function closeBannerZoomModal() {
@@ -842,7 +915,8 @@
         revenue, searchRevenue, searchShare,
         basketItems,
         bannerImages: [],
-        bannerComment: ""
+        bannerComment: "",
+        bannerItems: null
       };
 
       dataset.push(newEntry);
@@ -916,7 +990,7 @@
         saveData();
         renderBannerTab();
         closeBannerModal();
-        alert("배너 이미지가 성공적으로 반영되었습니다!");
+        alert("배너 캡처표 이미지가 성공적으로 반영되었습니다!");
       }
     }
 
@@ -930,7 +1004,7 @@
             <div>
               <span class="font-bold text-slate-800">${d.week}</span>
               <span class="text-slate-400 ml-1">(${d.period})</span>
-              <span class="ml-2 text-slate-500">배너 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
+              <span class="ml-2 text-slate-500">배너표 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
             </div>
             <button onclick="deleteWeek(${idx})" class="text-red-500 hover:font-bold">삭제</button>
           </div>
@@ -1237,37 +1311,4 @@
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `제타_주간지표_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-    }
-
-    const kpiDropZone = document.getElementById('kpiOcrDropZone');
-    kpiDropZone.addEventListener('click', () => document.getElementById('kpiOcrFileInput').click());
-    kpiDropZone.addEventListener('dragover', (e) => { e.preventDefault(); kpiDropZone.classList.add('border-indigo-500', 'bg-indigo-50/50'); });
-    kpiDropZone.addEventListener('dragleave', () => { kpiDropZone.classList.remove('border-indigo-500', 'bg-indigo-50/50'); });
-    kpiDropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      kpiDropZone.classList.remove('border-indigo-500', 'bg-indigo-50/50');
-      if (e.dataTransfer.files.length) {
-        document.getElementById('kpiOcrFileInput').files = e.dataTransfer.files;
-        handleKpiOcrImage({ target: { files: e.dataTransfer.files } });
-      }
-    });
-
-    const mDropZone = document.getElementById('modalBannerDropZone');
-    mDropZone.addEventListener('click', () => document.getElementById('modalBannerInput').click());
-    mDropZone.addEventListener('dragover', (e) => { e.preventDefault(); mDropZone.classList.add('border-amber-500', 'bg-amber-100/50'); });
-    mDropZone.addEventListener('dragleave', () => { mDropZone.classList.remove('border-amber-500', 'bg-amber-100/50'); });
-    mDropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      mDropZone.classList.remove('border-amber-500', 'bg-amber-100/50');
-      if (e.dataTransfer.files.length) {
-        handleModalBannerImages({ target: { files: e.dataTransfer.files } });
-      }
-    });
-
-    window.addEventListener('DOMContentLoaded', initApp);
-  </script>
-</body>
-</html>
+      a.href
