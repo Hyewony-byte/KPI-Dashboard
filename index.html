@@ -36,18 +36,15 @@
           </select>
         </div>
 
-        <!-- 1. 주요 KPI 수치 등록 버튼 -->
         <button onclick="openKpiModal()" class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
           <span>+ 주요 KPI 등록</span>
         </button>
 
-        <!-- 2. 배너 효율 캡처 업로드 버튼 -->
         <button onclick="openBannerModal()" class="flex items-center space-x-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
           <span>🖼️ 배너 캡처 등록</span>
         </button>
 
-        <!-- 3. 주차 목록 관리 버튼 -->
-        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리 및 삭제">
+        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리 및 순서 정렬">
           ⚙️
         </button>
 
@@ -69,16 +66,13 @@
       <button id="tabBtn-table" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('table')">전체 지표 비교표</button>
     </div>
 
-    <!-- 데이터 없을 때 안내 화면 (Empty State) -->
+    <!-- 데이터 없을 때 안내 화면 -->
     <div id="emptyState" class="hidden bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
       <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📊</div>
       <div class="space-y-1">
         <h3 class="text-base font-bold text-slate-900">등록된 주차 데이터가 없습니다</h3>
-        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 주요 KPI 등록]</strong> 버튼을 눌러 첫 번째 주간 데이터를 입력해 주세요.</p>
+        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 주요 KPI 등록]</strong> 버튼을 눌러 주간 데이터를 입력해 주세요.</p>
       </div>
-      <button onclick="openKpiModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-        + 첫 주차 데이터 입력하기
-      </button>
     </div>
 
     <!-- 탭 1: 요약 대시보드 -->
@@ -109,8 +103,8 @@
       <section class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
-            <h2 class="text-base font-bold text-slate-900">최근 3개 주차 지표 상세 현황</h2>
-            <p class="text-xs text-slate-500 mt-0.5">전주 대비(WoW) 증감률 및 주차별 연속 추이</p>
+            <h2 class="text-base font-bold text-slate-900">주차별 지표 상세 현황</h2>
+            <p class="text-xs text-slate-500 mt-0.5">선택 주차 시점 기준 전주 대비(WoW) 증감률 분석</p>
           </div>
           <span class="text-xs text-slate-400">일평균 집계 기준</span>
         </div>
@@ -124,7 +118,7 @@
                 <th class="py-3 px-4 text-right" id="th-week-prev1">-</th>
                 <th class="py-3 px-4 text-right bg-blue-50/40 text-blue-900 font-bold" id="th-week-curr">-</th>
                 <th class="py-3 px-4 text-right">전주대비 WoW 증감</th>
-                <th class="py-3 px-4 text-center w-28">3주 추이</th>
+                <th class="py-3 px-4 text-center w-28">추이</th>
               </tr>
             </thead>
             <tbody id="weeklyTableBody" class="divide-y divide-slate-100">
@@ -187,7 +181,7 @@
     <div id="tab-table" class="space-y-6 hidden">
       <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="text-base font-bold text-slate-900">누적 주차별 전체 지표 매트릭스</h3>
+          <h3 class="text-base font-bold text-slate-900">누적 주차별 전체 지표 매트릭스 (과거 → 최근)</h3>
           <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 font-medium rounded-lg text-slate-700 transition">CSV 다운로드</button>
         </div>
         <div class="overflow-x-auto">
@@ -199,7 +193,7 @@
 
   </main>
 
-  <!-- [모달 1] 주요 KPI 수치 입력 전용 모달 -->
+  <!-- 모달 1: 주요 KPI 등록 -->
   <div id="kpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -215,11 +209,11 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">주차 명칭 *</label>
-              <input type="text" id="formWeekName" required placeholder="예: 11월 1주차" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <input type="text" id="formWeekName" required placeholder="예: 10월 4주차" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">집계 기간 *</label>
-              <input type="text" id="formWeekPeriod" required placeholder="예: 10.29~11.01" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <input type="text" id="formWeekPeriod" required placeholder="예: 10.22~10.28" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             </div>
           </div>
 
@@ -228,15 +222,15 @@
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 UV (명)</label>
-                <input type="number" id="formUV" required placeholder="예: 253202" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formUV" required placeholder="예: 172199" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 PV (건)</label>
-                <input type="number" id="formPV" required placeholder="예: 4598919" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formPV" required placeholder="예: 3611820" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">주문건수 (건)</label>
-                <input type="number" id="formOrders" required placeholder="예: 15043" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formOrders" required placeholder="예: 12174" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
             </div>
           </div>
@@ -246,15 +240,15 @@
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">전체 검색수</label>
-                <input type="number" id="formTotalSearch" required placeholder="예: 412007" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formTotalSearch" required placeholder="예: 342042" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 실패수</label>
-                <input type="number" id="formSearchFail" required placeholder="예: 13260" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formSearchFail" required placeholder="예: 10890" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 주문건수</label>
-                <input type="number" id="formSearchOrders" placeholder="선택 (미입력시 추정)" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formSearchOrders" placeholder="선택 (예: 25826)" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
             </div>
           </div>
@@ -264,15 +258,15 @@
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">전체주문금액 (백만)</label>
-                <input type="number" id="formRevenue" required placeholder="예: 790" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formRevenue" required placeholder="예: 584" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">검색주문금액 (백만)</label>
-                <input type="number" id="formSearchRevenue" placeholder="예: 271" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" id="formSearchRevenue" placeholder="예: 202" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
               <div>
                 <label class="block text-[11px] font-medium text-slate-600 mb-1">건당수량 (개)</label>
-                <input type="number" step="0.1" id="formBasketItems" required placeholder="예: 10.9" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
+                <input type="number" step="0.1" id="formBasketItems" required placeholder="예: 11.5" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg">
               </div>
             </div>
           </div>
@@ -286,7 +280,7 @@
     </div>
   </div>
 
-  <!-- [모달 2] 메인배너 효율 캡처 이미지 업로드 전용 모달 -->
+  <!-- 모달 2: 메인배너 캡처 등록 -->
   <div id="bannerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-amber-50/50">
@@ -302,7 +296,7 @@
           <input type="file" id="modalBannerInput" accept="image/*" multiple class="hidden" onchange="handleModalBannerImages(event)">
           <div class="space-y-1">
             <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 캡처 이미지를 끌어다 놓으세요</p>
-            <p class="text-[11px] text-slate-400">Ctrl 또는 Shift 키를 누르고 여러 장을 한 번에 선택할 수 있습니다</p>
+            <p class="text-[11px] text-slate-400">다중 선택 가능 (Ctrl/Shift 키 활용)</p>
           </div>
         </div>
 
@@ -324,11 +318,14 @@
     </div>
   </div>
 
-  <!-- [모달 3] 주차 관리 모달 -->
+  <!-- 모달 3: 주차 관리 및 순서 정렬 -->
   <div id="manageModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-        <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
+        <div>
+          <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
+          <p class="text-xs text-slate-500">순서는 항상 과거 → 최근 순으로 자동 정렬됩니다.</p>
+        </div>
         <button onclick="closeManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
       <div class="p-6 space-y-4">
@@ -342,13 +339,32 @@
     </div>
   </div>
 
-  <!-- 메인 스크립트 -->
   <script>
-    // 기존 10월 1~2주차 데이터를 완전 삭제하고 빈 배열로 시작
     let dataset = [];
     let tempBannerList = [];
     let currentViewBannerImgIdx = 0;
     let chartInstances = {};
+
+    // 날짜 파싱 헬퍼 (예: "10.22~10.28" -> 시작일 10.22를 기준 숫자로 변환)
+    function parseDateWeight(periodStr, weekName) {
+      if (!periodStr) return 0;
+      const match = periodStr.match(/(\d{1,2})\.(\d{1,2})/);
+      if (match) {
+        const month = parseInt(match[1]);
+        const day = parseInt(match[2]);
+        return month * 100 + day;
+      }
+      return 0;
+    }
+
+    // 데이터셋을 과거 -> 최근 순으로 항상 정렬 유지
+    function sortDatasetChronologically() {
+      dataset.sort((a, b) => {
+        const weightA = parseDateWeight(a.period, a.week);
+        const weightB = parseDateWeight(b.period, b.week);
+        return weightA - weightB;
+      });
+    }
 
     function initApp() {
       try {
@@ -363,12 +379,14 @@
         dataset = [];
       }
 
+      sortDatasetChronologically();
       populateWeekSelector();
       onWeekChanged();
     }
 
     function saveData() {
       try {
+        sortDatasetChronologically();
         localStorage.setItem('zeta_kpi_dataset_v_clean', JSON.stringify(dataset));
       } catch (e) {
         console.warn("로컬 저장 오류:", e);
@@ -392,6 +410,7 @@
         const opt = document.createElement('option');
         opt.value = idx;
         opt.textContent = `${d.week} (${d.period})`;
+        // 가장 최근 주차(맨 마지막)를 기본 선택
         if (idx === dataset.length - 1) opt.selected = true;
         sel.appendChild(opt);
       });
@@ -413,21 +432,24 @@
       }
     }
 
+    // 핵심: 선택된 주차를 "당주(최신)"로 간주하고 그 이전 시점까지만 잘라서 렌더링
     function renderDashboard() {
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
       if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) return;
 
-      const curr = dataset[currIdx];
-      const prev = currIdx > 0 ? dataset[currIdx - 1] : null;
+      // 선택 시점까지의 데이터만 추출 (미래 주차 제거)
+      const visibleData = dataset.slice(0, currIdx + 1);
+      const curr = visibleData[visibleData.length - 1]; // 선택된 당주
+      const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null; // 바로 전주
 
       document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period}`;
       document.getElementById('insightContainer').innerHTML = generateExecutiveInsight(curr, prev);
 
-      renderKpiCards(curr, prev);
-      renderWeeklyTable(currIdx);
-      renderCharts();
-      renderFullMatrixTable();
+      renderKpiCards(curr, prev, visibleData);
+      renderWeeklyTable(curr, prev, visibleData);
+      renderCharts(visibleData);
+      renderFullMatrixTable(visibleData);
     }
 
     function renderBannerTab() {
@@ -511,7 +533,7 @@
       `;
     }
 
-    function renderKpiCards(curr, prev) {
+    function renderKpiCards(curr, prev, visibleData) {
       const container = document.getElementById('kpiCardsContainer');
       const calcDiff = (c, p) => p ? (((c - p) / p) * 100).toFixed(1) : 0;
       const calcPDiff = (c, p) => p ? (c - p).toFixed(1) : 0;
@@ -524,7 +546,7 @@
           diff: prev ? calcDiff(curr.uv, prev.uv) : null,
           unit: "%",
           isGood: prev ? (curr.uv >= prev.uv) : true,
-          sparkData: dataset.map(d => d.uv)
+          sparkData: visibleData.map(d => d.uv)
         },
         {
           title: "일평균 PV",
@@ -533,7 +555,7 @@
           diff: prev ? calcDiff(curr.pv, prev.pv) : null,
           unit: "%",
           isGood: prev ? (curr.pv >= prev.pv) : true,
-          sparkData: dataset.map(d => d.pv)
+          sparkData: visibleData.map(d => d.pv)
         },
         {
           title: "구매전환율 (CVR)",
@@ -542,7 +564,7 @@
           diff: prev ? calcPDiff(curr.cvr, prev.cvr) : null,
           unit: "%p",
           isGood: prev ? (curr.cvr >= prev.cvr) : true,
-          sparkData: dataset.map(d => d.cvr)
+          sparkData: visibleData.map(d => d.cvr)
         },
         {
           title: "검색 실패율",
@@ -551,7 +573,7 @@
           diff: prev ? calcPDiff(curr.searchFailRate, prev.searchFailRate) : null,
           unit: "%p",
           isGood: prev ? (curr.searchFailRate <= prev.searchFailRate) : true,
-          sparkData: dataset.map(d => d.searchFailRate)
+          sparkData: visibleData.map(d => d.searchFailRate)
         },
         {
           title: "전체 주문금액",
@@ -560,7 +582,7 @@
           diff: prev ? calcDiff(curr.revenue, prev.revenue) : null,
           unit: "%",
           isGood: prev ? (curr.revenue >= prev.revenue) : true,
-          sparkData: dataset.map(d => d.revenue)
+          sparkData: visibleData.map(d => d.revenue)
         }
       ];
 
@@ -586,7 +608,7 @@
               </div>
             </div>
             <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between">
-              <span class="text-[10px] text-slate-400">최근 추이</span>
+              <span class="text-[10px] text-slate-400">선택 시점까지 추이</span>
               <div class="w-24 h-6">${sparkSvg}</div>
             </div>
           </div>
@@ -614,15 +636,16 @@
       `;
     }
 
-    function renderWeeklyTable(currIdx) {
+    // 비교 테이블: 과거 -> 최근 순서로 배치 (전전주 -> 전주 -> 당주)
+    function renderWeeklyTable(curr, prev, visibleData) {
       const tbody = document.getElementById('weeklyTableBody');
-      const curr = dataset[currIdx];
-      const prev1 = currIdx >= 1 ? dataset[currIdx - 1] : null;
-      const prev2 = currIdx >= 2 ? dataset[currIdx - 2] : null;
+      const vLen = visibleData.length;
+      const prev1 = vLen >= 2 ? visibleData[vLen - 2] : null; // 바로 전주
+      const prev2 = vLen >= 3 ? visibleData[vLen - 3] : null; // 전전주
 
-      document.getElementById('th-week-curr').textContent = curr.week;
-      document.getElementById('th-week-prev1').textContent = prev1 ? prev1.week : '-';
       document.getElementById('th-week-prev2').textContent = prev2 ? prev2.week : '-';
+      document.getElementById('th-week-prev1').textContent = prev1 ? prev1.week : '-';
+      document.getElementById('th-week-curr').textContent = curr.week; // 선택된 당주
 
       const rowsConfig = [
         { group: "트래픽", name: "UV (명)", k: "uv", fmt: n => n.toLocaleString(), type: "%" },
@@ -683,9 +706,10 @@
       }).join('');
     }
 
-    function renderCharts() {
-      if (!window.Chart || dataset.length === 0) return;
-      const labels = dataset.map(d => d.week);
+    // 트렌드 차트: 과거 -> 최근 순서로 노출
+    function renderCharts(visibleData) {
+      if (!window.Chart || visibleData.length === 0) return;
+      const labels = visibleData.map(d => d.week);
       
       const createOrUpdate = (id, config) => {
         const el = document.getElementById(id);
@@ -700,8 +724,8 @@
         data: {
           labels,
           datasets: [
-            { label: '일평균 UV', data: dataset.map(d => d.uv), borderColor: '#2563eb', tension: 0.3, yAxisID: 'y' },
-            { label: '주문수', data: dataset.map(d => d.orders), borderColor: '#10b981', tension: 0.3, yAxisID: 'y1' }
+            { label: '일평균 UV', data: visibleData.map(d => d.uv), borderColor: '#2563eb', tension: 0.3, yAxisID: 'y' },
+            { label: '주문수', data: visibleData.map(d => d.orders), borderColor: '#10b981', tension: 0.3, yAxisID: 'y1' }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
@@ -712,8 +736,8 @@
         data: {
           labels,
           datasets: [
-            { type: 'line', label: '구매전환율 (%)', data: dataset.map(d => d.cvr), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
-            { type: 'bar', label: 'UV당 PV', data: dataset.map(d => d.pvPerUv), backgroundColor: '#94a3b8', yAxisID: 'y1' }
+            { type: 'line', label: '구매전환율 (%)', data: visibleData.map(d => d.cvr), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
+            { type: 'bar', label: 'UV당 PV', data: visibleData.map(d => d.pvPerUv), backgroundColor: '#94a3b8', yAxisID: 'y1' }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right' } } }
@@ -724,8 +748,8 @@
         data: {
           labels,
           datasets: [
-            { label: '검색 실패율 (%)', data: dataset.map(d => d.searchFailRate), borderColor: '#ef4444', tension: 0.3 },
-            { label: '검색 구매비중 (%)', data: dataset.map(d => d.searchShare), borderColor: '#8b5cf6', tension: 0.3 }
+            { label: '검색 실패율 (%)', data: visibleData.map(d => d.searchFailRate), borderColor: '#ef4444', tension: 0.3 },
+            { label: '검색 구매비중 (%)', data: visibleData.map(d => d.searchShare), borderColor: '#8b5cf6', tension: 0.3 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -735,17 +759,17 @@
         type: 'bar',
         data: {
           labels,
-          datasets: [{ label: '주문금액 (백만원)', data: dataset.map(d => d.revenue), backgroundColor: '#3b82f6', borderRadius: 6 }]
+          datasets: [{ label: '주문금액 (백만원)', data: visibleData.map(d => d.revenue), backgroundColor: '#3b82f6', borderRadius: 6 }]
         },
         options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
-    function renderFullMatrixTable() {
+    function renderFullMatrixTable(visibleData) {
       const table = document.getElementById('fullMatrixTable');
-      if (!table || dataset.length === 0) return;
+      if (!table || visibleData.length === 0) return;
       let thead = `<tr class="bg-slate-50 text-slate-700 font-semibold border-b"><th class="py-3 px-4">지표명</th>`;
-      dataset.forEach(d => { thead += `<th class="py-3 px-4 text-right">${d.week}</th>`; });
+      visibleData.forEach(d => { thead += `<th class="py-3 px-4 text-right">${d.week}</th>`; });
       thead += `</tr>`;
 
       const keys = [
@@ -764,7 +788,7 @@
       let tbody = "";
       keys.forEach(row => {
         tbody += `<tr class="border-b hover:bg-slate-50"><td class="py-2.5 px-4 font-medium text-slate-800">${row.label}</td>`;
-        dataset.forEach(d => { tbody += `<td class="py-2.5 px-4 text-right text-slate-600">${row.fmt(d[row.k])}</td>`; });
+        visibleData.forEach(d => { tbody += `<td class="py-2.5 px-4 text-right text-slate-600">${row.fmt(d[row.k])}</td>`; });
         tbody += `</tr>`;
       });
 
@@ -787,9 +811,13 @@
       if (tabId === 'banner') {
         renderBannerTab();
       }
+      if (tabId === 'trends') {
+        const sel = document.getElementById('weekSelector');
+        let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+        renderCharts(dataset.slice(0, currIdx + 1));
+      }
     }
 
-    // [모달 1] 주요 KPI 폼
     function openKpiModal() {
       document.getElementById('kpiDataForm').reset();
       document.getElementById('kpiModal').classList.remove('hidden');
@@ -836,7 +864,6 @@
       onWeekChanged();
     }
 
-    // [모달 2] 배너 캡처 업로드 모달
     function openBannerModal() {
       if (dataset.length === 0) {
         alert("먼저 [+ 주요 KPI 등록]으로 주차를 등록해주세요.");
@@ -900,11 +927,10 @@
         saveData();
         renderBannerTab();
         closeBannerModal();
-        alert("배너 캡처 이미지가 성공적으로 반영되었습니다!");
+        alert("배너 캡처 이미지가 반영되었습니다!");
       }
     }
 
-    // [모달 3] 주차 관리 및 삭제
     function openManageModal() {
       const list = document.getElementById('manageWeekList');
       if (dataset.length === 0) {
@@ -970,7 +996,6 @@
       a.click();
     }
 
-    // 드래그앤드롭 이벤트 바인딩
     const mDropZone = document.getElementById('modalBannerDropZone');
     mDropZone.addEventListener('click', () => document.getElementById('modalBannerInput').click());
     mDropZone.addEventListener('dragover', (e) => { e.preventDefault(); mDropZone.classList.add('border-amber-500', 'bg-amber-100/50'); });
