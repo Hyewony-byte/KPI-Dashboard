@@ -23,7 +23,7 @@
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
-      <!-- 1. 로고 및 타이틀 클릭 시 HOME(요약 대시보드)으로 이동 -->
+      <!-- 로고 및 타이틀 클릭 시 HOME(요약 대시보드)으로 이동 -->
       <div onclick="goHome()" class="flex items-center space-x-3 cursor-pointer group select-none" title="클릭 시 HOME(요약 대시보드)으로 이동">
         <div class="w-10 h-10 rounded-xl bg-[#FF3323] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#FF3323]/25 group-hover:scale-105 transition-transform">
           Z
@@ -44,7 +44,6 @@
           </select>
         </div>
 
-        <!-- 현재 주차 수치 수정 버튼 -->
         <button onclick="editCurrentWeekData()" class="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition" title="현재 선택된 주차의 지표 수정">
           <span>✎ 수치 수정</span>
         </button>
@@ -169,7 +168,7 @@
 
     <!-- 탭 3: 메인 배너구좌별 효율 -->
     <div id="tab-banner" class="space-y-6 hidden">
-      <!-- 코멘트 영역 -->
+      <!-- 1. 코멘트 영역 -->
       <section class="bg-white rounded-2xl border border-amber-200/90 p-5 shadow-xs relative bg-amber-50/20">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-amber-100 gap-2">
           <div class="flex items-center space-x-2">
@@ -186,12 +185,12 @@
         </div>
       </section>
 
-      <!-- 주요 배너 구좌별 세부 실적 테이블 (썸네일 업로드 & URL 입력 지원) -->
+      <!-- 2. 주요 배너 구좌별 세부 실적 테이블 (썸네일 등록/확대 지원) -->
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
             <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">주요 배너 구좌별 세부 실적 및 배너 썸네일</h3>
-            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 원본 배너가 확대되며, <strong>[+등록]</strong> 버튼으로 파일 업로드 또는 이미지 URL을 입력할 수 있습니다.</p>
+            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 원본 배너가 확대되며, <strong>[+등록]</strong> 버튼으로 실제 배너 그래픽을 개별 업로드할 수 있습니다.</p>
           </div>
           <span class="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded font-medium">구좌별 실적 대조</span>
         </div>
@@ -215,7 +214,7 @@
         </div>
       </section>
 
-      <!-- 구좌별 클릭수 vs 매출 차트 -->
+      <!-- 3. 구좌별 클릭수 vs 매출 차트 -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -229,7 +228,7 @@
         </div>
       </div>
 
-      <!-- 배너 실적표 캡처 아코디언 -->
+      <!-- 4. 배너 실적표 캡처 아코디언 (최하단 접힘 유지) -->
       <div id="bannerCaptureViewBox" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 bg-slate-50/70 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition" onclick="toggleBannerCaptureAccordion()">
           <div class="flex items-center space-x-2">
@@ -442,7 +441,7 @@
     </div>
   </div>
 
-  <!-- [신규 모달] 2. 배너 썸네일 등록 팝업 (파일 업로드 OR 이미지 URL 직접 입력) -->
+  <!-- [모달 3] 배너 썸네일 등록 팝업 (파일 업로드 OR 이미지 URL 직접 입력) -->
   <div id="bannerThumbUploadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
       <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -454,9 +453,7 @@
       </div>
 
       <div class="p-5 space-y-4">
-        <!-- 탭 방식 옵션 -->
         <div class="space-y-3">
-          <!-- 옵션 A: 내 컴퓨터 파일 첨부 -->
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1.5">방식 1. 내 컴퓨터에서 이미지 파일 선택</label>
             <button type="button" onclick="openLocalFileInput()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition flex items-center justify-center space-x-1.5">
@@ -470,7 +467,6 @@
             <div class="flex-grow border-t border-slate-200"></div>
           </div>
 
-          <!-- 옵션 B: 이미지 URL 직접 입력 -->
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1.5">방식 2. 이미지 웹 URL 주소 직접 입력</label>
             <div class="flex space-x-1.5">
@@ -483,7 +479,6 @@
           </div>
         </div>
 
-        <!-- 미리보기 박스 -->
         <div id="thumbModalPreviewBox" class="hidden border border-slate-200 rounded-xl bg-slate-50 p-2 text-center">
           <p class="text-[10px] font-medium text-slate-500 mb-1">선택된 썸네일 미리보기:</p>
           <img id="thumbModalPreviewImg" src="" class="max-h-28 mx-auto rounded object-contain border border-slate-300 shadow-2xs">
@@ -539,7 +534,7 @@
     let tempBannerList = [];
     let currentUploadedKpiImage = null;
     let currentViewBannerImgIdx = 0;
-    let currentUploadItemIdx = null; // 썸네일 등록 타깃 인덱스
+    let currentUploadItemIdx = null;
     let isCaptureAccordionOpen = false;
     let chartInstances = {};
 
@@ -556,7 +551,6 @@
       { slot: "6번", name: "[메인배너_6번] 261015_오리온(광고)", imp: 38547, click: 2150, ctr: 5.6, orders: 56, rev: 297115, cvr: 2.6, thumb: null }
     ];
 
-    // 1. HOME 이동 함수 (로고 및 타이틀 클릭 시)
     function goHome() {
       switchTab('summary');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -565,7 +559,7 @@
     function parseDateWeight(periodStr, weekName) {
       let month = 0, day = 0, weekNum = 0;
       if (periodStr) {
-        const clean = periodStr.trim();
+        const clean = String(periodStr).trim();
         const dotMatch = clean.match(/(\d{1,2})\.(\d{1,2})/);
         if (dotMatch) {
           month = parseInt(dotMatch[1]);
@@ -579,7 +573,7 @@
         }
       }
       if (weekName) {
-        const weekMatch = weekName.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*주/);
+        const weekMatch = String(weekName).match(/(\d{1,2})\s*월\s*(\d{1,2})\s*주/);
         if (weekMatch) {
           const wMonth = parseInt(weekMatch[1]);
           const wWeek = parseInt(weekMatch[2]);
@@ -638,7 +632,7 @@
         const d = dataset[i];
         const opt = document.createElement('option');
         opt.value = i;
-        opt.textContent = `${d.week} (${d.period})`;
+        opt.textContent = `${d.week || '주차'} (${d.period || '-'})`;
         if (i === dataset.length - 1) opt.selected = true;
         sel.appendChild(opt);
       }
@@ -670,105 +664,173 @@
       const curr = visibleData[visibleData.length - 1];
       const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null;
 
-      document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period}`;
+      document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period || '-'}`;
       
-      renderSummaryComment(curr, prev);
-      renderKpiCards(curr, prev, visibleData);
-      renderWeeklyTable(curr, prev, visibleData);
-      renderCharts(visibleData);
-      renderFullMatrixTable(visibleData);
+      try { renderSummaryComment(curr, prev); } catch(e) { console.error("요약 코멘트 렌더 오류:", e); }
+      try { renderKpiCards(curr, prev, visibleData); } catch(e) { console.error("KPI 카드 렌더 오류:", e); }
+      try { renderWeeklyTable(curr, prev, visibleData); } catch(e) { console.error("상세 테이블 렌더 오류:", e); }
+      try { renderCharts(visibleData); } catch(e) { console.error("차트 렌더 오류:", e); }
+      try { renderFullMatrixTable(visibleData); } catch(e) { console.error("전체 매트릭스 렌더 오류:", e); }
     }
 
-    function renderCharts(visibleData) {
-      if (!window.Chart || visibleData.length === 0) return;
-      const labels = visibleData.map(d => d.week);
-      
-      const createOrUpdate = (id, config) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (chartInstances[id]) chartInstances[id].destroy();
-        const ctx = el.getContext('2d');
-        chartInstances[id] = new Chart(ctx, config);
-      };
+    function renderKpiCards(curr, prev, visibleData) {
+      const container = document.getElementById('kpiCardsContainer');
+      if (!container) return;
 
-      createOrUpdate('chartTraffic', {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            { label: '일평균 UV', data: visibleData.map(d => d.uv), borderColor: '#2563eb', tension: 0.3, yAxisID: 'y' },
-            { label: '주문수', data: visibleData.map(d => d.orders), borderColor: '#10b981', tension: 0.3, yAxisID: 'y1' }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
-      });
+      const uvVal = Number(curr.uv) || 0;
+      const pvVal = Number(curr.pv) || 0;
+      const pvPerUvVal = Number(curr.pvPerUv) || (uvVal > 0 ? parseFloat((pvVal / uvVal).toFixed(1)) : 0);
+      const ordersVal = Number(curr.orders) || 0;
+      const cvrVal = Number(curr.cvr) || (uvVal > 0 ? parseFloat(((ordersVal / uvVal) * 100).toFixed(1)) : 0);
+      const searchFailVal = Number(curr.searchFail) || 0;
+      const searchFailRateVal = Number(curr.searchFailRate) || 0;
+      const revVal = Number(curr.revenue) || 0;
 
-      createOrUpdate('chartEfficiency', {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [
-            { type: 'line', label: '구매전환율 (%)', data: visibleData.map(d => d.cvr), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
-            { type: 'bar', label: 'UV당 PV', data: visibleData.map(d => d.pvPerUv), backgroundColor: '#94a3b8', yAxisID: 'y1' }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right' } } }
-      });
+      const prevUv = prev ? (Number(prev.uv) || 0) : null;
+      const prevPv = prev ? (Number(prev.pv) || 0) : null;
+      const prevCvr = prev ? (Number(prev.cvr) || 0) : null;
+      const prevFail = prev ? (Number(prev.searchFailRate) || 0) : null;
+      const prevRev = prev ? (Number(prev.revenue) || 0) : null;
 
-      createOrUpdate('chartSearch', {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            { label: '검색 실패율 (%)', data: visibleData.map(d => d.searchFailRate), borderColor: '#ef4444', tension: 0.3 },
-            { label: '검색 구매비중 (%)', data: visibleData.map(d => d.searchShare), borderColor: '#8b5cf6', tension: 0.3 }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
+      const calcDiff = (c, p) => (p && p > 0) ? (((c - p) / p) * 100).toFixed(1) : null;
+      const calcPDiff = (c, p) => (p !== null && p !== undefined) ? (c - p).toFixed(1) : null;
 
-      createOrUpdate('chartRevenue', {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{ label: '주문금액 (백만원)', data: visibleData.map(d => d.revenue), backgroundColor: '#3b82f6', borderRadius: 6 }]
+      const cards = [
+        { 
+          title: "일평균 UV", 
+          value: `${(uvVal / 10000).toFixed(1)}만`, 
+          subValue: `${uvVal.toLocaleString()}명`, 
+          diff: prev ? calcDiff(uvVal, prevUv) : null, 
+          unit: "%", 
+          isGood: prev ? (uvVal >= prevUv) : true, 
+          sparkData: visibleData.map(d => Number(d.uv) || 0) 
         },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
+        { 
+          title: "일평균 PV", 
+          value: `${(pvVal / 1000000).toFixed(1)}백만`, 
+          subValue: `UV당 PV ${pvPerUvVal.toFixed(1)}건`, 
+          diff: prev ? calcDiff(pvVal, prevPv) : null, 
+          unit: "%", 
+          isGood: prev ? (pvVal >= prevPv) : true, 
+          sparkData: visibleData.map(d => Number(d.pv) || 0) 
+        },
+        { 
+          title: "구매전환율 (CVR)", 
+          value: `${cvrVal.toFixed(1)}%`, 
+          subValue: `주문 ${ordersVal.toLocaleString()}건`, 
+          diff: prev ? calcPDiff(cvrVal, prevCvr) : null, 
+          unit: "%p", 
+          isGood: prev ? (cvrVal >= prevCvr) : true, 
+          sparkData: visibleData.map(d => Number(d.cvr) || 0) 
+        },
+        { 
+          title: "검색 실패율", 
+          value: `${searchFailRateVal.toFixed(1)}%`, 
+          subValue: `실패 ${searchFailVal.toLocaleString()}건`, 
+          diff: prev ? calcPDiff(searchFailRateVal, prevFail) : null, 
+          unit: "%p", 
+          isGood: prev ? (searchFailRateVal <= prevFail) : true, 
+          sparkData: visibleData.map(d => Number(d.searchFailRate) || 0) 
+        },
+        { 
+          title: "전체 주문금액", 
+          value: `${(revVal / 100).toFixed(1)}억`, 
+          subValue: `${revVal.toLocaleString()}백만원`, 
+          diff: prev ? calcDiff(revVal, prevRev) : null, 
+          unit: "%", 
+          isGood: prev ? (revVal >= prevRev) : true, 
+          sparkData: visibleData.map(d => Number(d.revenue) || 0) 
+        }
+      ];
+
+      container.innerHTML = cards.map(c => {
+        let diffBadge = `<span class="text-xs text-slate-400 font-medium">비교 대상 없음</span>`;
+        if (c.diff !== null && !isNaN(parseFloat(c.diff))) {
+          const numDiff = parseFloat(c.diff);
+          const isPositive = numDiff >= 0;
+          const sign = isPositive ? "▲" : "▼";
+          const colorClass = c.isGood ? "text-red-500 font-bold" : "text-blue-500 font-semibold";
+          diffBadge = `<span class="text-xs ${colorClass}">전주대비 ${sign} ${Math.abs(numDiff)}${c.unit}</span>`;
+        }
+
+        const sparkSvg = createSparklineSvg(c.sparkData, c.isGood ? '#3b82f6' : '#64748b');
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
+            <div>
+              <div class="text-xs font-semibold text-slate-600 mb-2">${c.title}</div>
+              <div class="text-2xl font-extrabold text-slate-900 tracking-tight">${c.value}</div>
+              <div class="flex items-center justify-between mt-1 text-[11px] text-slate-500">
+                <span>${c.subValue}</span>
+                ${diffBadge}
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between">
+              <span class="text-[10px] text-slate-400">선택 시점까지 추이</span>
+              <div class="w-24 h-6">${sparkSvg}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createSparklineSvg(data, color = '#2563eb') {
+      if (!data || data.length < 2) return '<div class="text-[10px] text-slate-300 text-center">-</div>';
+      const cleanData = data.map(v => Number(v) || 0);
+      const min = Math.min(...cleanData);
+      const max = Math.max(...cleanData);
+      const range = (max - min) || 1;
+      const width = 100;
+      const height = 24;
+      const points = cleanData.map((val, idx) => {
+        const x = (idx / (cleanData.length - 1)) * width;
+        const y = height - ((val - min) / range) * (height - 6) - 3;
+        return `${x.toFixed(1)},${isNaN(y) ? 12 : y.toFixed(1)}`;
+      }).join(' ');
+
+      return `
+        <svg viewBox="0 0 100 24" class="w-full h-full">
+          <polyline fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
+        </svg>
+      `;
     }
 
     function renderWeeklyTable(curr, prev, visibleData) {
       const tbody = document.getElementById('weeklyTableBody');
+      if (!tbody) return;
+
       const vLen = visibleData.length;
       const prev1 = vLen >= 2 ? visibleData[vLen - 2] : null;
       const prev2 = vLen >= 3 ? visibleData[vLen - 3] : null;
 
       document.getElementById('th-week-prev2').textContent = prev2 ? prev2.week : '-';
       document.getElementById('th-week-prev1').textContent = prev1 ? prev1.week : '-';
-      document.getElementById('th-week-curr').textContent = curr.week;
+      document.getElementById('th-week-curr').textContent = curr ? curr.week : '-';
+
+      const safeNum = (v) => (v !== null && v !== undefined && v !== '' && !isNaN(Number(v))) ? Number(v) : null;
 
       const rowsConfig = [
-        { group: "트래픽", name: "UV (명)", k: "uv", fmt: n => n.toLocaleString(), type: "%" },
-        { group: "트래픽", name: "PV (건)", k: "pv", fmt: n => n.toLocaleString(), type: "%" },
-        { group: "트래픽", name: "UV 당 PV (건)", k: "pvPerUv", fmt: n => n.toFixed(1), type: "diff" },
-        { group: "구매전환율", name: "주문건수 (건)", k: "orders", fmt: n => n.toLocaleString(), type: "%" },
-        { group: "구매전환율", name: "전환율 (%)", k: "cvr", fmt: n => `${n.toFixed(1)}%`, type: "p" },
-        { group: "검색", name: "전체 검색수", k: "totalSearch", fmt: n => n.toLocaleString(), type: "%" },
-        { group: "검색", name: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${n.toFixed(1)}%`, type: "p_inv" },
-        { group: "검색", name: "검색구매비중 (%)", k: "searchShare", fmt: n => `${n.toFixed(1)}%`, type: "p" },
-        { group: "매출/바스켓", name: "전체주문금액 (백만)", k: "revenue", fmt: n => n.toLocaleString(), type: "%" },
-        { group: "매출/바스켓", name: "건당수량 (개)", k: "basketItems", fmt: n => n.toFixed(1), type: "diff" }
+        { group: "트래픽", name: "UV (명)", k: "uv", fmt: n => n !== null ? n.toLocaleString() : '-', type: "%" },
+        { group: "트래픽", name: "PV (건)", k: "pv", fmt: n => n !== null ? n.toLocaleString() : '-', type: "%" },
+        { group: "트래픽", name: "UV 당 PV (건)", k: "pvPerUv", fmt: n => n !== null ? n.toFixed(1) : '-', type: "diff" },
+        { group: "구매전환율", name: "주문건수 (건)", k: "orders", fmt: n => n !== null ? n.toLocaleString() : '-', type: "%" },
+        { group: "구매전환율", name: "전환율 (%)", k: "cvr", fmt: n => n !== null ? `${n.toFixed(1)}%` : '-', type: "p" },
+        { group: "검색", name: "전체 검색수", k: "totalSearch", fmt: n => n !== null ? n.toLocaleString() : '-', type: "%" },
+        { group: "검색", name: "검색 실패율 (%)", k: "searchFailRate", fmt: n => n !== null ? `${n.toFixed(1)}%` : '-', type: "p_inv" },
+        { group: "검색", name: "검색구매비중 (%)", k: "searchShare", fmt: n => n !== null ? `${n.toFixed(1)}%` : '-', type: "p" },
+        { group: "매출/바스켓", name: "전체주문금액 (백만)", k: "revenue", fmt: n => n !== null ? n.toLocaleString() : '-', type: "%" },
+        { group: "매출/바스켓", name: "건당수량 (개)", k: "basketItems", fmt: n => n !== null ? n.toFixed(1) : '-', type: "diff" }
       ];
 
       tbody.innerHTML = rowsConfig.map(r => {
-        const valCurr = curr[r.k];
-        const valPrev1 = prev1 ? prev1[r.k] : null;
-        const valPrev2 = prev2 ? prev2[r.k] : null;
+        const valCurr = safeNum(curr ? curr[r.k] : null);
+        const valPrev1 = safeNum(prev1 ? prev1[r.k] : null);
+        const valPrev2 = safeNum(prev2 ? prev2[r.k] : null);
 
         let wowHtml = "-";
-        if (valPrev1 !== null) {
+        if (valCurr !== null && valPrev1 !== null) {
           if (r.type === "%") {
-            const diff = ((valCurr - valPrev1) / valPrev1) * 100;
+            const diff = valPrev1 > 0 ? (((valCurr - valPrev1) / valPrev1) * 100) : 0;
             const sign = diff >= 0 ? "▲" : "▼";
             const color = diff >= 0 ? "text-red-500 font-bold" : "text-blue-500";
             wowHtml = `<span class="${color}">${sign} ${Math.abs(diff).toFixed(1)}%</span>`;
@@ -796,8 +858,8 @@
           <tr class="hover:bg-slate-50/70 transition">
             <td class="py-2.5 px-4 font-medium text-slate-500">${r.group}</td>
             <td class="py-2.5 px-4 font-semibold text-slate-900">${r.name}</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${valPrev2 !== null ? r.fmt(valPrev2) : '-'}</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${valPrev1 !== null ? r.fmt(valPrev1) : '-'}</td>
+            <td class="py-2.5 px-4 text-right text-slate-600">${r.fmt(valPrev2)}</td>
+            <td class="py-2.5 px-4 text-right text-slate-600">${r.fmt(valPrev1)}</td>
             <td class="py-2.5 px-4 text-right bg-blue-50/30 text-blue-900 font-bold">${r.fmt(valCurr)}</td>
             <td class="py-2.5 px-4 text-right">${wowHtml}</td>
             <td class="py-2.5 px-4 text-center"><div class="w-20 h-5 mx-auto">${miniSpark}</div></td>
@@ -808,51 +870,69 @@
 
     function renderSummaryComment(curr, prev) {
       const commentBox = document.getElementById('insightContainer');
+      if (!commentBox) return;
+
       if (curr.summaryComment && curr.summaryComment.trim() !== '') {
         commentBox.innerHTML = curr.summaryComment;
         return;
       }
 
+      const uvCurr = Number(curr.uv) || 0;
+      const pvCurr = Number(curr.pv) || 0;
+      const cvrCurr = Number(curr.cvr) || 0;
+      const revCurr = Number(curr.revenue) || 0;
+      const failCurr = Number(curr.searchFailRate) || 0;
+      const basketCurr = Number(curr.basketItems) || 0;
+      const pvPerUvCurr = Number(curr.pvPerUv) || (uvCurr > 0 ? parseFloat((pvCurr / uvCurr).toFixed(1)) : 0);
+
       if (!prev) {
         commentBox.innerHTML = `
           <div class="flex items-start space-x-2">
             <span class="px-2 py-0.5 text-[11px] font-bold bg-indigo-50 text-indigo-700 rounded border border-indigo-200 shrink-0 mt-0.5">기본 현황</span>
-            <p class="text-xs text-slate-700"><strong>[${curr.week} 등록 완료]</strong> 일평균 UV ${(curr.uv/10000).toFixed(1)}만, PV ${(curr.pv/1000000).toFixed(1)}백만, 구매전환율 ${curr.cvr}%로 첫 주차가 기록되었습니다. 다음 주차가 등록되면 4대 진단 분석이 활성화됩니다.</p>
+            <p class="text-xs text-slate-700"><strong>[${curr.week} 등록 완료]</strong> 일평균 UV ${(uvCurr/10000).toFixed(1)}만, PV ${(pvCurr/1000000).toFixed(1)}백만, 구매전환율 ${cvrCurr}%로 첫 주차가 기록되었습니다. 다음 주차가 등록되면 4대 진단 분석이 활성화됩니다.</p>
           </div>
         `;
         return;
       }
 
-      const uvDiff = prev.uv ? (((curr.uv - prev.uv) / prev.uv) * 100) : 0;
-      const cvrDiff = curr.cvr - prev.cvr;
-      const revDiff = prev.revenue ? (((curr.revenue - prev.revenue) / prev.revenue) * 100) : 0;
-      const pvPerUvDiff = curr.pvPerUv - prev.pvPerUv;
-      const failDiff = curr.searchFailRate - prev.searchFailRate;
-      const basketDiff = curr.basketItems - prev.basketItems;
+      const uvPrev = Number(prev.uv) || 0;
+      const pvPrev = Number(prev.pv) || 0;
+      const cvrPrev = Number(prev.cvr) || 0;
+      const revPrev = Number(prev.revenue) || 0;
+      const failPrev = Number(prev.searchFailRate) || 0;
+      const basketPrev = Number(prev.basketItems) || 0;
+      const pvPerUvPrev = Number(prev.pvPerUv) || (uvPrev > 0 ? parseFloat((pvPrev / uvPrev).toFixed(1)) : 0);
+
+      const uvDiff = uvPrev > 0 ? (((uvCurr - uvPrev) / uvPrev) * 100) : 0;
+      const cvrDiff = cvrCurr - cvrPrev;
+      const revDiff = revPrev > 0 ? (((revCurr - revPrev) / revPrev) * 100) : 0;
+      const pvPerUvDiff = pvPerUvCurr - pvPerUvPrev;
+      const failDiff = failCurr - failPrev;
+      const basketDiff = basketCurr - basketPrev;
 
       let trafficText = "";
       if (uvDiff > 20 && pvPerUvDiff < 0) {
-        trafficText = `대형 행사 및 외부 유입 확대로 유입 트래픽(UV +${uvDiff.toFixed(1)}%)은 큰 폭 성장했으나, 체류 깊이(UV당 PV ${curr.pvPerUv.toFixed(1)}건, ${pvPerUvDiff.toFixed(1)}건)는 다소 희석되어 <strong>초기 이탈 방지 및 개인화 홈 동선 점검</strong>이 요구됩니다.`;
+        trafficText = `대형 행사 및 외부 유입 확대로 유입 트래픽(UV +${uvDiff.toFixed(1)}%)은 큰 폭 성장했으나, 체류 깊이(UV당 PV ${pvPerUvCurr.toFixed(1)}건, ${pvPerUvDiff.toFixed(1)}건)는 다소 희석되어 <strong>초기 이탈 방지 및 개인화 홈 동선 점검</strong>이 요구됩니다.`;
       } else if (uvDiff < -10 && pvPerUvDiff > 1.0) {
-        trafficText = `프로모션 종료로 유입 모수(UV ${uvDiff.toFixed(1)}%)는 조정되었으나, 1인당 탐색 깊이(UV당 PV ${curr.pvPerUv.toFixed(1)}건, +${pvPerUvDiff.toFixed(1)}건)가 크게 상승하여 <strong>진성·목적형 구매자 중심</strong>으로 압축되었습니다.`;
+        trafficText = `프로모션 종료로 유입 모수(UV ${uvDiff.toFixed(1)}%)는 조정되었으나, 1인당 탐색 깊이(UV당 PV ${pvPerUvCurr.toFixed(1)}건, +${pvPerUvDiff.toFixed(1)}건)가 크게 상승하여 <strong>진성·목적형 구매자 중심</strong>으로 압축되었습니다.`;
       } else {
-        trafficText = `일평균 트래픽(UV ${uvDiff >= 0 ? '+' : ''}${uvDiff.toFixed(1)}%)과 1인당 탐색량(UV당 PV ${curr.pvPerUv.toFixed(1)}건)이 견고한 평시 수준을 유지하고 있습니다.`;
+        trafficText = `일평균 트래픽(UV ${uvDiff >= 0 ? '+' : ''}${uvDiff.toFixed(1)}%)과 1인당 탐색량(UV당 PV ${pvPerUvCurr.toFixed(1)}건)이 견고한 평시 수준을 유지하고 있습니다.`;
       }
 
       let convText = "";
       if (cvrDiff >= 0.5) {
-        convText = `구매전환율이 <strong>${curr.cvr}%</strong>(WoW ▲${cvrDiff.toFixed(1)}%p)로 탄탄하게 우상향하며 결제 완주 단계까지의 높은 쇼핑 전환 효율을 증명했습니다.`;
+        convText = `구매전환율이 <strong>${cvrCurr.toFixed(1)}%</strong>(WoW ▲${cvrDiff.toFixed(1)}%p)로 탄탄하게 우상향하며 결제 완주 단계까지의 높은 쇼핑 전환 효율을 증명했습니다.`;
       } else if (cvrDiff <= -0.5) {
-        convText = `신규·라이트 유저 유입 확대로 구매전환율(CVR ${curr.cvr}%, ▼${Math.abs(cvrDiff).toFixed(1)}%p)이 소폭 분산되었으며, <strong>첫 구매 특가 및 첫바구니 혜택 강화</strong>가 권장됩니다.`;
+        convText = `신규·라이트 유저 유입 확대로 구매전환율(CVR ${cvrCurr.toFixed(1)}%, ▼${Math.abs(cvrDiff).toFixed(1)}%p)이 소폭 분산되었으며, <strong>첫 구매 특가 및 첫바구니 혜택 강화</strong>가 권장됩니다.`;
       } else {
-        convText = `구매전환율은 <strong>${curr.cvr}%</strong>(WoW ${cvrDiff >= 0 ? '+' : ''}${cvrDiff.toFixed(1)}%p)로 평시 타깃 방어선을 안정적으로 지켜내고 있습니다.`;
+        convText = `구매전환율은 <strong>${cvrCurr.toFixed(1)}%</strong>(WoW ${cvrDiff >= 0 ? '+' : ''}${cvrDiff.toFixed(1)}%p)로 평시 타깃 방어선을 안정적으로 지켜내고 있습니다.`;
       }
 
       let searchText = failDiff <= 0 
-        ? `검색 실패율은 <strong>${curr.searchFailRate}%</strong>로 전주 대비 개선(▼${Math.abs(failDiff).toFixed(1)}%p)되었으며, 검색 유입 주문금액(${curr.searchRevenue}백만원, 비중 ${curr.searchShare}%) 또한 양호한 탐색 품질을 기록했습니다.`
-        : `검색 실패율(${curr.searchFailRate}%, ▲${failDiff.toFixed(1)}%p)이 소폭 상승하여 미결과 검색어 및 오타 교정·동의어 사전 보완이 권장됩니다.`;
+        ? `검색 실패율은 <strong>${failCurr.toFixed(1)}%</strong>로 전주 대비 개선(▼${Math.abs(failDiff).toFixed(1)}%p)되었으며, 검색 유입 주문금액(${curr.searchRevenue || 0}백만원, 비중 ${curr.searchShare || 0}%) 또한 양호한 탐색 품질을 기록했습니다.`
+        : `검색 실패율(${failCurr.toFixed(1)}%, ▲${failDiff.toFixed(1)}%p)이 소폭 상승하여 미결과 검색어 및 오타 교정·동의어 사전 보완이 권장됩니다.`;
 
-      let basketText = `전체 일평균 주문금액은 <strong>${curr.revenue.toLocaleString()}백만원</strong>(WoW ${revDiff >= 0 ? '+' : ''}${revDiff.toFixed(1)}%)이며, 건당 구매수량은 <strong>${curr.basketItems}개</strong>(WoW ${basketDiff >= 0 ? '+' : ''}${basketDiff.toFixed(1)}개)로 객단가 방어선을 탄탄히 유지 중입니다.`;
+      let basketText = `전체 일평균 주문금액은 <strong>${revCurr.toLocaleString()}백만원</strong>(WoW ${revDiff >= 0 ? '+' : ''}${revDiff.toFixed(1)}%)이며, 건당 구매수량은 <strong>${basketCurr.toFixed(1)}개</strong>(WoW ${basketDiff >= 0 ? '+' : ''}${basketDiff.toFixed(1)}개)로 객단가 방어선을 탄탄히 유지 중입니다.`;
 
       commentBox.innerHTML = `
         <div class="flex items-start space-x-2">
@@ -884,7 +964,64 @@
       }
     }
 
-    // 메인 배너 효율 탭 렌더링
+    function renderCharts(visibleData) {
+      if (!window.Chart || visibleData.length === 0) return;
+      const labels = visibleData.map(d => d.week || '');
+      
+      const createOrUpdate = (id, config) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (chartInstances[id]) chartInstances[id].destroy();
+        const ctx = el.getContext('2d');
+        chartInstances[id] = new Chart(ctx, config);
+      };
+
+      createOrUpdate('chartTraffic', {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: '일평균 UV', data: visibleData.map(d => Number(d.uv) || 0), borderColor: '#2563eb', tension: 0.3, yAxisID: 'y' },
+            { label: '주문수', data: visibleData.map(d => Number(d.orders) || 0), borderColor: '#10b981', tension: 0.3, yAxisID: 'y1' }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
+      });
+
+      createOrUpdate('chartEfficiency', {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { type: 'line', label: '구매전환율 (%)', data: visibleData.map(d => Number(d.cvr) || 0), borderColor: '#f59e0b', tension: 0.3, yAxisID: 'y' },
+            { type: 'bar', label: 'UV당 PV', data: visibleData.map(d => Number(d.pvPerUv) || 0), backgroundColor: '#94a3b8', yAxisID: 'y1' }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right' } } }
+      });
+
+      createOrUpdate('chartSearch', {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: '검색 실패율 (%)', data: visibleData.map(d => Number(d.searchFailRate) || 0), borderColor: '#ef4444', tension: 0.3 },
+            { label: '검색 구매비중 (%)', data: visibleData.map(d => Number(d.searchShare) || 0), borderColor: '#8b5cf6', tension: 0.3 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      createOrUpdate('chartRevenue', {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ label: '주문금액 (백만원)', data: visibleData.map(d => Number(d.revenue) || 0), backgroundColor: '#3b82f6', borderRadius: 6 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
     function renderBannerTab() {
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
@@ -900,11 +1037,13 @@
     }
 
     function renderBannerCaptureAccordion(curr, images) {
-      document.getElementById('bannerCaptureViewTitle').textContent = `[${curr.week}] 메인배너 효율 분석 표 캡처 (${images.length}장)`;
+      const viewTitle = document.getElementById('bannerCaptureViewTitle');
+      if (viewTitle) viewTitle.textContent = `[${curr.week}] 메인배너 효율 분석 표 캡처 (${images.length}장)`;
       const bannerImg = document.getElementById('bannerCaptureImg');
       const noImg = document.getElementById('noBannerImgText');
       const tabBtns = document.getElementById('bannerImgTabButtons');
 
+      if (!tabBtns) return;
       tabBtns.innerHTML = '';
       if (images.length > 0) {
         bannerImg.classList.remove('hidden');
@@ -953,6 +1092,8 @@
 
     function renderBannerComment(curr) {
       const commentBox = document.getElementById('bannerCommentBox');
+      if (!commentBox) return;
+
       if (curr.bannerComment && curr.bannerComment.trim() !== '') {
         commentBox.innerHTML = curr.bannerComment;
         return;
@@ -977,7 +1118,6 @@
       }
     }
 
-    // 2. 배너 썸네일 테이블 렌더링 (등록 모달 호출)
     function renderStructuredBannerTable(curr) {
       const tbody = document.getElementById('mainBannerTableBody');
       if (!tbody) return;
@@ -1007,24 +1147,28 @@
           `;
         }
 
+        const imp = Number(b.imp) || 0;
+        const click = Number(b.click) || 0;
+        const ctr = Number(b.ctr) || 0;
+        const orders = Number(b.orders) || 0;
+        const rev = Number(b.rev) || 0;
+        const cvr = Number(b.cvr) || 0;
+
         return `
           <tr class="hover:bg-slate-50 transition ${idx < 2 ? 'bg-amber-50/30 font-medium' : ''}">
             <td class="py-2 px-3 text-center">${thumbCellHtml}</td>
             <td class="py-2.5 px-4 font-semibold text-slate-900">${b.name}</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${b.imp.toLocaleString()}</td>
-            <td class="py-2.5 px-4 text-right font-semibold text-slate-800">${b.click.toLocaleString()}</td>
-            <td class="py-2.5 px-4 text-right ${b.ctr >= 12 ? 'text-red-500 font-bold' : 'text-slate-700'}">${b.ctr.toFixed(1)}%</td>
-            <td class="py-2.5 px-4 text-right text-slate-600">${b.orders.toLocaleString()}</td>
-            <td class="py-2.5 px-4 text-right font-bold text-slate-900">${b.rev ? Math.round(b.rev/10000).toLocaleString() + '만' : '-'}</td>
-            <td class="py-2.5 px-4 text-right ${b.cvr >= 20 ? 'text-emerald-600 font-bold' : 'text-slate-600'}">${b.cvr.toFixed(1)}%</td>
+            <td class="py-2.5 px-4 text-right text-slate-600">${imp.toLocaleString()}</td>
+            <td class="py-2.5 px-4 text-right font-semibold text-slate-800">${click.toLocaleString()}</td>
+            <td class="py-2.5 px-4 text-right ${ctr >= 12 ? 'text-red-500 font-bold' : 'text-slate-700'}">${ctr.toFixed(1)}%</td>
+            <td class="py-2.5 px-4 text-right text-slate-600">${orders.toLocaleString()}</td>
+            <td class="py-2.5 px-4 text-right font-bold text-slate-900">${rev ? Math.round(rev/10000).toLocaleString() + '만' : '-'}</td>
+            <td class="py-2.5 px-4 text-right ${cvr >= 20 ? 'text-emerald-600 font-bold' : 'text-slate-600'}">${cvr.toFixed(1)}%</td>
           </tr>
         `;
       }).join('');
     }
 
-    // ========================================================
-    // [신규 기능 2] 배너 썸네일 등록 팝업 제어 (파일 선택 OR URL 입력)
-    // ========================================================
     function openThumbUploadModal(itemIndex) {
       currentUploadItemIdx = itemIndex;
       const sel = document.getElementById('weekSelector');
@@ -1066,8 +1210,7 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const base64 = e.target.result;
-        saveThumbToTarget(base64);
+        saveThumbToTarget(e.target.result);
         closeBannerThumbUploadModal();
       };
       reader.readAsDataURL(file);
@@ -1084,7 +1227,6 @@
         return;
       }
 
-      // 이미지 유효성 확인 후 저장
       const tempImg = new Image();
       tempImg.onload = function() {
         saveThumbToTarget(url);
@@ -1188,17 +1330,17 @@
       document.getElementById('kpiModalTitle').textContent = `[${d.week}] 주요 KPI 수치 수정`;
       document.getElementById('kpiSubmitBtn').textContent = "수정사항 저장";
 
-      document.getElementById('formWeekName').value = d.week;
-      document.getElementById('formWeekPeriod').value = d.period;
-      document.getElementById('formUV').value = d.uv;
-      document.getElementById('formPV').value = d.pv;
-      document.getElementById('formOrders').value = d.orders;
-      document.getElementById('formTotalSearch').value = d.totalSearch;
-      document.getElementById('formSearchFail').value = d.searchFail;
-      document.getElementById('formSearchOrders').value = d.searchOrders || '';
-      document.getElementById('formRevenue').value = d.revenue;
-      document.getElementById('formSearchRevenue').value = d.searchRevenue || '';
-      document.getElementById('formBasketItems').value = d.basketItems;
+      document.getElementById('formWeekName').value = d.week || '';
+      document.getElementById('formWeekPeriod').value = d.period || '';
+      document.getElementById('formUV').value = d.uv ?? '';
+      document.getElementById('formPV').value = d.pv ?? '';
+      document.getElementById('formOrders').value = d.orders ?? '';
+      document.getElementById('formTotalSearch').value = d.totalSearch ?? '';
+      document.getElementById('formSearchFail').value = d.searchFail ?? '';
+      document.getElementById('formSearchOrders').value = d.searchOrders ?? '';
+      document.getElementById('formRevenue').value = d.revenue ?? '';
+      document.getElementById('formSearchRevenue').value = d.searchRevenue ?? '';
+      document.getElementById('formBasketItems').value = d.basketItems ?? '';
 
       clearKpiOcrImage();
       closeManageModal();
@@ -1558,17 +1700,20 @@
       visibleData.forEach(d => { thead += `<th class="py-3 px-4 text-right">${d.week}</th>`; });
       thead += `</tr>`;
 
+      const safeFmtNum = (n) => (n !== null && n !== undefined && !isNaN(Number(n))) ? Number(n).toLocaleString() : '-';
+      const safeFmtFixed = (n) => (n !== null && n !== undefined && !isNaN(Number(n))) ? Number(n).toFixed(1) : '-';
+
       const keys = [
-        { label: "일평균 UV (명)", k: "uv", fmt: n => n.toLocaleString() },
-        { label: "일평균 PV (건)", k: "pv", fmt: n => n.toLocaleString() },
-        { label: "UV당 PV", k: "pvPerUv", fmt: n => n.toFixed(1) },
-        { label: "주문건수 (건)", k: "orders", fmt: n => n.toLocaleString() },
-        { label: "구매전환율 (%)", k: "cvr", fmt: n => `${n.toFixed(1)}%` },
-        { label: "전체 검색수", k: "totalSearch", fmt: n => n.toLocaleString() },
-        { label: "검색 실패수", k: "searchFail", fmt: n => n.toLocaleString() },
-        { label: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${n.toFixed(1)}%` },
-        { label: "전체 주문금액 (백만)", k: "revenue", fmt: n => n.toLocaleString() },
-        { label: "건당수량 (개)", k: "basketItems", fmt: n => n.toFixed(1) }
+        { label: "일평균 UV (명)", k: "uv", fmt: safeFmtNum },
+        { label: "일평균 PV (건)", k: "pv", fmt: safeFmtNum },
+        { label: "UV당 PV", k: "pvPerUv", fmt: safeFmtFixed },
+        { label: "주문건수 (건)", k: "orders", fmt: safeFmtNum },
+        { label: "구매전환율 (%)", k: "cvr", fmt: n => (n !== null && !isNaN(Number(n))) ? `${Number(n).toFixed(1)}%` : '-' },
+        { label: "전체 검색수", k: "totalSearch", fmt: safeFmtNum },
+        { label: "검색 실패수", k: "searchFail", fmt: safeFmtNum },
+        { label: "검색 실패율 (%)", k: "searchFailRate", fmt: n => (n !== null && !isNaN(Number(n))) ? `${Number(n).toFixed(1)}%` : '-' },
+        { label: "전체 주문금액 (백만)", k: "revenue", fmt: safeFmtNum },
+        { label: "건당수량 (개)", k: "basketItems", fmt: safeFmtFixed }
       ];
 
       let tbody = "";
