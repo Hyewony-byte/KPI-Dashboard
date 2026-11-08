@@ -37,27 +37,17 @@
         </div>
       </div>
 
-      <div class="flex items-center space-x-2">
+      <!-- 상단 컨트롤러: 리뷰 주차 + 통합 데이터 관리(어드민) + 인쇄 -->
+      <div class="flex items-center space-x-2.5">
         <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
           <span class="text-xs font-medium text-slate-500">리뷰 주차:</span>
           <select id="weekSelector" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
           </select>
         </div>
 
-        <button onclick="editCurrentWeekData()" class="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition" title="현재 선택된 주차의 지표 수정">
-          <span>✎ 수치 수정</span>
-        </button>
-
-        <button onclick="openKpiModal()" class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-          <span>+ 신규 주차 등록</span>
-        </button>
-
-        <button onclick="openBannerModal()" class="flex items-center space-x-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-          <span>🖼️ 배너 실적표 캡처 등록</span>
-        </button>
-
-        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리 및 삭제">
-          ⚙️
+        <!-- 통합 관리 모달 버튼 (어드민 보호) -->
+        <button onclick="requestAdminAccess(() => openUnifiedManageModal('kpi'))" class="flex items-center space-x-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+          <span>⚙️ 주간 데이터 관리 / 등록</span>
         </button>
 
         <button onclick="window.print()" class="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-200 transition">
@@ -83,8 +73,11 @@
       <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📊</div>
       <div class="space-y-1">
         <h3 class="text-base font-bold text-slate-900">등록된 주차 데이터가 없습니다</h3>
-        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 신규 주차 등록]</strong> 버튼을 눌러 첫 주차 지표를 추가해 주세요.</p>
+        <p class="text-xs text-slate-500">상단 우측의 <strong>[⚙️ 주간 데이터 관리 / 등록]</strong> 버튼을 눌러 첫 주차 지표를 추가해 주세요.</p>
       </div>
+      <button onclick="requestAdminAccess(() => openUnifiedManageModal('kpi'))" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+        + 첫 주차 데이터 등록하기
+      </button>
     </div>
 
     <!-- 탭 1: 요약 대시보드 -->
@@ -101,7 +94,7 @@
             <span class="text-[11px] text-slate-400 font-normal">| 텍스트를 클릭해 직접 수정할 수 있습니다.</span>
           </div>
           <div class="flex items-center space-x-2">
-            <button onclick="saveSummaryCommentManual()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
+            <button onclick="requestAdminAccess(saveSummaryCommentManual)" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
               <span>💾 코멘트 저장</span>
             </button>
             <button onclick="copyInsightScript()" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium border border-slate-200 transition">
@@ -166,10 +159,10 @@
       </div>
     </div>
 
-    <!-- 탭 3: 메인 배너구좌별 효율 (서브 탭 + 권역 필터 전면 개편) -->
+    <!-- 탭 3: 메인 배너구좌별 효율 -->
     <div id="tab-banner" class="space-y-6 hidden">
       
-      <!-- 1. 코멘트 영역 -->
+      <!-- 코멘트 영역 -->
       <section class="bg-white rounded-2xl border border-amber-200/90 p-5 shadow-xs relative bg-amber-50/20">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-amber-100 gap-2">
           <div class="flex items-center space-x-2">
@@ -178,7 +171,7 @@
             </span>
             <span class="text-xs text-slate-500">클릭하여 문구를 직접 수정/추가할 수 있습니다.</span>
           </div>
-          <button onclick="saveBannerCommentManual()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
+          <button onclick="requestAdminAccess(saveBannerCommentManual)" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
             <span>💾 코멘트 저장</span>
           </button>
         </div>
@@ -186,9 +179,8 @@
         </div>
       </section>
 
-      <!-- 2. 구좌 선택 서브 탭 & 권역 필터 바 -->
+      <!-- 구좌 선택 서브 탭 & 권역 필터 바 -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <!-- 4대 구좌 서브 탭 -->
         <div class="flex flex-wrap items-center gap-1.5" id="bannerSubTabGroup">
           <button onclick="switchBannerSection('main')" id="subTab-main" class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition bg-amber-500 text-white shadow-xs">
             1. 메인배너
@@ -204,7 +196,6 @@
           </button>
         </div>
 
-        <!-- 권역별 토글 필터 (전체 / 전점·ISF / CFC) -->
         <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl text-xs border border-slate-200 self-start md:self-auto">
           <span class="text-[11px] font-semibold text-slate-400 px-1.5">권역:</span>
           <button onclick="setBannerRegionFilter('ALL')" id="rf-ALL" class="px-2.5 py-1 rounded-lg font-bold bg-white text-slate-800 shadow-2xs">전체</button>
@@ -213,7 +204,7 @@
         </div>
       </div>
 
-      <!-- 3. 선택된 구좌의 슬롯 차트 -->
+      <!-- 선택된 구좌의 슬롯 차트 -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -227,7 +218,7 @@
         </div>
       </div>
 
-      <!-- 4. 선택된 구좌의 세부 실적 테이블 (썸네일 업로드 & URL 입력 지원) -->
+      <!-- 선택된 구좌의 세부 실적 테이블 -->
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
@@ -256,7 +247,7 @@
         </div>
       </section>
 
-      <!-- 5. 배너 실적표 캡처 아코디언 (최하단 접힘 유지) -->
+      <!-- 배너 실적표 캡처 아코디언 -->
       <div id="bannerCaptureViewBox" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 bg-slate-50/70 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition" onclick="toggleBannerCaptureAccordion()">
           <div class="flex items-center space-x-2">
@@ -266,7 +257,7 @@
           </div>
           <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
             <div id="bannerImgTabButtons" class="flex flex-wrap items-center gap-1.5"></div>
-            <button onclick="openBannerModal()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+            <button onclick="requestAdminAccess(() => openUnifiedManageModal('banner'))" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
               + 캡처 이미지 등록/변경
             </button>
             <button onclick="toggleBannerCaptureAccordion()" class="px-2 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-50">
@@ -280,7 +271,7 @@
             <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
             <div id="noBannerImgText" class="text-center py-10 space-y-2">
               <p class="text-xs text-slate-500">선택된 주차에 등록된 메인배너 효율 캡처 이미지가 없습니다.</p>
-              <button onclick="openBannerModal()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
+              <button onclick="requestAdminAccess(() => openUnifiedManageModal('banner'))" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
                 🖼️ 지금 배너 캡처 이미지 올리기
               </button>
             </div>
@@ -306,170 +297,241 @@
 
   </main>
 
-  <!-- [모달 1] 주요 KPI 등록/수정 모달 -->
-  <div id="kpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+  <!-- ======================================================== -->
+  <!-- [신규 통합 모달]: 주간 데이터 관리 / 등록 센터 (어드민 보호) -->
+  <!-- ======================================================== -->
+  <div id="unifiedManageModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
+      
+      <!-- 모달 상단 헤더 -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
-          <h3 class="text-base font-bold text-slate-900" id="kpiModalTitle">주간 주요 KPI 수치 등록</h3>
-          <p class="text-xs text-slate-500 mt-0.5">표 캡처본을 올리면 OCR이 최우측 열(당주) 수치를 자동 추출합니다.</p>
+          <h3 class="text-base font-bold text-slate-900">주간 데이터 관리 센터 (Admin)</h3>
+          <p class="text-xs text-slate-500 mt-0.5">주요 KPI 수치, 메인배너 실적표, 주차 삭제를 한곳에서 통합 관리합니다.</p>
         </div>
-        <button onclick="closeKpiModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+        <button onclick="closeUnifiedManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
 
-      <div class="p-6 overflow-y-auto space-y-4">
-        <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3.5 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-indigo-900 flex items-center space-x-1">
-              <span>📷 주요지표 표 캡처 올리기 (정밀 OCR)</span>
-            </span>
-            <span class="text-[11px] text-indigo-600 font-medium">JPG, PNG</span>
-          </div>
-          
-          <div id="kpiOcrDropZone" class="border-2 border-dashed border-indigo-300 rounded-lg p-3.5 text-center bg-white cursor-pointer hover:bg-indigo-50/30 transition">
-            <input type="file" id="kpiOcrFileInput" accept="image/*" class="hidden" onchange="handleKpiOcrImage(event)">
-            <div id="kpiOcrPrompt" class="space-y-0.5">
-              <p class="text-xs font-semibold text-slate-700">여기를 클릭하거나 표 캡처 이미지를 끌어다 놓으세요</p>
-              <p class="text-[11px] text-slate-400">장표의 가장 우측 열(최신 주차) 데이터를 자동 인식합니다</p>
+      <!-- 모달 내부 서브 탭 바 -->
+      <div class="flex items-center border-b border-slate-200 px-6 pt-2 bg-slate-50/50 text-xs font-bold space-x-4">
+        <button id="modalTabBtn-kpi" onclick="switchManageModalTab('kpi')" class="pb-2.5 border-b-2 border-blue-600 text-blue-600 transition">
+          1. 주요 KPI 수치 등록 / 수정
+        </button>
+        <button id="modalTabBtn-banner" onclick="switchManageModalTab('banner')" class="pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+          2. 메인영역 배너 실적 등록
+        </button>
+        <button id="modalTabBtn-list" onclick="switchManageModalTab('list')" class="pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+          3. 주차 목록 & 데이터 완전 삭제
+        </button>
+      </div>
+
+      <!-- 모달 본문 (3개 탭 전환) -->
+      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+
+        <!-- [모달 탭 1]: 주요 KPI 수치 등록/수정 -->
+        <div id="modalSec-kpi" class="space-y-4">
+          <!-- OCR 드롭존 -->
+          <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-900 flex items-center space-x-1">
+                <span>📷 주요지표 표 캡처 올리기 (정밀 OCR)</span>
+              </span>
+              <span class="text-[11px] text-indigo-600 font-medium">최우측 열 자동 매핑</span>
             </div>
-            <div id="kpiOcrLoading" class="hidden space-y-1.5 py-1">
-              <div class="flex justify-between text-[11px] font-bold text-indigo-700">
-                <span id="ocrStatusMsg">표 캡처 전처리 및 수치 정밀 추출 중...</span>
-                <span id="ocrPercent">0%</span>
+            
+            <div id="kpiOcrDropZone" class="border-2 border-dashed border-indigo-300 rounded-lg p-3 text-center bg-white cursor-pointer hover:bg-indigo-50/30 transition">
+              <input type="file" id="kpiOcrFileInput" accept="image/*" class="hidden" onchange="handleKpiOcrImage(event)">
+              <div id="kpiOcrPrompt" class="space-y-0.5">
+                <p class="text-xs font-semibold text-slate-700">여기를 클릭하거나 표 캡처 이미지를 끌어다 놓으세요</p>
+                <p class="text-[11px] text-slate-400">장표의 가장 우측 열(최신 주차) 데이터를 자동 인식합니다</p>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                <div id="ocrBar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+              <div id="kpiOcrLoading" class="hidden space-y-1.5 py-1">
+                <div class="flex justify-between text-[11px] font-bold text-indigo-700">
+                  <span id="ocrStatusMsg">표 캡처 전처리 및 수치 추출 중...</span>
+                  <span id="ocrPercent">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div id="ocrBar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="kpiOcrPreviewContainer" class="hidden pt-1">
+              <div class="flex items-center justify-between text-xs text-slate-600 mb-1">
+                <span>업로드된 원본 표:</span>
+                <button type="button" onclick="clearKpiOcrImage()" class="text-red-500 hover:underline text-[11px]">삭제</button>
+              </div>
+              <div class="max-h-32 overflow-auto border border-slate-200 rounded-lg bg-slate-900/5 p-1">
+                <img id="kpiOcrPreviewImg" src="" class="w-full object-contain rounded">
               </div>
             </div>
           </div>
 
-          <div id="kpiOcrPreviewContainer" class="hidden pt-1">
-            <div class="flex items-center justify-between text-xs text-slate-600 mb-1">
-              <span>업로드된 원본 표:</span>
-              <button type="button" onclick="clearKpiOcrImage()" class="text-red-500 hover:underline text-[11px]">삭제</button>
+          <form id="kpiDataForm" onsubmit="saveKpiData(event)" class="space-y-3.5">
+            <input type="hidden" id="editTargetIndex" value="-1">
+
+            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+              <span class="text-xs font-bold text-slate-800" id="kpiFormModeBadge">신규 주차 등록 모드</span>
+              <button type="button" onclick="resetKpiFormToNew()" class="text-xs text-blue-600 hover:underline">새 주차로 초기화</button>
             </div>
-            <div class="max-h-36 overflow-auto border border-slate-200 rounded-lg bg-slate-900/5 p-1">
-              <img id="kpiOcrPreviewImg" src="" class="w-full object-contain rounded">
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">주차 명칭 *</label>
+                <input type="text" id="formWeekName" required placeholder="예: 11월 1주차" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">집계 기간 *</label>
+                <input type="text" id="formWeekPeriod" required placeholder="예: 10.29~11.01" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3 space-y-2.5 bg-slate-50/50">
+              <h4 class="text-xs font-bold text-slate-800">1. 트래픽 & 주문 지표 (일평균)</h4>
+              <div class="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 UV (명)</label>
+                  <input type="number" id="formUV" required placeholder="예: 365073" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 PV (건)</label>
+                  <input type="number" id="formPV" required placeholder="예: 6008275" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">주문건수 (건)</label>
+                  <input type="number" id="formOrders" required placeholder="예: 20281" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3 space-y-2.5 bg-slate-50/50">
+              <h4 class="text-xs font-bold text-slate-800">2. 검색 품질 및 전환</h4>
+              <div class="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">전체 검색수</label>
+                  <input type="number" id="formTotalSearch" required placeholder="예: 526822" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 실패수</label>
+                  <input type="number" id="formSearchFail" required placeholder="예: 14443" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 주문건수</label>
+                  <input type="number" id="formSearchOrders" placeholder="예: 36489" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3 space-y-2.5 bg-slate-50/50">
+              <h4 class="text-xs font-bold text-slate-800">3. 매출 및 바스켓</h4>
+              <div class="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">전체주문금액 (백만)</label>
+                  <input type="number" id="formRevenue" required placeholder="예: 1104" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">검색주문금액 (백만)</label>
+                  <input type="number" id="formSearchRevenue" placeholder="예: 313" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">건당수량 (개)</label>
+                  <input type="number" step="0.1" id="formBasketItems" required placeholder="예: 11.8" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-2">
+              <button type="submit" id="kpiSubmitBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">
+                지표 저장
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- [모달 탭 2]: 메인영역 배너 실적 등록 -->
+        <div id="modalSec-banner" class="space-y-4 hidden">
+          <div class="bg-amber-50/40 border border-amber-200 rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-900">🖼️ <span id="bannerTargetWeekTitle">-</span> 메인배너 효율 표 캡처 등록</span>
+              <span id="modalBannerCountText" class="text-xs text-amber-700 font-bold">0장 등록됨</span>
+            </div>
+            
+            <div id="modalBannerDropZone" class="border-2 border-dashed border-amber-300 rounded-xl p-4 text-center bg-white cursor-pointer hover:bg-amber-50/50 transition">
+              <input type="file" id="modalBannerInput" accept="image/*" multiple class="hidden" onchange="handleModalBannerImages(event)">
+              <div class="space-y-1">
+                <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 표 캡처 이미지를 끌어다 놓으세요</p>
+                <p class="text-[11px] text-slate-400">여러 장의 실적표 캡처본(CFC, 전점 등)을 한 번에 선택할 수 있습니다</p>
+              </div>
+            </div>
+
+            <div id="modalBannerThumbnails" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-200 rounded-lg bg-slate-50">
+              <p class="col-span-3 text-center text-xs text-slate-400 py-6">선택된 이미지가 없습니다.</p>
+            </div>
+
+            <div class="flex items-center justify-end pt-2">
+              <button type="button" onclick="saveBannerImages()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">
+                배너 캡처 이미지 반영
+              </button>
             </div>
           </div>
         </div>
 
-        <form id="kpiDataForm" onsubmit="saveKpiData(event)" class="space-y-4">
-          <input type="hidden" id="editTargetIndex" value="-1">
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">주차 명칭 *</label>
-              <input type="text" id="formWeekName" required placeholder="예: 11월 1주차" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <!-- [모달 탭 3]: 주차 목록 & 데이터 완전 삭제 -->
+        <div id="modalSec-list" class="space-y-4 hidden">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-xs font-bold text-slate-800">등록된 주차 목록 (삭제 시 배너 및 캡처까지 완전 삭제)</h4>
+              <button onclick="changeAdminPasswordPrompt()" class="text-[11px] text-slate-500 hover:text-blue-600 underline">관리자 비밀번호 변경</button>
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">집계 기간 *</label>
-              <input type="text" id="formWeekPeriod" required placeholder="예: 10.29~11.01" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div id="manageWeekList" class="divide-y divide-slate-100 max-h-64 overflow-y-auto border border-slate-200 rounded-xl bg-white">
             </div>
           </div>
 
-          <div class="border border-slate-200 rounded-xl p-3.5 space-y-3 bg-slate-50/50">
-            <h4 class="text-xs font-bold text-slate-800">1. 트래픽 & 주문 지표 (일평균)</h4>
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 UV (명)</label>
-                <input type="number" id="formUV" required placeholder="예: 365073" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">일평균 PV (건)</label>
-                <input type="number" id="formPV" required placeholder="예: 6008275" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">주문건수 (건)</label>
-                <input type="number" id="formOrders" required placeholder="예: 20281" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-            </div>
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <button type="button" onclick="clearAllDataWithConfirm()" class="text-xs text-red-500 hover:underline font-semibold">
+              ⚠️ 모든 주차 데이터 영구 초기화
+            </button>
           </div>
+        </div>
 
-          <div class="border border-slate-200 rounded-xl p-3.5 space-y-3 bg-slate-50/50">
-            <h4 class="text-xs font-bold text-slate-800">2. 검색 품질 및 전환</h4>
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">전체 검색수</label>
-                <input type="number" id="formTotalSearch" required placeholder="예: 526822" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 실패수</label>
-                <input type="number" id="formSearchFail" required placeholder="예: 14443" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">검색 주문건수</label>
-                <input type="number" id="formSearchOrders" placeholder="예: 36489" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-            </div>
-          </div>
+      </div>
 
-          <div class="border border-slate-200 rounded-xl p-3.5 space-y-3 bg-slate-50/50">
-            <h4 class="text-xs font-bold text-slate-800">3. 매출 및 바스켓</h4>
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">전체주문금액 (백만)</label>
-                <input type="number" id="formRevenue" required placeholder="예: 1104" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">검색주문금액 (백만)</label>
-                <input type="number" id="formSearchRevenue" placeholder="예: 313" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-              <div>
-                <label class="block text-[11px] font-medium text-slate-600 mb-1">건당수량 (개)</label>
-                <input type="number" step="0.1" id="formBasketItems" required placeholder="예: 11.8" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:bg-white">
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-end space-x-2 pt-2">
-            <button type="button" onclick="closeKpiModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
-            <button type="submit" id="kpiSubmitBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">지표 저장</button>
-          </div>
-        </form>
+      <!-- 모달 하단 닫기 -->
+      <div class="px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+        <button type="button" onclick="closeUnifiedManageModal()" class="px-4 py-2 bg-white border border-slate-300 text-xs font-semibold rounded-lg text-slate-700 hover:bg-slate-50">
+          닫기
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- [모달 2] 배너 실적표 캡처 등록 -->
-  <div id="bannerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
-      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-amber-50/50">
-        <div>
-          <h3 class="text-base font-bold text-slate-900">메인배너 효율 표 캡처 등록</h3>
-          <p class="text-xs text-slate-500 mt-0.5"><span id="targetWeekBadge" class="font-bold text-amber-700"></span>에 등록할 표 캡처 이미지를 선택하세요.</p>
+  <!-- [어드민 인증 모달] -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center space-x-2">
+          <span class="text-base">🔒</span>
+          <h3 class="text-sm font-bold text-slate-900">관리자 인증</h3>
         </div>
-        <button onclick="closeBannerModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+        <button onclick="closeAdminAuthModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
 
-      <div class="p-6 space-y-4 overflow-y-auto">
-        <div id="modalBannerDropZone" class="border-2 border-dashed border-amber-300 rounded-xl p-5 text-center bg-amber-50/20 cursor-pointer hover:bg-amber-50/50 transition">
-          <input type="file" id="modalBannerInput" accept="image/*" multiple class="hidden" onchange="handleModalBannerImages(event)">
-          <div class="space-y-1">
-            <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 표 캡처 이미지를 끌어다 놓으세요</p>
-            <p class="text-[11px] text-slate-400">여러 장의 표 캡처본(CFC, 전점 등)을 한 번에 선택할 수 있습니다</p>
-          </div>
-        </div>
-
+      <form onsubmit="verifyAdminPassword(event)" class="p-5 space-y-4">
         <div>
-          <div class="flex items-center justify-between text-xs text-slate-600 mb-2 font-medium">
-            <span>등록 대기 중인 표 이미지:</span>
-            <span id="modalBannerCountText" class="text-amber-700 font-bold">0장</span>
-          </div>
-          <div id="modalBannerThumbnails" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-200 rounded-lg bg-slate-50">
-            <p class="col-span-3 text-center text-xs text-slate-400 py-6">선택된 이미지가 없습니다.</p>
-          </div>
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">관리자 비밀번호를 입력하세요</label>
+          <input type="password" id="adminPasswordInput" required placeholder="초기 비밀번호: 1234" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <p id="adminAuthError" class="text-[11px] text-red-500 mt-1 hidden">비밀번호가 올바르지 않습니다.</p>
         </div>
 
-        <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
-          <button type="button" onclick="closeBannerModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
-          <button type="button" onclick="saveBannerImages()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">배너 이미지 반영</button>
+        <div class="flex items-center justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeAdminAuthModal()" class="px-3.5 py-1.5 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
+          <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">인증 확인</button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 
-  <!-- [모달 3] 배너 썸네일 등록 팝업 (파일 업로드 OR 이미지 URL 직접 입력) -->
+  <!-- [배너 썸네일 등록 팝업]: 파일 업로드 OR 이미지 URL 직접 입력 -->
   <div id="bannerThumbUploadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
       <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -519,7 +581,7 @@
     </div>
   </div>
 
-  <!-- [모달 4] 배너 썸네일 고화질 확대 뷰어 모달 -->
+  <!-- [배너 썸네일 고화질 확대 뷰어 모달] -->
   <div id="bannerZoomModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4" onclick="closeBannerZoomModal()">
     <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -535,27 +597,6 @@
     </div>
   </div>
 
-  <!-- [모달 5] 주차 관리 -->
-  <div id="manageModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-        <div>
-          <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
-          <p class="text-xs text-slate-500">목록에서 바로 수정하거나 삭제할 수 있습니다.</p>
-        </div>
-        <button onclick="closeManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
-      </div>
-      <div class="p-6 space-y-4">
-        <div id="manageWeekList" class="divide-y divide-slate-100 max-h-60 overflow-y-auto border border-slate-200 rounded-lg">
-        </div>
-        <div class="flex items-center justify-between pt-2">
-          <button type="button" onclick="clearAllData()" class="text-xs text-red-500 hover:underline">전체 데이터 비우기</button>
-          <button type="button" onclick="closeManageModal()" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg text-slate-700 hover:bg-slate-200">닫기</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- 스크립트 로직 -->
   <script>
     let dataset = [];
@@ -566,11 +607,13 @@
     let isCaptureAccordionOpen = false;
     let chartInstances = {};
 
-    // 4대 구좌 및 권역 상태 관리 변수
-    let currentBannerSection = 'main'; // 'main', 'topSwipe', 'grid', 'bottomSwipe'
-    let currentBannerRegion = 'ALL';   // 'ALL', 'ISF', 'CFC'
+    let currentBannerSection = 'main';
+    let currentBannerRegion = 'ALL';
 
-    // 4대 구좌 표준 초기 데이터 세트 (실제 실적 장표 데이터 기반)
+    // 관리자 인증 상태 변수
+    let isAdminAuthenticated = false;
+    let pendingAdminCallback = null;
+
     const DEFAULT_BANNER_DATASETS = {
       main: [
         { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", region: "ISF", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: null },
@@ -614,6 +657,218 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ==========================================
+    // [어드민 비밀번호 인증 시스템 (초기비번 1234)]
+    // ==========================================
+    function getAdminPassword() {
+      return localStorage.getItem('zeta_kpi_admin_pwd') || '1234';
+    }
+
+    function requestAdminAccess(callback) {
+      if (isAdminAuthenticated) {
+        callback();
+        return;
+      }
+      pendingAdminCallback = callback;
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('adminAuthError').classList.add('hidden');
+      document.getElementById('adminAuthModal').classList.remove('hidden');
+      document.getElementById('adminPasswordInput').focus();
+    }
+
+    function closeAdminAuthModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+      pendingAdminCallback = null;
+    }
+
+    function verifyAdminPassword(e) {
+      e.preventDefault();
+      const input = document.getElementById('adminPasswordInput').value.trim();
+      const actual = getAdminPassword();
+
+      if (input === actual) {
+        isAdminAuthenticated = true;
+        closeAdminAuthModal();
+        if (typeof pendingAdminCallback === 'function') {
+          pendingAdminCallback();
+        }
+      } else {
+        document.getElementById('adminAuthError').classList.remove('hidden');
+      }
+    }
+
+    function changeAdminPasswordPrompt() {
+      const current = prompt("현재 관리자 비밀번호를 입력하세요:");
+      if (current === null) return;
+      if (current !== getAdminPassword()) {
+        alert("현재 비밀번호가 일치하지 않습니다.");
+        return;
+      }
+      const newPwd = prompt("새로운 관리자 비밀번호를 입력하세요:");
+      if (!newPwd || newPwd.trim() === '') {
+        alert("유효한 비밀번호를 입력해주세요.");
+        return;
+      }
+      localStorage.setItem('zeta_kpi_admin_pwd', newPwd.trim());
+      alert("관리자 비밀번호가 성공적으로 변경되었습니다.");
+    }
+
+    // ==========================================
+    // [통합 데이터 관리 모달 제어]
+    // ==========================================
+    function openUnifiedManageModal(initialTab = 'kpi') {
+      document.getElementById('unifiedManageModal').classList.remove('hidden');
+      switchManageModalTab(initialTab);
+    }
+
+    function closeUnifiedManageModal() {
+      document.getElementById('unifiedManageModal').classList.add('hidden');
+    }
+
+    function switchManageModalTab(tabKey) {
+      ['kpi', 'banner', 'list'].forEach(t => {
+        const sec = document.getElementById(`modalSec-${t}`);
+        const btn = document.getElementById(`modalTabBtn-${t}`);
+        if (sec && btn) {
+          if (t === tabKey) {
+            sec.classList.remove('hidden');
+            btn.className = "pb-2.5 border-b-2 border-blue-600 text-blue-600 transition";
+          } else {
+            sec.classList.add('hidden');
+            btn.className = "pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition";
+          }
+        }
+      });
+
+      if (tabKey === 'banner') setupBannerManageTab();
+      if (tabKey === 'list') renderManageWeekList();
+    }
+
+    function setupBannerManageTab() {
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      const curr = dataset[currIdx];
+      const titleBadge = document.getElementById('bannerTargetWeekTitle');
+
+      if (!curr) {
+        titleBadge.textContent = '등록된 주차 없음';
+        tempBannerList = [];
+      } else {
+        titleBadge.textContent = `[${curr.week}]`;
+        tempBannerList = curr.bannerImages ? [...curr.bannerImages] : [];
+      }
+      renderModalBannerThumbnails();
+    }
+
+    function resetKpiFormToNew() {
+      document.getElementById('kpiDataForm').reset();
+      document.getElementById('editTargetIndex').value = "-1";
+      document.getElementById('kpiFormModeBadge').textContent = "신규 주차 등록 모드";
+      document.getElementById('kpiSubmitBtn').textContent = "신규 지표 저장";
+      clearKpiOcrImage();
+    }
+
+    function editCurrentWeekData() {
+      requestAdminAccess(() => {
+        const sel = document.getElementById('weekSelector');
+        let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : -1;
+        if (currIdx === -1 || !dataset[currIdx]) {
+          alert("수정할 주차 데이터가 없습니다. 먼저 신규 등록을 진행해주세요.");
+          return;
+        }
+        openEditModalWithIndex(currIdx);
+      });
+    }
+
+    function openEditModalWithIndex(index) {
+      const d = dataset[index];
+      if (!d) return;
+
+      openUnifiedManageModal('kpi');
+      document.getElementById('editTargetIndex').value = index;
+      document.getElementById('kpiFormModeBadge').textContent = `[${d.week}] 수치 수정 모드`;
+      document.getElementById('kpiSubmitBtn').textContent = "수정사항 저장";
+
+      document.getElementById('formWeekName').value = d.week || '';
+      document.getElementById('formWeekPeriod').value = d.period || '';
+      document.getElementById('formUV').value = d.uv ?? '';
+      document.getElementById('formPV').value = d.pv ?? '';
+      document.getElementById('formOrders').value = d.orders ?? '';
+      document.getElementById('formTotalSearch').value = d.totalSearch ?? '';
+      document.getElementById('formSearchFail').value = d.searchFail ?? '';
+      document.getElementById('formSearchOrders').value = d.searchOrders ?? '';
+      document.getElementById('formRevenue').value = d.revenue ?? '';
+      document.getElementById('formSearchRevenue').value = d.searchRevenue ?? '';
+      document.getElementById('formBasketItems').value = d.basketItems ?? '';
+
+      clearKpiOcrImage();
+    }
+
+    // [주차 완전 삭제]: 주요 지표 + 매핑된 배너 데이터 + 캡처 표 + 코멘트 영구 삭제
+    function deleteWeekCompletely(idx) {
+      const targetWeek = dataset[idx];
+      if (!targetWeek) return;
+
+      const msg = `정말 '${targetWeek.week}' 데이터를 완전히 삭제하시겠습니까?\n\n※ 포함된 주요 KPI 수치, 메인배너 실적 데이터, 표 캡처 이미지, 코멘트가 모두 영구 삭제됩니다.`;
+      if (confirm(msg)) {
+        dataset.splice(idx, 1);
+        saveData();
+        populateWeekSelector();
+        onWeekChanged();
+        renderManageWeekList();
+        alert(`'${targetWeek.week}' 관련 모든 데이터가 완전히 삭제되었습니다.`);
+      }
+    }
+
+    function renderManageWeekList() {
+      const list = document.getElementById('manageWeekList');
+      if (!list) return;
+
+      if (dataset.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">등록된 주차가 없습니다.</p>`;
+      } else {
+        let html = '';
+        for (let idx = dataset.length - 1; idx >= 0; idx--) {
+          const d = dataset[idx];
+          const bannerCount = (d.bannerSections?.main?.length || 0) + (d.bannerSections?.topSwipe?.length || 0) + (d.bannerSections?.grid?.length || 0) + (d.bannerSections?.bottomSwipe?.length || 0);
+          const captureCount = d.bannerImages ? d.bannerImages.length : 0;
+
+          html += `
+            <div class="flex items-center justify-between p-3.5 text-xs hover:bg-slate-50 transition">
+              <div>
+                <div class="flex items-center space-x-1.5">
+                  <span class="font-bold text-slate-900">${d.week}</span>
+                  <span class="text-slate-400">(${d.period})</span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">
+                  UV ${(Number(d.uv)||0).toLocaleString()}명 | 배너 ${bannerCount}개 | 캡처 ${captureCount}장
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button type="button" onclick="openEditModalWithIndex(${idx})" class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-semibold transition">수정</button>
+                <button type="button" onclick="deleteWeekCompletely(${idx})" class="px-2.5 py-1 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-semibold transition">완전 삭제</button>
+              </div>
+            </div>
+          `;
+        }
+        list.innerHTML = html;
+      }
+    }
+
+    function clearAllDataWithConfirm() {
+      const input = prompt("모든 주차 데이터를 완전히 초기화하려면 '초기화'를 입력하세요:");
+      if (input === '초기화') {
+        dataset = [];
+        saveData();
+        populateWeekSelector();
+        onWeekChanged();
+        renderManageWeekList();
+        closeUnifiedManageModal();
+        alert("모든 주차 데이터가 영구 초기화되었습니다.");
+      }
+    }
+
+    // 날짜 가중치 및 정렬 함수
     function parseDateWeight(periodStr, weekName) {
       let month = 0, day = 0, weekNum = 0;
       if (periodStr) {
@@ -1040,9 +1295,6 @@
       });
     }
 
-    // ========================================================
-    // [서브 탭 & 권역 필터] 메인 배너 효율 탭 제어 로직
-    // ========================================================
     function switchBannerSection(sectionKey) {
       currentBannerSection = sectionKey;
 
@@ -1088,29 +1340,21 @@
 
       renderBannerComment(curr);
 
-      // 구좌별 데이터 추출 및 권역 필터링
       ensureBannerDataStructure(curr);
       const sectionData = curr.bannerSections[currentBannerSection] || [];
       const filteredData = filterBannerDataByRegion(sectionData, currentBannerRegion);
 
-      // 테이블 렌더링
       renderStructuredBannerTable(filteredData);
-
-      // 슬롯 비교 차트 렌더링
       renderBannerSlotChartBySection(filteredData);
-
-      // 하단 캡처 표 아코디언 세팅
       renderBannerCaptureAccordion(curr, images);
     }
 
-    // 주차 객체 내 4대 구좌 구조가 완벽한지 검증 및 초기화
     function ensureBannerDataStructure(curr) {
       if (!curr.bannerSections) {
         curr.bannerSections = {};
       }
       ['main', 'topSwipe', 'grid', 'bottomSwipe'].forEach(key => {
         if (!curr.bannerSections[key] || !Array.isArray(curr.bannerSections[key]) || curr.bannerSections[key].length === 0) {
-          // 기존 bannerItems가 있으면 메인배너로 승계, 없으면 DEFAULT_BANNER_DATASETS 복사
           if (key === 'main' && curr.bannerItems && curr.bannerItems.length > 0) {
             curr.bannerSections[key] = JSON.parse(JSON.stringify(curr.bannerItems));
           } else {
@@ -1158,14 +1402,14 @@
             <div class="relative group inline-block">
               <img src="${b.thumb}" onclick="openBannerZoomModal('${b.name}', '${b.thumb}')" class="w-14 h-9 object-cover rounded cursor-pointer border border-slate-300 hover:scale-105 transition shadow-xs" title="클릭하여 크게보기">
               <div class="absolute -top-1 -right-1 flex space-x-0.5 opacity-0 group-hover:opacity-100 transition">
-                <button type="button" onclick="openThumbUploadModal(${idx})" class="bg-blue-600 text-white rounded p-0.5 text-[9px]" title="이미지 변경 (파일/URL)">✎</button>
-                <button type="button" onclick="removeSingleBannerThumb(${idx})" class="bg-red-600 text-white rounded p-0.5 text-[9px]" title="삭제">✕</button>
+                <button type="button" onclick="requestAdminAccess(() => openThumbUploadModal(${idx}))" class="bg-blue-600 text-white rounded p-0.5 text-[9px]" title="이미지 변경 (파일/URL)">✎</button>
+                <button type="button" onclick="requestAdminAccess(() => removeSingleBannerThumb(${idx}))" class="bg-red-600 text-white rounded p-0.5 text-[9px]" title="삭제">✕</button>
               </div>
             </div>
           `;
         } else {
           thumbCellHtml = `
-            <button type="button" onclick="openThumbUploadModal(${idx})" class="px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md transition shadow-2xs">
+            <button type="button" onclick="requestAdminAccess(() => openThumbUploadModal(${idx}))" class="px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md transition shadow-2xs">
               +등록
             </button>
           `;
@@ -1433,54 +1677,6 @@
       }
     }
 
-    function openKpiModal() {
-      document.getElementById('kpiDataForm').reset();
-      document.getElementById('editTargetIndex').value = "-1";
-      document.getElementById('kpiModalTitle').textContent = "주간 주요 KPI 수치 신규 등록";
-      document.getElementById('kpiSubmitBtn').textContent = "신규 지표 저장";
-      clearKpiOcrImage();
-      document.getElementById('kpiModal').classList.remove('hidden');
-    }
-
-    function editCurrentWeekData() {
-      const sel = document.getElementById('weekSelector');
-      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : -1;
-      if (currIdx === -1 || !dataset[currIdx]) {
-        alert("수정할 주차 데이터가 없습니다. 먼저 신규 등록을 진행해주세요.");
-        return;
-      }
-      openEditModalWithIndex(currIdx);
-    }
-
-    function openEditModalWithIndex(index) {
-      const d = dataset[index];
-      if (!d) return;
-
-      document.getElementById('editTargetIndex').value = index;
-      document.getElementById('kpiModalTitle').textContent = `[${d.week}] 주요 KPI 수치 수정`;
-      document.getElementById('kpiSubmitBtn').textContent = "수정사항 저장";
-
-      document.getElementById('formWeekName').value = d.week || '';
-      document.getElementById('formWeekPeriod').value = d.period || '';
-      document.getElementById('formUV').value = d.uv ?? '';
-      document.getElementById('formPV').value = d.pv ?? '';
-      document.getElementById('formOrders').value = d.orders ?? '';
-      document.getElementById('formTotalSearch').value = d.totalSearch ?? '';
-      document.getElementById('formSearchFail').value = d.searchFail ?? '';
-      document.getElementById('formSearchOrders').value = d.searchOrders ?? '';
-      document.getElementById('formRevenue').value = d.revenue ?? '';
-      document.getElementById('formSearchRevenue').value = d.searchRevenue ?? '';
-      document.getElementById('formBasketItems').value = d.basketItems ?? '';
-
-      clearKpiOcrImage();
-      closeManageModal();
-      document.getElementById('kpiModal').classList.remove('hidden');
-    }
-
-    function closeKpiModal() {
-      document.getElementById('kpiModal').classList.add('hidden');
-    }
-
     function clearKpiOcrImage() {
       currentUploadedKpiImage = null;
       document.getElementById('kpiOcrFileInput').value = '';
@@ -1672,31 +1868,14 @@
           bannerComment: ""
         };
         dataset.push(newEntry);
+        alert(`[${newEntry.week}] 데이터가 신규 등록되었습니다!`);
       }
 
       saveData();
-      closeKpiModal();
       populateWeekSelector();
       document.getElementById('weekSelector').value = editIndex >= 0 ? editIndex : (dataset.length - 1);
       onWeekChanged();
-    }
-
-    function openBannerModal() {
-      if (dataset.length === 0) {
-        alert("먼저 [+ 주요 KPI 등록]으로 주차를 등록해주세요.");
-        return;
-      }
-      const sel = document.getElementById('weekSelector');
-      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
-      const curr = dataset[currIdx];
-
-      document.getElementById('targetWeekBadge').textContent = `[${curr.week}]`;
-      tempBannerList = curr.bannerImages ? [...curr.bannerImages] : [];
-      renderModalBannerThumbnails();
-      document.getElementById('bannerModal').classList.remove('hidden');
-    }
-    function closeBannerModal() {
-      document.getElementById('bannerModal').classList.add('hidden');
+      switchManageModalTab('list');
     }
 
     function handleModalBannerImages(event) {
@@ -1716,7 +1895,8 @@
     function renderModalBannerThumbnails() {
       const container = document.getElementById('modalBannerThumbnails');
       const countText = document.getElementById('modalBannerCountText');
-      countText.textContent = `${tempBannerList.length}장`;
+      if (!container) return;
+      countText.textContent = `${tempBannerList.length}장 등록됨`;
 
       if (tempBannerList.length > 0) {
         container.innerHTML = tempBannerList.map((src, idx) => `
@@ -1743,58 +1923,7 @@
         dataset[currIdx].bannerImages = [...tempBannerList];
         saveData();
         renderBannerTab();
-        closeBannerModal();
         alert("배너 실적표 캡처 이미지가 반영되었습니다!");
-      }
-    }
-
-    function openManageModal() {
-      const list = document.getElementById('manageWeekList');
-      if (dataset.length === 0) {
-        list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">등록된 주차가 없습니다.</p>`;
-      } else {
-        let html = '';
-        for (let idx = dataset.length - 1; idx >= 0; idx--) {
-          const d = dataset[idx];
-          html += `
-          <div class="flex items-center justify-between p-3 text-xs hover:bg-slate-50 transition">
-            <div>
-              <span class="font-bold text-slate-800">${d.week}</span>
-              <span class="text-slate-400 ml-1">(${d.period})</span>
-              <span class="ml-2 text-slate-500">배너 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <button onclick="openEditModalWithIndex(${idx})" class="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 font-semibold">수정</button>
-              <button onclick="deleteWeek(${idx})" class="px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100 font-semibold">삭제</button>
-            </div>
-          </div>
-        `;
-        }
-        list.innerHTML = html;
-      }
-      document.getElementById('manageModal').classList.remove('hidden');
-    }
-    function closeManageModal() {
-      document.getElementById('manageModal').classList.add('hidden');
-    }
-
-    function deleteWeek(idx) {
-      if (confirm(`'${dataset[idx].week}' 데이터를 삭제하시겠습니까?`)) {
-        dataset.splice(idx, 1);
-        saveData();
-        populateWeekSelector();
-        onWeekChanged();
-        openManageModal();
-      }
-    }
-
-    function clearAllData() {
-      if (confirm("정말 모든 주차 데이터를 완전히 초기화하시겠습니까?")) {
-        dataset = [];
-        saveData();
-        populateWeekSelector();
-        onWeekChanged();
-        closeManageModal();
       }
     }
 
