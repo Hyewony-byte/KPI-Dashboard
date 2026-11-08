@@ -16,19 +16,21 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-16">
 
-  <!-- 숨김 파일 입력창 (개별 배너 썸네일 업로드 전용) -->
+  <!-- 숨김 파일 입력창 (개별 배너 썸네일 로컬 업로드용) -->
   <input type="file" id="singleBannerThumbInput" accept="image/*" class="hidden" onchange="handleSingleBannerThumbSelected(event)">
 
   <!-- 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-[#FF3323] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#FF3323]/25">
+      
+      <!-- 1. 로고 및 타이틀 클릭 시 HOME(요약 대시보드)으로 이동 -->
+      <div onclick="goHome()" class="flex items-center space-x-3 cursor-pointer group select-none" title="클릭 시 HOME(요약 대시보드)으로 이동">
+        <div class="w-10 h-10 rounded-xl bg-[#FF3323] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#FF3323]/25 group-hover:scale-105 transition-transform">
           Z
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <h1 class="text-lg font-bold text-slate-900 leading-tight">제타 주요지표 주간 리뷰_큐레이션</h1>
+            <h1 class="text-lg font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">제타 주요지표 주간 리뷰_큐레이션</h1>
             <span class="px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">운영 KPI</span>
           </div>
           <p class="text-xs text-slate-500">ZETTA Executive Weekly Performance Analytics</p>
@@ -42,15 +44,20 @@
           </select>
         </div>
 
+        <!-- 현재 주차 수치 수정 버튼 -->
+        <button onclick="editCurrentWeekData()" class="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition" title="현재 선택된 주차의 지표 수정">
+          <span>✎ 수치 수정</span>
+        </button>
+
         <button onclick="openKpiModal()" class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-          <span>+ 주요 KPI 등록</span>
+          <span>+ 신규 주차 등록</span>
         </button>
 
         <button onclick="openBannerModal()" class="flex items-center space-x-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
           <span>🖼️ 배너 실적표 캡처 등록</span>
         </button>
 
-        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리">
+        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리 및 삭제">
           ⚙️
         </button>
 
@@ -77,7 +84,7 @@
       <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📊</div>
       <div class="space-y-1">
         <h3 class="text-base font-bold text-slate-900">등록된 주차 데이터가 없습니다</h3>
-        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 주요 KPI 등록]</strong> 버튼을 눌러 주차를 추가해 주세요.</p>
+        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 신규 주차 등록]</strong> 버튼을 눌러 첫 주차 지표를 추가해 주세요.</p>
       </div>
     </div>
 
@@ -138,7 +145,7 @@
       </section>
     </div>
 
-    <!-- 탭 2: 트렌드 심층 분석 차트 (좌 -> 우 순서: 과거 -> 최근) -->
+    <!-- 탭 2: 트렌드 심층 분석 차트 -->
     <div id="tab-trends" class="space-y-6 hidden">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -179,12 +186,12 @@
         </div>
       </section>
 
-      <!-- 주요 배너 구좌별 세부 실적 테이블 -->
+      <!-- 주요 배너 구좌별 세부 실적 테이블 (썸네일 업로드 & URL 입력 지원) -->
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
             <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">주요 배너 구좌별 세부 실적 및 배너 썸네일</h3>
-            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 원본 배너가 확대되며, <strong>[+등록]</strong> 버튼으로 실제 배너 그래픽을 개별 업로드할 수 있습니다.</p>
+            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 원본 배너가 확대되며, <strong>[+등록]</strong> 버튼으로 파일 업로드 또는 이미지 URL을 입력할 수 있습니다.</p>
           </div>
           <span class="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded font-medium">구좌별 실적 대조</span>
         </div>
@@ -272,13 +279,13 @@
 
   </main>
 
-  <!-- [모달 1] 주요 KPI 등록 -->
+  <!-- [모달 1] 주요 KPI 등록/수정 모달 -->
   <div id="kpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
-          <h3 class="text-base font-bold text-slate-900">주간 주요 KPI 수치 등록</h3>
-          <p class="text-xs text-slate-500 mt-0.5">표 캡처본을 올리면 OCR이 수치를 자동 채워줍니다.</p>
+          <h3 class="text-base font-bold text-slate-900" id="kpiModalTitle">주간 주요 KPI 수치 등록</h3>
+          <p class="text-xs text-slate-500 mt-0.5">표 캡처본을 올리면 OCR이 최우측 열(당주) 수치를 자동 추출합니다.</p>
         </div>
         <button onclick="closeKpiModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
@@ -287,7 +294,7 @@
         <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3.5 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-indigo-900 flex items-center space-x-1">
-              <span>📷 주요지표 표 캡처 올리기 (자동 입력)</span>
+              <span>📷 주요지표 표 캡처 올리기 (정밀 OCR)</span>
             </span>
             <span class="text-[11px] text-indigo-600 font-medium">JPG, PNG</span>
           </div>
@@ -300,7 +307,7 @@
             </div>
             <div id="kpiOcrLoading" class="hidden space-y-1.5 py-1">
               <div class="flex justify-between text-[11px] font-bold text-indigo-700">
-                <span id="ocrStatusMsg">표 캡처 수치 인식 중...</span>
+                <span id="ocrStatusMsg">표 캡처 전처리 및 수치 정밀 추출 중...</span>
                 <span id="ocrPercent">0%</span>
               </div>
               <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -321,6 +328,8 @@
         </div>
 
         <form id="kpiDataForm" onsubmit="saveKpiData(event)" class="space-y-4">
+          <input type="hidden" id="editTargetIndex" value="-1">
+
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">주차 명칭 *</label>
@@ -388,7 +397,7 @@
 
           <div class="flex items-center justify-end space-x-2 pt-2">
             <button type="button" onclick="closeKpiModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
-            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">지표 저장</button>
+            <button type="submit" id="kpiSubmitBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">지표 저장</button>
           </div>
         </form>
       </div>
@@ -433,7 +442,61 @@
     </div>
   </div>
 
-  <!-- [모달 3] 배너 썸네일 고화질 확대 뷰어 모달 -->
+  <!-- [신규 모달] 2. 배너 썸네일 등록 팝업 (파일 업로드 OR 이미지 URL 직접 입력) -->
+  <div id="bannerThumbUploadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900">배너 썸네일 등록/변경</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5" id="thumbModalBannerName">-</p>
+        </div>
+        <button onclick="closeBannerThumbUploadModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <!-- 탭 방식 옵션 -->
+        <div class="space-y-3">
+          <!-- 옵션 A: 내 컴퓨터 파일 첨부 -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">방식 1. 내 컴퓨터에서 이미지 파일 선택</label>
+            <button type="button" onclick="openLocalFileInput()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition flex items-center justify-center space-x-1.5">
+              <span>📁 이미지 파일 찾아보기 (JPG, PNG)</span>
+            </button>
+          </div>
+
+          <div class="relative flex py-1 items-center">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="flex-shrink mx-2 text-[11px] text-slate-400 font-medium">또는</span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <!-- 옵션 B: 이미지 URL 직접 입력 -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">방식 2. 이미지 웹 URL 주소 직접 입력</label>
+            <div class="flex space-x-1.5">
+              <input type="url" id="bannerThumbUrlInput" placeholder="https://... (이미지 주소 붙여넣기)" class="flex-1 px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <button type="button" onclick="applyThumbFromUrl()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition shrink-0">
+                적용
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">온라인 쇼핑몰, 사내 CDN, 웹상에 올라간 이미지 링크를 붙여넣으세요.</p>
+          </div>
+        </div>
+
+        <!-- 미리보기 박스 -->
+        <div id="thumbModalPreviewBox" class="hidden border border-slate-200 rounded-xl bg-slate-50 p-2 text-center">
+          <p class="text-[10px] font-medium text-slate-500 mb-1">선택된 썸네일 미리보기:</p>
+          <img id="thumbModalPreviewImg" src="" class="max-h-28 mx-auto rounded object-contain border border-slate-300 shadow-2xs">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeBannerThumbUploadModal()" class="px-3.5 py-1.5 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [모달 4] 배너 썸네일 고화질 확대 뷰어 모달 -->
   <div id="bannerZoomModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4" onclick="closeBannerZoomModal()">
     <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -449,13 +512,13 @@
     </div>
   </div>
 
-  <!-- [모달 4] 주차 관리 -->
+  <!-- [모달 5] 주차 관리 -->
   <div id="manageModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
           <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
-          <p class="text-xs text-slate-500">목록은 최신순으로 상위에 노출됩니다.</p>
+          <p class="text-xs text-slate-500">목록에서 바로 수정하거나 삭제할 수 있습니다.</p>
         </div>
         <button onclick="closeManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
@@ -476,24 +539,38 @@
     let tempBannerList = [];
     let currentUploadedKpiImage = null;
     let currentViewBannerImgIdx = 0;
-    let currentUploadItemIdx = null;
+    let currentUploadItemIdx = null; // 썸네일 등록 타깃 인덱스
     let isCaptureAccordionOpen = false;
     let chartInstances = {};
 
-    // 날짜 가중치 추출 함수: "10.22", "1022", "10월 3주", "11월 1주차" 등 모든 형태 완벽 파싱
+    const DEFAULT_BANNER_ITEMS = [
+      { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: null },
+      { slot: "1번", name: "[메인배너_1번] 261019_한우데이(전점)", imp: 79017, click: 14964, ctr: 18.9, orders: 2568, rev: 0, cvr: 17.2, thumb: null },
+      { slot: "2번", name: "[메인배너_2번] 261015_초신선(전점)", imp: 16447, click: 2215, ctr: 13.5, orders: 1708, rev: 29643846, cvr: 77.1, thumb: null },
+      { slot: "2번", name: "[메인배너_2번] 261019_초신선(전점)", imp: 64013, click: 7543, ctr: 11.8, orders: 1708, rev: 0, cvr: 22.6, thumb: null },
+      { slot: "3번", name: "[메인배너_3번] 261015_정육(CFC)", imp: 12357, click: 1569, ctr: 12.7, orders: 1119, rev: 19002591, cvr: 71.3, thumb: null },
+      { slot: "3번", name: "[메인배너_3번] 261019_정육(전점)", imp: 47677, click: 5464, ctr: 11.5, orders: 1119, rev: 0, cvr: 20.5, thumb: null },
+      { slot: "4번", name: "[메인배너_4번] 261015_밥상주치의(CFC)", imp: 10042, click: 599, ctr: 6.0, orders: 37, rev: 601843, cvr: 6.2, thumb: null },
+      { slot: "4번", name: "[메인배너_4번] 261015_제타패스(구독)", imp: 16000, click: 577, ctr: 3.6, orders: 56, rev: 1038548, cvr: 9.7, thumb: null },
+      { slot: "5번", name: "[메인배너_5번] 261019_코카콜라(광고)", imp: 43008, click: 3083, ctr: 7.2, orders: 66, rev: 641426, cvr: 2.1, thumb: null },
+      { slot: "6번", name: "[메인배너_6번] 261015_오리온(광고)", imp: 38547, click: 2150, ctr: 5.6, orders: 56, rev: 297115, cvr: 2.6, thumb: null }
+    ];
+
+    // 1. HOME 이동 함수 (로고 및 타이틀 클릭 시)
+    function goHome() {
+      switchTab('summary');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function parseDateWeight(periodStr, weekName) {
       let month = 0, day = 0, weekNum = 0;
-
-      // 1. 기간 문자열(periodStr)에서 월/일 파싱
       if (periodStr) {
         const clean = periodStr.trim();
-        // 형태 A: "10.22~10.28" 또는 "10.22"
         const dotMatch = clean.match(/(\d{1,2})\.(\d{1,2})/);
         if (dotMatch) {
           month = parseInt(dotMatch[1]);
           day = parseInt(dotMatch[2]);
         } else {
-          // 형태 B: "1022~1028" 또는 "1022" (점 없는 4자리 연속 숫자)
           const fourDigitMatch = clean.match(/^(\d{2})(\d{2})/);
           if (fourDigitMatch) {
             month = parseInt(fourDigitMatch[1]);
@@ -501,8 +578,6 @@
           }
         }
       }
-
-      // 2. 주차명(weekName)에서 월/주차 파싱 (보조 및 보정)
       if (weekName) {
         const weekMatch = weekName.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*주/);
         if (weekMatch) {
@@ -512,17 +587,11 @@
           weekNum = wWeek;
         }
       }
-
-      // 날짜(day)가 확인되면 월*100 + 일, 날짜가 없으면 월*100 + 주차*7
-      if (month > 0 && day > 0) {
-        return month * 100 + day;
-      } else if (month > 0 && weekNum > 0) {
-        return month * 100 + (weekNum * 7);
-      }
+      if (month > 0 && day > 0) return month * 100 + day;
+      if (month > 0 && weekNum > 0) return month * 100 + (weekNum * 7);
       return 0;
     }
 
-    // dataset을 과거 -> 최근(오름차순)으로 항상 정렬
     function sortDatasetChronologically() {
       dataset.sort((a, b) => parseDateWeight(a.period, a.week) - parseDateWeight(b.period, b.week));
     }
@@ -552,7 +621,6 @@
       }
     }
 
-    // [1번 요구사항] 리뷰 주차 드롭다운: 최신순(내림차순) 상위 노출
     function populateWeekSelector() {
       const sel = document.getElementById('weekSelector');
       if (!sel) return;
@@ -566,13 +634,11 @@
         return;
       }
 
-      // 최신 주차가 드롭다운 최상단에 오도록 역순(내림차순) 루프
       for (let i = dataset.length - 1; i >= 0; i--) {
         const d = dataset[i];
         const opt = document.createElement('option');
         opt.value = i;
         opt.textContent = `${d.week} (${d.period})`;
-        // 기본 선택: 가장 최신 주차(맨 위 항목)
         if (i === dataset.length - 1) opt.selected = true;
         sel.appendChild(opt);
       }
@@ -600,10 +666,9 @@
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
       if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) return;
 
-      // 선택 시점까지의 데이터만 추출 (과거 -> 현재 오름차순 유지)
       const visibleData = dataset.slice(0, currIdx + 1);
-      const curr = visibleData[visibleData.length - 1]; // 선택된 당주
-      const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null; // 바로 전주
+      const curr = visibleData[visibleData.length - 1];
+      const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null;
 
       document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period}`;
       
@@ -614,10 +679,8 @@
       renderFullMatrixTable(visibleData);
     }
 
-    // [2번 요구사항] 트렌드 차트: X축 좌 -> 우 순서가 과거 -> 최근 (오름차순)으로 표시
     function renderCharts(visibleData) {
       if (!window.Chart || visibleData.length === 0) return;
-      // visibleData는 과거 -> 최근 순서로 정렬되어 있으므로 labels도 자연스럽게 10월3주 -> 10월4주 -> 11월1주 순서
       const labels = visibleData.map(d => d.week);
       
       const createOrUpdate = (id, config) => {
@@ -674,7 +737,6 @@
       });
     }
 
-    // 비교 테이블: 좌 -> 우 순서가 과거 -> 최근 (전전주 -> 전주 -> 당주)
     function renderWeeklyTable(curr, prev, visibleData) {
       const tbody = document.getElementById('weeklyTableBody');
       const vLen = visibleData.length;
@@ -915,23 +977,13 @@
       }
     }
 
+    // 2. 배너 썸네일 테이블 렌더링 (등록 모달 호출)
     function renderStructuredBannerTable(curr) {
       const tbody = document.getElementById('mainBannerTableBody');
       if (!tbody) return;
 
       if (!curr.bannerItems || curr.bannerItems.length === 0) {
-        curr.bannerItems = [
-          { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: null },
-          { slot: "1번", name: "[메인배너_1번] 261019_한우데이(전점)", imp: 79017, click: 14964, ctr: 18.9, orders: 2568, rev: 0, cvr: 17.2, thumb: null },
-          { slot: "2번", name: "[메인배너_2번] 261015_초신선(전점)", imp: 16447, click: 2215, ctr: 13.5, orders: 1708, rev: 29643846, cvr: 77.1, thumb: null },
-          { slot: "2번", name: "[메인배너_2번] 261019_초신선(전점)", imp: 64013, click: 7543, ctr: 11.8, orders: 1708, rev: 0, cvr: 22.6, thumb: null },
-          { slot: "3번", name: "[메인배너_3번] 261015_정육(CFC)", imp: 12357, click: 1569, ctr: 12.7, orders: 1119, rev: 19002591, cvr: 71.3, thumb: null },
-          { slot: "3번", name: "[메인배너_3번] 261019_정육(전점)", imp: 47677, click: 5464, ctr: 11.5, orders: 1119, rev: 0, cvr: 20.5, thumb: null },
-          { slot: "4번", name: "[메인배너_4번] 261015_밥상주치의(CFC)", imp: 10042, click: 599, ctr: 6.0, orders: 37, rev: 601843, cvr: 6.2, thumb: null },
-          { slot: "4번", name: "[메인배너_4번] 261015_제타패스(구독)", imp: 16000, click: 577, ctr: 3.6, orders: 56, rev: 1038548, cvr: 9.7, thumb: null },
-          { slot: "5번", name: "[메인배너_5번] 261019_코카콜라(광고)", imp: 43008, click: 3083, ctr: 7.2, orders: 66, rev: 641426, cvr: 2.1, thumb: null },
-          { slot: "6번", name: "[메인배너_6번] 261015_오리온(광고)", imp: 38547, click: 2150, ctr: 5.6, orders: 56, rev: 297115, cvr: 2.6, thumb: null }
-        ];
+        curr.bannerItems = JSON.parse(JSON.stringify(DEFAULT_BANNER_ITEMS));
         saveData();
       }
 
@@ -942,14 +994,14 @@
             <div class="relative group inline-block">
               <img src="${b.thumb}" onclick="openBannerZoomModal('${b.name}', '${b.thumb}')" class="w-14 h-9 object-cover rounded cursor-pointer border border-slate-300 hover:scale-105 transition shadow-xs" title="클릭하여 크게보기">
               <div class="absolute -top-1 -right-1 flex space-x-0.5 opacity-0 group-hover:opacity-100 transition">
-                <button type="button" onclick="triggerSingleBannerThumbUpload(${idx})" class="bg-blue-600 text-white rounded p-0.5 text-[9px]" title="이미지 변경">✎</button>
+                <button type="button" onclick="openThumbUploadModal(${idx})" class="bg-blue-600 text-white rounded p-0.5 text-[9px]" title="이미지 변경 (파일/URL)">✎</button>
                 <button type="button" onclick="removeSingleBannerThumb(${idx})" class="bg-red-600 text-white rounded p-0.5 text-[9px]" title="삭제">✕</button>
               </div>
             </div>
           `;
         } else {
           thumbCellHtml = `
-            <button type="button" onclick="triggerSingleBannerThumbUpload(${idx})" class="px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md transition shadow-2xs">
+            <button type="button" onclick="openThumbUploadModal(${idx})" class="px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md transition shadow-2xs">
               +등록
             </button>
           `;
@@ -970,8 +1022,39 @@
       }).join('');
     }
 
-    function triggerSingleBannerThumbUpload(itemIndex) {
+    // ========================================================
+    // [신규 기능 2] 배너 썸네일 등록 팝업 제어 (파일 선택 OR URL 입력)
+    // ========================================================
+    function openThumbUploadModal(itemIndex) {
       currentUploadItemIdx = itemIndex;
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
+      const b = (dataset[currIdx] && dataset[currIdx].bannerItems) ? dataset[currIdx].bannerItems[itemIndex] : null;
+
+      document.getElementById('thumbModalBannerName').textContent = b ? b.name : '배너 구좌 선택';
+      document.getElementById('bannerThumbUrlInput').value = '';
+
+      const previewBox = document.getElementById('thumbModalPreviewBox');
+      const previewImg = document.getElementById('thumbModalPreviewImg');
+      if (b && b.thumb) {
+        previewImg.src = b.thumb;
+        previewBox.classList.remove('hidden');
+        if (b.thumb.startsWith('http')) {
+          document.getElementById('bannerThumbUrlInput').value = b.thumb;
+        }
+      } else {
+        previewBox.classList.add('hidden');
+      }
+
+      document.getElementById('bannerThumbUploadModal').classList.remove('hidden');
+    }
+
+    function closeBannerThumbUploadModal() {
+      document.getElementById('bannerThumbUploadModal').classList.add('hidden');
+      currentUploadItemIdx = null;
+    }
+
+    function openLocalFileInput() {
       const fileInput = document.getElementById('singleBannerThumbInput');
       fileInput.value = '';
       fileInput.click();
@@ -984,15 +1067,47 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const base64 = e.target.result;
-        const sel = document.getElementById('weekSelector');
-        let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
-        if (dataset[currIdx] && dataset[currIdx].bannerItems && dataset[currIdx].bannerItems[currentUploadItemIdx]) {
-          dataset[currIdx].bannerItems[currentUploadItemIdx].thumb = base64;
-          saveData();
-          renderStructuredBannerTable(dataset[currIdx]);
-        }
+        saveThumbToTarget(base64);
+        closeBannerThumbUploadModal();
       };
       reader.readAsDataURL(file);
+    }
+
+    function applyThumbFromUrl() {
+      const url = document.getElementById('bannerThumbUrlInput').value.trim();
+      if (!url) {
+        alert("이미지 URL을 입력해주세요.");
+        return;
+      }
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        alert("올바른 웹 URL 형식(http:// 또는 https://)으로 입력해주세요.");
+        return;
+      }
+
+      // 이미지 유효성 확인 후 저장
+      const tempImg = new Image();
+      tempImg.onload = function() {
+        saveThumbToTarget(url);
+        closeBannerThumbUploadModal();
+        alert("이미지 URL이 성공적으로 등록되었습니다!");
+      };
+      tempImg.onerror = function() {
+        if (confirm("이미지를 불러올 수 없는 URL일 수 있습니다. 그래도 등록하시겠습니까?")) {
+          saveThumbToTarget(url);
+          closeBannerThumbUploadModal();
+        }
+      };
+      tempImg.src = url;
+    }
+
+    function saveThumbToTarget(imgSrc) {
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
+      if (dataset[currIdx] && dataset[currIdx].bannerItems && dataset[currIdx].bannerItems[currentUploadItemIdx]) {
+        dataset[currIdx].bannerItems[currentUploadItemIdx].thumb = imgSrc;
+        saveData();
+        renderStructuredBannerTable(dataset[currIdx]);
+      }
     }
 
     function removeSingleBannerThumb(itemIndex) {
@@ -1048,9 +1163,48 @@
 
     function openKpiModal() {
       document.getElementById('kpiDataForm').reset();
+      document.getElementById('editTargetIndex').value = "-1";
+      document.getElementById('kpiModalTitle').textContent = "주간 주요 KPI 수치 신규 등록";
+      document.getElementById('kpiSubmitBtn').textContent = "신규 지표 저장";
       clearKpiOcrImage();
       document.getElementById('kpiModal').classList.remove('hidden');
     }
+
+    function editCurrentWeekData() {
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : -1;
+      if (currIdx === -1 || !dataset[currIdx]) {
+        alert("수정할 주차 데이터가 없습니다. 먼저 신규 등록을 진행해주세요.");
+        return;
+      }
+      openEditModalWithIndex(currIdx);
+    }
+
+    function openEditModalWithIndex(index) {
+      const d = dataset[index];
+      if (!d) return;
+
+      document.getElementById('editTargetIndex').value = index;
+      document.getElementById('kpiModalTitle').textContent = `[${d.week}] 주요 KPI 수치 수정`;
+      document.getElementById('kpiSubmitBtn').textContent = "수정사항 저장";
+
+      document.getElementById('formWeekName').value = d.week;
+      document.getElementById('formWeekPeriod').value = d.period;
+      document.getElementById('formUV').value = d.uv;
+      document.getElementById('formPV').value = d.pv;
+      document.getElementById('formOrders').value = d.orders;
+      document.getElementById('formTotalSearch').value = d.totalSearch;
+      document.getElementById('formSearchFail').value = d.searchFail;
+      document.getElementById('formSearchOrders').value = d.searchOrders || '';
+      document.getElementById('formRevenue').value = d.revenue;
+      document.getElementById('formSearchRevenue').value = d.searchRevenue || '';
+      document.getElementById('formBasketItems').value = d.basketItems;
+
+      clearKpiOcrImage();
+      closeManageModal();
+      document.getElementById('kpiModal').classList.remove('hidden');
+    }
+
     function closeKpiModal() {
       document.getElementById('kpiModal').classList.add('hidden');
     }
@@ -1077,8 +1231,10 @@
         try {
           if (!window.Tesseract) throw new Error("OCR 라이브러리 준비 중");
 
+          const preprocessedDataUrl = await preprocessImageForOcr(currentUploadedKpiImage);
+
           const result = await Tesseract.recognize(
-            currentUploadedKpiImage,
+            preprocessedDataUrl,
             'eng',
             {
               logger: m => {
@@ -1090,10 +1246,12 @@
               }
             }
           );
-          parseZettaTableOcr(result.data.text);
+
+          parseZettaTableOcrRefined(result.data.text);
+
         } catch (err) {
-          console.error("OCR 분석 에러:", err);
-          alert("이미지 자동 인식 중 지연이 발생했습니다. 수치를 직접 확인하고 입력해주세요.");
+          console.error("정밀 OCR 분석 실패:", err);
+          alert("이미지 텍스트 인식 중 문제가 발생했습니다. 수치를 직접 확인하고 입력해주세요.");
         } finally {
           document.getElementById('kpiOcrPrompt').classList.remove('hidden');
           document.getElementById('kpiOcrLoading').classList.add('hidden');
@@ -1102,56 +1260,98 @@
       reader.readAsDataURL(file);
     }
 
-    function parseZettaTableOcr(text) {
-      const cleanText = text.replace(/,/g, '');
-      const rawTokens = cleanText.split(/\s+/);
-      const numbers = rawTokens.map(t => parseFloat(t)).filter(n => !isNaN(n) && n > 0);
+    function preprocessImageForOcr(dataUrl) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
 
-      const periodMatch = text.match(/(\d{1,2}\.\d{1,2}\s*[\~\-]\s*\d{1,2}\.\d{1,2})/);
-      if (periodMatch) document.getElementById('formWeekPeriod').value = periodMatch[1].replace(/\s+/g, '');
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+          for (let i = 0; i < data.length; i += 4) {
+            const avg = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            const threshold = avg > 175 ? 255 : 0;
+            data[i] = threshold;
+            data[i + 1] = threshold;
+            data[i + 2] = threshold;
+          }
+          ctx.putImageData(imgData, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.src = dataUrl;
+      });
+    }
 
-      const pvCandidates = numbers.filter(n => n >= 1500000 && n <= 15000000);
-      const pv = pvCandidates.length > 0 ? pvCandidates[pvCandidates.length - 1] : null;
+    function parseZettaTableOcrRefined(ocrText) {
+      const lines = ocrText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-      const uvCandidates = numbers.filter(n => n >= 100000 && n <= 950000 && n !== pv);
-      const uv = uvCandidates.length > 0 ? uvCandidates[uvCandidates.length - 1] : null;
+      const periodMatch = ocrText.match(/(\d{1,2}\.\d{1,2}\s*[\~\-]\s*\d{1,2}\.\d{1,2})/);
+      if (periodMatch) {
+        document.getElementById('formWeekPeriod').value = periodMatch[1].replace(/\s+/g, '');
+      }
 
-      const searchCandidates = numbers.filter(n => n >= 200000 && n <= 950000 && n !== uv && n !== pv);
-      const totalSearch = searchCandidates.length > 0 ? searchCandidates[searchCandidates.length - 1] : null;
+      const extractLastNumberFromLine = (line) => {
+        const clean = line.replace(/,/g, '');
+        const matches = clean.match(/\b\d+(\.\d+)?\b/g);
+        if (!matches) return null;
+        const valid = matches.map(n => parseFloat(n)).filter(n => !isNaN(n) && n > 0);
+        return valid.length > 0 ? valid[valid.length - 1] : null;
+      };
 
-      const orderCandidates = numbers.filter(n => n >= 9000 && n <= 45000);
-      const orders = orderCandidates.length > 0 ? orderCandidates[orderCandidates.length - 1] : null;
+      lines.forEach(line => {
+        const lower = line.toLowerCase();
+        if (lower.includes('uv') && !lower.includes('pv') && !lower.includes('당')) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 50000 && val <= 990000) document.getElementById('formUV').value = Math.round(val);
+        } else if (lower.includes('pv') && !lower.includes('uv')) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 1000000) document.getElementById('formPV').value = Math.round(val);
+        } else if (line.includes('주문건수') || lower.includes('orders') || lower.includes('order')) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 5000 && val <= 50000) document.getElementById('formOrders').value = Math.round(val);
+        } else if (line.includes('전체') && line.includes('검색')) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 100000) document.getElementById('formTotalSearch').value = Math.round(val);
+        } else if (line.includes('실패수') || line.includes('실패')) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 5000 && val <= 50000) document.getElementById('formSearchFail').value = Math.round(val);
+        } else if (line.includes('전체주문금액') || (line.includes('전체') && line.includes('금액'))) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 300 && val <= 3000) document.getElementById('formRevenue').value = Math.round(val);
+        } else if (line.includes('검색주문금액') || (line.includes('검색') && line.includes('금액'))) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 100 && val <= 900) document.getElementById('formSearchRevenue').value = Math.round(val);
+        } else if (line.includes('건당수량') || line.includes('건당')) {
+          const val = extractLastNumberFromLine(line);
+          if (val && val >= 8.0 && val <= 20.0) document.getElementById('formBasketItems').value = val.toFixed(1);
+        }
+      });
 
-      const failCandidates = numbers.filter(n => n >= 7000 && n <= 35000 && n !== orders);
-      const searchFail = failCandidates.length > 0 ? failCandidates[failCandidates.length - 1] : null;
+      const allTokens = ocrText.replace(/,/g, '').split(/\s+/).map(t => parseFloat(t)).filter(n => !isNaN(n));
+      if (!document.getElementById('formPV').value) {
+        const pvCands = allTokens.filter(n => n >= 1500000 && n <= 15000000);
+        if (pvCands.length) document.getElementById('formPV').value = Math.round(pvCands[pvCands.length - 1]);
+      }
+      if (!document.getElementById('formUV').value) {
+        const uvCands = allTokens.filter(n => n >= 100000 && n <= 950000);
+        if (uvCands.length) document.getElementById('formUV').value = Math.round(uvCands[uvCands.length - 1]);
+      }
+      if (!document.getElementById('formRevenue').value) {
+        const revCands = allTokens.filter(n => n >= 400 && n <= 2500);
+        if (revCands.length) document.getElementById('formRevenue').value = Math.round(revCands[revCands.length - 1]);
+      }
 
-      const sOrderCandidates = numbers.filter(n => n >= 20000 && n <= 45000 && n !== orders && n !== searchFail);
-      const searchOrders = sOrderCandidates.length > 0 ? sOrderCandidates[sOrderCandidates.length - 1] : null;
-
-      const revCandidates = numbers.filter(n => n >= 400 && n <= 2500);
-      const revenue = revCandidates.length > 0 ? revCandidates[revCandidates.length - 1] : null;
-
-      const sRevCandidates = numbers.filter(n => n >= 150 && n <= 450 && n !== revenue);
-      const searchRevenue = sRevCandidates.length > 0 ? sRevCandidates[sRevCandidates.length - 1] : null;
-
-      const basketCandidates = rawTokens.filter(t => t.includes('.') && parseFloat(t) >= 9.0 && parseFloat(t) <= 15.0);
-      const basket = basketCandidates.length > 0 ? parseFloat(basketCandidates[basketCandidates.length - 1]) : null;
-
-      if (uv) document.getElementById('formUV').value = Math.round(uv);
-      if (pv) document.getElementById('formPV').value = Math.round(pv);
-      if (orders) document.getElementById('formOrders').value = Math.round(orders);
-      if (totalSearch) document.getElementById('formTotalSearch').value = Math.round(totalSearch);
-      if (searchFail) document.getElementById('formSearchFail').value = Math.round(searchFail);
-      if (searchOrders) document.getElementById('formSearchOrders').value = Math.round(searchOrders);
-      if (revenue) document.getElementById('formRevenue').value = Math.round(revenue);
-      if (searchRevenue) document.getElementById('formSearchRevenue').value = Math.round(searchRevenue);
-      if (basket) document.getElementById('formBasketItems').value = basket.toFixed(1);
-
-      alert("✨ 표 캡처본에서 최신 주차의 주요 수치가 자동으로 입력되었습니다!");
+      alert("✨ 표 캡처본에서 최신 주차의 주요 수치가 자동으로 추출되었습니다!\n대조용 캡처를 보며 필요시 미세 수정 후 저장해주세요.");
     }
 
     function saveKpiData(e) {
       e.preventDefault();
+      const editIndex = parseInt(document.getElementById('editTargetIndex').value);
+
       const uv = parseInt(document.getElementById('formUV').value) || 0;
       const pv = parseInt(document.getElementById('formPV').value) || 0;
       const orders = parseInt(document.getElementById('formOrders').value) || 0;
@@ -1169,23 +1369,45 @@
       }
       const searchShare = revenue > 0 ? parseFloat(((searchRevenue / revenue) * 100).toFixed(1)) : 0;
 
-      const newEntry = {
-        week: document.getElementById('formWeekName').value,
-        period: document.getElementById('formWeekPeriod').value,
-        uv, pv, pvPerUv, orders, cvr,
-        totalSearch, searchFail, searchFailRate,
-        revenue, searchRevenue, searchShare,
-        basketItems,
-        bannerImages: [],
-        bannerItems: [],
-        summaryComment: "",
-        bannerComment: ""
-      };
+      if (editIndex >= 0 && dataset[editIndex]) {
+        dataset[editIndex].week = document.getElementById('formWeekName').value;
+        dataset[editIndex].period = document.getElementById('formWeekPeriod').value;
+        dataset[editIndex].uv = uv;
+        dataset[editIndex].pv = pv;
+        dataset[editIndex].pvPerUv = pvPerUv;
+        dataset[editIndex].orders = orders;
+        dataset[editIndex].cvr = cvr;
+        dataset[editIndex].totalSearch = totalSearch;
+        dataset[editIndex].searchFail = searchFail;
+        dataset[editIndex].searchFailRate = searchFailRate;
+        dataset[editIndex].revenue = revenue;
+        dataset[editIndex].searchRevenue = searchRevenue;
+        dataset[editIndex].searchShare = searchShare;
+        dataset[editIndex].basketItems = basketItems;
+        if (!dataset[editIndex].bannerItems || dataset[editIndex].bannerItems.length === 0) {
+          dataset[editIndex].bannerItems = JSON.parse(JSON.stringify(DEFAULT_BANNER_ITEMS));
+        }
+        alert(`[${dataset[editIndex].week}] 지표 수치가 성공적으로 수정되었습니다!`);
+      } else {
+        const newEntry = {
+          week: document.getElementById('formWeekName').value,
+          period: document.getElementById('formWeekPeriod').value,
+          uv, pv, pvPerUv, orders, cvr,
+          totalSearch, searchFail, searchFailRate,
+          revenue, searchRevenue, searchShare,
+          basketItems,
+          bannerImages: [],
+          bannerItems: JSON.parse(JSON.stringify(DEFAULT_BANNER_ITEMS)),
+          summaryComment: "",
+          bannerComment: ""
+        };
+        dataset.push(newEntry);
+      }
 
-      dataset.push(newEntry);
       saveData();
       closeKpiModal();
       populateWeekSelector();
+      document.getElementById('weekSelector').value = editIndex >= 0 ? editIndex : (dataset.length - 1);
       onWeekChanged();
     }
 
@@ -1265,13 +1487,16 @@
         for (let idx = dataset.length - 1; idx >= 0; idx--) {
           const d = dataset[idx];
           html += `
-          <div class="flex items-center justify-between p-3 text-xs">
+          <div class="flex items-center justify-between p-3 text-xs hover:bg-slate-50 transition">
             <div>
               <span class="font-bold text-slate-800">${d.week}</span>
               <span class="text-slate-400 ml-1">(${d.period})</span>
               <span class="ml-2 text-slate-500">배너 캡처 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
             </div>
-            <button onclick="deleteWeek(${idx})" class="text-red-500 hover:font-bold">삭제</button>
+            <div class="flex items-center space-x-2">
+              <button onclick="openEditModalWithIndex(${idx})" class="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 font-semibold">수정</button>
+              <button onclick="deleteWeek(${idx})" class="px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100 font-semibold">삭제</button>
+            </div>
           </div>
         `;
         }
@@ -1303,67 +1528,27 @@
       }
     }
 
-    function renderKpiCards(curr, prev, visibleData) {
-      const container = document.getElementById('kpiCardsContainer');
-      const calcDiff = (c, p) => p ? (((c - p) / p) * 100).toFixed(1) : 0;
-      const calcPDiff = (c, p) => p ? (c - p).toFixed(1) : 0;
-
-      const cards = [
-        { title: "일평균 UV", value: `${(curr.uv / 10000).toFixed(1)}만`, subValue: `${curr.uv.toLocaleString()}명`, diff: prev ? calcDiff(curr.uv, prev.uv) : null, unit: "%", isGood: prev ? (curr.uv >= prev.uv) : true, sparkData: visibleData.map(d => d.uv) },
-        { title: "일평균 PV", value: `${(curr.pv / 1000000).toFixed(1)}백만`, subValue: `UV당 PV ${curr.pvPerUv.toFixed(1)}건`, diff: prev ? calcDiff(curr.pv, prev.pv) : null, unit: "%", isGood: prev ? (curr.pv >= prev.pv) : true, sparkData: visibleData.map(d => d.pv) },
-        { title: "구매전환율 (CVR)", value: `${curr.cvr}%`, subValue: `주문 ${curr.orders.toLocaleString()}건`, diff: prev ? calcPDiff(curr.cvr, prev.cvr) : null, unit: "%p", isGood: prev ? (curr.cvr >= prev.cvr) : true, sparkData: visibleData.map(d => d.cvr) },
-        { title: "검색 실패율", value: `${curr.searchFailRate}%`, subValue: `실패 ${curr.searchFail.toLocaleString()}건`, diff: prev ? calcPDiff(curr.searchFailRate, prev.searchFailRate) : null, unit: "%p", isGood: prev ? (curr.searchFailRate <= prev.searchFailRate) : true, sparkData: visibleData.map(d => d.searchFailRate) },
-        { title: "전체 주문금액", value: `${(curr.revenue / 100).toFixed(1)}억`, subValue: `${curr.revenue.toLocaleString()}백만원`, diff: prev ? calcDiff(curr.revenue, prev.revenue) : null, unit: "%", isGood: prev ? (curr.revenue >= prev.revenue) : true, sparkData: visibleData.map(d => d.revenue) }
-      ];
-
-      container.innerHTML = cards.map(c => {
-        let diffBadge = `<span class="text-xs text-slate-400 font-medium">비교 대상 없음</span>`;
-        if (c.diff !== null) {
-          const isPositive = parseFloat(c.diff) >= 0;
-          const sign = isPositive ? "▲" : "▼";
-          const colorClass = c.isGood ? "text-red-500 font-bold" : "text-blue-500 font-semibold";
-          diffBadge = `<span class="text-xs ${colorClass}">전주대비 ${sign} ${Math.abs(c.diff)}${c.unit}</span>`;
-        }
-
-        const sparkSvg = createSparklineSvg(c.sparkData, c.isGood ? '#3b82f6' : '#64748b');
-
-        return `
-          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
-            <div>
-              <div class="text-xs font-semibold text-slate-600 mb-2">${c.title}</div>
-              <div class="text-2xl font-extrabold text-slate-900 tracking-tight">${c.value}</div>
-              <div class="flex items-center justify-between mt-1 text-[11px] text-slate-500">
-                <span>${c.subValue}</span>
-                ${diffBadge}
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between">
-              <span class="text-[10px] text-slate-400">선택 시점까지 추이</span>
-              <div class="w-24 h-6">${sparkSvg}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
+    function copyInsightScript() {
+      const text = document.getElementById('insightContainer').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtnText');
+        btn.textContent = "복사 완료!";
+        setTimeout(() => { btn.textContent = "요약 복사"; }, 2000);
+      });
     }
 
-    function createSparklineSvg(data, color = '#2563eb') {
-      if (!data || data.length < 2) return '<div class="text-[10px] text-slate-300 text-center">-</div>';
-      const min = Math.min(...data);
-      const max = Math.max(...data);
-      const range = (max - min) || 1;
-      const width = 100;
-      const height = 24;
-      const points = data.map((val, idx) => {
-        const x = (idx / (data.length - 1)) * width;
-        const y = height - ((val - min) / range) * (height - 6) - 3;
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      }).join(' ');
-
-      return `
-        <svg viewBox="0 0 100 24" class="w-full h-full">
-          <polyline fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
-        </svg>
-      `;
+    function exportToCSV() {
+      if (dataset.length === 0) return;
+      let csv = "주차,집계기간,UV,PV,UV당PV,주문건수,구매전환율(%),전체검색수,검색실패수,검색실패율(%),전체주문금액,건당수량\n";
+      dataset.forEach(d => {
+        csv += `"${d.week}","${d.period}",${d.uv},${d.pv},${d.pvPerUv},${d.orders},${d.cvr},${d.totalSearch},${d.searchFail},${d.searchFailRate},${d.revenue},${d.basketItems}\n`;
+      });
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `제타_주간지표_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
     }
 
     function renderFullMatrixTable(visibleData) {
@@ -1415,29 +1600,6 @@
         let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
         renderCharts(dataset.slice(0, currIdx + 1));
       }
-    }
-
-    function copyInsightScript() {
-      const text = document.getElementById('insightContainer').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtnText');
-        btn.textContent = "복사 완료!";
-        setTimeout(() => { btn.textContent = "요약 복사"; }, 2000);
-      });
-    }
-
-    function exportToCSV() {
-      if (dataset.length === 0) return;
-      let csv = "주차,집계기간,UV,PV,UV당PV,주문건수,구매전환율(%),전체검색수,검색실패수,검색실패율(%),전체주문금액,건당수량\n";
-      dataset.forEach(d => {
-        csv += `"${d.week}","${d.period}",${d.uv},${d.pv},${d.pvPerUv},${d.orders},${d.cvr},${d.totalSearch},${d.searchFail},${d.searchFailRate},${d.revenue},${d.basketItems}\n`;
-      });
-      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `제타_주간지표_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
     }
 
     const kpiDropZone = document.getElementById('kpiOcrDropZone');
