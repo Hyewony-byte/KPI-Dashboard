@@ -42,20 +42,15 @@
           </select>
         </div>
 
-        <!-- 신규 추가: 현재 주차 수치 수정 버튼 -->
-        <button onclick="editCurrentWeekData()" class="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition" title="현재 선택된 주차의 지표 수정">
-          <span>✎ 수치 수정</span>
-        </button>
-
         <button onclick="openKpiModal()" class="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-          <span>+ 신규 주차 등록</span>
+          <span>+ 주요 KPI 등록</span>
         </button>
 
         <button onclick="openBannerModal()" class="flex items-center space-x-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
           <span>🖼️ 배너 실적표 캡처 등록</span>
         </button>
 
-        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리 및 삭제">
+        <button onclick="openManageModal()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition" title="주차 목록 관리">
           ⚙️
         </button>
 
@@ -69,7 +64,7 @@
   <!-- 메인 본문 -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-    <!-- 상단 탭: 순서 반영 (1.요약 -> 2.트렌드 -> 3.메인배너 -> 4.비교표) -->
+    <!-- 상단 탭 (순서: 1.요약 -> 2.트렌드 -> 3.메인배너 -> 4.비교표) -->
     <div class="flex items-center space-x-2 border-b border-slate-200 text-sm font-semibold">
       <button id="tabBtn-summary" class="px-4 py-2.5 text-blue-600 border-b-2 border-blue-600" onclick="switchTab('summary')">요약 대시보드</button>
       <button id="tabBtn-trends" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('trends')">트렌드 심층 분석</button>
@@ -82,7 +77,7 @@
       <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📊</div>
       <div class="space-y-1">
         <h3 class="text-base font-bold text-slate-900">등록된 주차 데이터가 없습니다</h3>
-        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 신규 주차 등록]</strong> 버튼을 눌러 첫 주차 지표를 추가해 주세요.</p>
+        <p class="text-xs text-slate-500">상단 우측의 <strong>[+ 주요 KPI 등록]</strong> 버튼을 눌러 주차를 추가해 주세요.</p>
       </div>
     </div>
 
@@ -167,6 +162,7 @@
 
     <!-- 탭 3: 메인 배너구좌별 효율 -->
     <div id="tab-banner" class="space-y-6 hidden">
+      <!-- 코멘트 영역 -->
       <section class="bg-white rounded-2xl border border-amber-200/90 p-5 shadow-xs relative bg-amber-50/20">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-amber-100 gap-2">
           <div class="flex items-center space-x-2">
@@ -183,6 +179,7 @@
         </div>
       </section>
 
+      <!-- 주요 배너 구좌별 세부 실적 테이블 -->
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
@@ -211,6 +208,7 @@
         </div>
       </section>
 
+      <!-- 구좌별 클릭수 vs 매출 차트 -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -224,6 +222,7 @@
         </div>
       </div>
 
+      <!-- 배너 실적표 캡처 아코디언 -->
       <div id="bannerCaptureViewBox" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 bg-slate-50/70 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition" onclick="toggleBannerCaptureAccordion()">
           <div class="flex items-center space-x-2">
@@ -273,23 +272,22 @@
 
   </main>
 
-  <!-- [모달 1] 주요 KPI 등록/수정 모달 (정밀 OCR 엔진 + 엑셀 붙여넣기 탭 탑재) -->
+  <!-- [모달 1] 주요 KPI 등록 -->
   <div id="kpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div>
-          <h3 class="text-base font-bold text-slate-900" id="kpiModalTitle">주간 주요 KPI 수치 등록</h3>
-          <p class="text-xs text-slate-500 mt-0.5">표 캡처본을 올리면 OCR이 최우측 열(당주) 수치를 자동 추출합니다.</p>
+          <h3 class="text-base font-bold text-slate-900">주간 주요 KPI 수치 등록</h3>
+          <p class="text-xs text-slate-500 mt-0.5">표 캡처본을 올리면 OCR이 수치를 자동 채워줍니다.</p>
         </div>
         <button onclick="closeKpiModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
 
       <div class="p-6 overflow-y-auto space-y-4">
-        <!-- 캡처 이미지 OCR 드롭존 -->
         <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3.5 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-indigo-900 flex items-center space-x-1">
-              <span>📷 주요지표 표 캡처 올리기 (정밀 OCR)</span>
+              <span>📷 주요지표 표 캡처 올리기 (자동 입력)</span>
             </span>
             <span class="text-[11px] text-indigo-600 font-medium">JPG, PNG</span>
           </div>
@@ -302,7 +300,7 @@
             </div>
             <div id="kpiOcrLoading" class="hidden space-y-1.5 py-1">
               <div class="flex justify-between text-[11px] font-bold text-indigo-700">
-                <span id="ocrStatusMsg">표 캡처 전처리 및 수치 정밀 추출 중...</span>
+                <span id="ocrStatusMsg">표 캡처 수치 인식 중...</span>
                 <span id="ocrPercent">0%</span>
               </div>
               <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -323,8 +321,6 @@
         </div>
 
         <form id="kpiDataForm" onsubmit="saveKpiData(event)" class="space-y-4">
-          <input type="hidden" id="editTargetIndex" value="-1">
-
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">주차 명칭 *</label>
@@ -392,7 +388,7 @@
 
           <div class="flex items-center justify-end space-x-2 pt-2">
             <button type="button" onclick="closeKpiModal()" class="px-4 py-2 border border-slate-300 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
-            <button type="submit" id="kpiSubmitBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">지표 저장</button>
+            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm">지표 저장</button>
           </div>
         </form>
       </div>
@@ -459,7 +455,7 @@
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
           <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
-          <p class="text-xs text-slate-500">목록에서 바로 수정하거나 삭제할 수 있습니다.</p>
+          <p class="text-xs text-slate-500">목록은 최신순으로 상위에 노출됩니다.</p>
         </div>
         <button onclick="closeManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
@@ -484,15 +480,20 @@
     let isCaptureAccordionOpen = false;
     let chartInstances = {};
 
+    // 날짜 가중치 추출 함수: "10.22", "1022", "10월 3주", "11월 1주차" 등 모든 형태 완벽 파싱
     function parseDateWeight(periodStr, weekName) {
       let month = 0, day = 0, weekNum = 0;
+
+      // 1. 기간 문자열(periodStr)에서 월/일 파싱
       if (periodStr) {
         const clean = periodStr.trim();
+        // 형태 A: "10.22~10.28" 또는 "10.22"
         const dotMatch = clean.match(/(\d{1,2})\.(\d{1,2})/);
         if (dotMatch) {
           month = parseInt(dotMatch[1]);
           day = parseInt(dotMatch[2]);
         } else {
+          // 형태 B: "1022~1028" 또는 "1022" (점 없는 4자리 연속 숫자)
           const fourDigitMatch = clean.match(/^(\d{2})(\d{2})/);
           if (fourDigitMatch) {
             month = parseInt(fourDigitMatch[1]);
@@ -500,6 +501,8 @@
           }
         }
       }
+
+      // 2. 주차명(weekName)에서 월/주차 파싱 (보조 및 보정)
       if (weekName) {
         const weekMatch = weekName.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*주/);
         if (weekMatch) {
@@ -509,11 +512,17 @@
           weekNum = wWeek;
         }
       }
-      if (month > 0 && day > 0) return month * 100 + day;
-      if (month > 0 && weekNum > 0) return month * 100 + (weekNum * 7);
+
+      // 날짜(day)가 확인되면 월*100 + 일, 날짜가 없으면 월*100 + 주차*7
+      if (month > 0 && day > 0) {
+        return month * 100 + day;
+      } else if (month > 0 && weekNum > 0) {
+        return month * 100 + (weekNum * 7);
+      }
       return 0;
     }
 
+    // dataset을 과거 -> 최근(오름차순)으로 항상 정렬
     function sortDatasetChronologically() {
       dataset.sort((a, b) => parseDateWeight(a.period, a.week) - parseDateWeight(b.period, b.week));
     }
@@ -543,6 +552,7 @@
       }
     }
 
+    // [1번 요구사항] 리뷰 주차 드롭다운: 최신순(내림차순) 상위 노출
     function populateWeekSelector() {
       const sel = document.getElementById('weekSelector');
       if (!sel) return;
@@ -556,11 +566,13 @@
         return;
       }
 
+      // 최신 주차가 드롭다운 최상단에 오도록 역순(내림차순) 루프
       for (let i = dataset.length - 1; i >= 0; i--) {
         const d = dataset[i];
         const opt = document.createElement('option');
         opt.value = i;
         opt.textContent = `${d.week} (${d.period})`;
+        // 기본 선택: 가장 최신 주차(맨 위 항목)
         if (i === dataset.length - 1) opt.selected = true;
         sel.appendChild(opt);
       }
@@ -588,9 +600,10 @@
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
       if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) return;
 
+      // 선택 시점까지의 데이터만 추출 (과거 -> 현재 오름차순 유지)
       const visibleData = dataset.slice(0, currIdx + 1);
-      const curr = visibleData[visibleData.length - 1];
-      const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null;
+      const curr = visibleData[visibleData.length - 1]; // 선택된 당주
+      const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null; // 바로 전주
 
       document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period}`;
       
@@ -601,8 +614,10 @@
       renderFullMatrixTable(visibleData);
     }
 
+    // [2번 요구사항] 트렌드 차트: X축 좌 -> 우 순서가 과거 -> 최근 (오름차순)으로 표시
     function renderCharts(visibleData) {
       if (!window.Chart || visibleData.length === 0) return;
+      // visibleData는 과거 -> 최근 순서로 정렬되어 있으므로 labels도 자연스럽게 10월3주 -> 10월4주 -> 11월1주 순서
       const labels = visibleData.map(d => d.week);
       
       const createOrUpdate = (id, config) => {
@@ -659,6 +674,7 @@
       });
     }
 
+    // 비교 테이블: 좌 -> 우 순서가 과거 -> 최근 (전전주 -> 전주 -> 당주)
     function renderWeeklyTable(curr, prev, visibleData) {
       const tbody = document.getElementById('weeklyTableBody');
       const vLen = visibleData.length;
@@ -806,6 +822,7 @@
       }
     }
 
+    // 메인 배너 효율 탭 렌더링
     function renderBannerTab() {
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
@@ -1029,53 +1046,11 @@
       });
     }
 
-    // ==========================================
-    // [수정 기능]: 신규 등록 모달 / 기존 주차 수정 모달 통합
-    // ==========================================
     function openKpiModal() {
       document.getElementById('kpiDataForm').reset();
-      document.getElementById('editTargetIndex').value = "-1";
-      document.getElementById('kpiModalTitle').textContent = "주간 주요 KPI 수치 신규 등록";
-      document.getElementById('kpiSubmitBtn').textContent = "신규 지표 저장";
       clearKpiOcrImage();
       document.getElementById('kpiModal').classList.remove('hidden');
     }
-
-    function editCurrentWeekData() {
-      const sel = document.getElementById('weekSelector');
-      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : -1;
-      if (currIdx === -1 || !dataset[currIdx]) {
-        alert("수정할 주차 데이터가 없습니다. 먼저 신규 등록을 진행해주세요.");
-        return;
-      }
-      openEditModalWithIndex(currIdx);
-    }
-
-    function openEditModalWithIndex(index) {
-      const d = dataset[index];
-      if (!d) return;
-
-      document.getElementById('editTargetIndex').value = index;
-      document.getElementById('kpiModalTitle').textContent = `[${d.week}] 주요 KPI 수치 수정`;
-      document.getElementById('kpiSubmitBtn').textContent = "수정사항 저장";
-
-      document.getElementById('formWeekName').value = d.week;
-      document.getElementById('formWeekPeriod').value = d.period;
-      document.getElementById('formUV').value = d.uv;
-      document.getElementById('formPV').value = d.pv;
-      document.getElementById('formOrders').value = d.orders;
-      document.getElementById('formTotalSearch').value = d.totalSearch;
-      document.getElementById('formSearchFail').value = d.searchFail;
-      document.getElementById('formSearchOrders').value = d.searchOrders || '';
-      document.getElementById('formRevenue').value = d.revenue;
-      document.getElementById('formSearchRevenue').value = d.searchRevenue || '';
-      document.getElementById('formBasketItems').value = d.basketItems;
-
-      clearKpiOcrImage();
-      closeManageModal();
-      document.getElementById('kpiModal').classList.remove('hidden');
-    }
-
     function closeKpiModal() {
       document.getElementById('kpiModal').classList.add('hidden');
     }
@@ -1086,9 +1061,6 @@
       document.getElementById('kpiOcrPreviewContainer').classList.add('hidden');
     }
 
-    // =======================================================
-    // [개선된 정밀 OCR 엔진]: 전처리(흑백 이진화) + 행 단위 맨 우측 열 추출
-    // =======================================================
     async function handleKpiOcrImage(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1105,12 +1077,8 @@
         try {
           if (!window.Tesseract) throw new Error("OCR 라이브러리 준비 중");
 
-          // 1단계: 캔버스 전처리 (흑백 및 대비 강화로 테두리 선 간섭 제거)
-          const preprocessedDataUrl = await preprocessImageForOcr(currentUploadedKpiImage);
-
-          // 2단계: Tesseract 인식 실행
           const result = await Tesseract.recognize(
-            preprocessedDataUrl,
+            currentUploadedKpiImage,
             'eng',
             {
               logger: m => {
@@ -1122,13 +1090,10 @@
               }
             }
           );
-
-          // 3단계: 장표 정밀 파싱
-          parseZettaTableOcrRefined(result.data.text);
-
+          parseZettaTableOcr(result.data.text);
         } catch (err) {
-          console.error("정밀 OCR 분석 실패:", err);
-          alert("이미지 텍스트 인식 중 문제가 발생했습니다. 수치를 직접 확인하고 입력해주세요.");
+          console.error("OCR 분석 에러:", err);
+          alert("이미지 자동 인식 중 지연이 발생했습니다. 수치를 직접 확인하고 입력해주세요.");
         } finally {
           document.getElementById('kpiOcrPrompt').classList.remove('hidden');
           document.getElementById('kpiOcrLoading').classList.add('hidden');
@@ -1137,137 +1102,56 @@
       reader.readAsDataURL(file);
     }
 
-    // 흑백 이진화 전처리 함수
-    function preprocessImageForOcr(dataUrl) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
+    function parseZettaTableOcr(text) {
+      const cleanText = text.replace(/,/g, '');
+      const rawTokens = cleanText.split(/\s+/);
+      const numbers = rawTokens.map(t => parseFloat(t)).filter(n => !isNaN(n) && n > 0);
 
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = imgData.data;
-          // 그레이스케일 및 대비 강화
-          for (let i = 0; i < data.length; i += 4) {
-            const avg = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            const threshold = avg > 175 ? 255 : 0; // 텍스트만 검은색으로 남김
-            data[i] = threshold;
-            data[i + 1] = threshold;
-            data[i + 2] = threshold;
-          }
-          ctx.putImageData(imgData, 0, 0);
-          resolve(canvas.toDataURL('image/png'));
-        };
-        img.src = dataUrl;
-      });
-    }
+      const periodMatch = text.match(/(\d{1,2}\.\d{1,2}\s*[\~\-]\s*\d{1,2}\.\d{1,2})/);
+      if (periodMatch) document.getElementById('formWeekPeriod').value = periodMatch[1].replace(/\s+/g, '');
 
-    // 행 단위 최우측 열 정밀 매핑 함수
-    function parseZettaTableOcrRefined(ocrText) {
-      const lines = ocrText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const pvCandidates = numbers.filter(n => n >= 1500000 && n <= 15000000);
+      const pv = pvCandidates.length > 0 ? pvCandidates[pvCandidates.length - 1] : null;
 
-      // 전체 텍스트에서 날짜/기간 추출 (예: "10.29~11.01" 또는 "10.29-11.01")
-      const periodMatch = ocrText.match(/(\d{1,2}\.\d{1,2}\s*[\~\-]\s*\d{1,2}\.\d{1,2})/);
-      if (periodMatch) {
-        document.getElementById('formWeekPeriod').value = periodMatch[1].replace(/\s+/g, '');
-      }
+      const uvCandidates = numbers.filter(n => n >= 100000 && n <= 950000 && n !== pv);
+      const uv = uvCandidates.length > 0 ? uvCandidates[uvCandidates.length - 1] : null;
 
-      // 각 행별로 맨 오른쪽(마지막) 숫자를 추출하는 헬퍼
-      const extractLastNumberFromLine = (line) => {
-        const clean = line.replace(/,/g, '');
-        const matches = clean.match(/\b\d+(\.\d+)?\b/g);
-        if (!matches) return null;
-        const valid = matches.map(n => parseFloat(n)).filter(n => !isNaN(n) && n > 0);
-        return valid.length > 0 ? valid[valid.length - 1] : null;
-      };
+      const searchCandidates = numbers.filter(n => n >= 200000 && n <= 950000 && n !== uv && n !== pv);
+      const totalSearch = searchCandidates.length > 0 ? searchCandidates[searchCandidates.length - 1] : null;
 
-      // 줄별 키워드 탐색 매핑
-      lines.forEach(line => {
-        const lower = line.toLowerCase();
+      const orderCandidates = numbers.filter(n => n >= 9000 && n <= 45000);
+      const orders = orderCandidates.length > 0 ? orderCandidates[orderCandidates.length - 1] : null;
 
-        // UV 행
-        if (lower.includes('uv') && !lower.includes('pv') && !lower.includes('당')) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 50000 && val <= 990000) {
-            document.getElementById('formUV').value = Math.round(val);
-          }
-        }
-        // PV 행
-        else if (lower.includes('pv') && !lower.includes('uv')) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 1000000) {
-            document.getElementById('formPV').value = Math.round(val);
-          }
-        }
-        // 주문건수 행
-        else if (line.includes('주문건수') || lower.includes('orders') || lower.includes('order')) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 5000 && val <= 50000) {
-            document.getElementById('formOrders').value = Math.round(val);
-          }
-        }
-        // 전체 검색수 행
-        else if (line.includes('전체') && line.includes('검색')) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 100000) {
-            document.getElementById('formTotalSearch').value = Math.round(val);
-          }
-        }
-        // 실패수 행
-        else if (line.includes('실패수') || line.includes('실패')) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 5000 && val <= 50000) {
-            document.getElementById('formSearchFail').value = Math.round(val);
-          }
-        }
-        // 전체주문금액 행
-        else if (line.includes('전체주문금액') || (line.includes('전체') && line.includes('금액'))) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 300 && val <= 3000) {
-            document.getElementById('formRevenue').value = Math.round(val);
-          }
-        }
-        // 검색주문금액 행
-        else if (line.includes('검색주문금액') || (line.includes('검색') && line.includes('금액'))) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 100 && val <= 900) {
-            document.getElementById('formSearchRevenue').value = Math.round(val);
-          }
-        }
-        // 건당수량 행
-        else if (line.includes('건당수량') || line.includes('건당')) {
-          const val = extractLastNumberFromLine(line);
-          if (val && val >= 8.0 && val <= 20.0) {
-            document.getElementById('formBasketItems').value = val.toFixed(1);
-          }
-        }
-      });
+      const failCandidates = numbers.filter(n => n >= 7000 && n <= 35000 && n !== orders);
+      const searchFail = failCandidates.length > 0 ? failCandidates[failCandidates.length - 1] : null;
 
-      // 만약 행 분리가 명확하지 않아 누락된 필드가 있다면 전체 숫자 토큰 중 범위로 안전 폴백
-      const allTokens = ocrText.replace(/,/g, '').split(/\s+/).map(t => parseFloat(t)).filter(n => !isNaN(n));
-      if (!document.getElementById('formPV').value) {
-        const pvCands = allTokens.filter(n => n >= 1500000 && n <= 15000000);
-        if (pvCands.length) document.getElementById('formPV').value = Math.round(pvCands[pvCands.length - 1]);
-      }
-      if (!document.getElementById('formUV').value) {
-        const uvCands = allTokens.filter(n => n >= 100000 && n <= 950000);
-        if (uvCands.length) document.getElementById('formUV').value = Math.round(uvCands[uvCands.length - 1]);
-      }
-      if (!document.getElementById('formRevenue').value) {
-        const revCands = allTokens.filter(n => n >= 400 && n <= 2500);
-        if (revCands.length) document.getElementById('formRevenue').value = Math.round(revCands[revCands.length - 1]);
-      }
+      const sOrderCandidates = numbers.filter(n => n >= 20000 && n <= 45000 && n !== orders && n !== searchFail);
+      const searchOrders = sOrderCandidates.length > 0 ? sOrderCandidates[sOrderCandidates.length - 1] : null;
 
-      alert("✨ 표 캡처본에서 최신 주차의 주요 수치가 자동으로 추출되었습니다!\n대조용 캡처를 보며 필요시 미세 수정 후 저장해주세요.");
+      const revCandidates = numbers.filter(n => n >= 400 && n <= 2500);
+      const revenue = revCandidates.length > 0 ? revCandidates[revCandidates.length - 1] : null;
+
+      const sRevCandidates = numbers.filter(n => n >= 150 && n <= 450 && n !== revenue);
+      const searchRevenue = sRevCandidates.length > 0 ? sRevCandidates[sRevCandidates.length - 1] : null;
+
+      const basketCandidates = rawTokens.filter(t => t.includes('.') && parseFloat(t) >= 9.0 && parseFloat(t) <= 15.0);
+      const basket = basketCandidates.length > 0 ? parseFloat(basketCandidates[basketCandidates.length - 1]) : null;
+
+      if (uv) document.getElementById('formUV').value = Math.round(uv);
+      if (pv) document.getElementById('formPV').value = Math.round(pv);
+      if (orders) document.getElementById('formOrders').value = Math.round(orders);
+      if (totalSearch) document.getElementById('formTotalSearch').value = Math.round(totalSearch);
+      if (searchFail) document.getElementById('formSearchFail').value = Math.round(searchFail);
+      if (searchOrders) document.getElementById('formSearchOrders').value = Math.round(searchOrders);
+      if (revenue) document.getElementById('formRevenue').value = Math.round(revenue);
+      if (searchRevenue) document.getElementById('formSearchRevenue').value = Math.round(searchRevenue);
+      if (basket) document.getElementById('formBasketItems').value = basket.toFixed(1);
+
+      alert("✨ 표 캡처본에서 최신 주차의 주요 수치가 자동으로 입력되었습니다!");
     }
 
     function saveKpiData(e) {
       e.preventDefault();
-      const editIndex = parseInt(document.getElementById('editTargetIndex').value);
-
       const uv = parseInt(document.getElementById('formUV').value) || 0;
       const pv = parseInt(document.getElementById('formPV').value) || 0;
       const orders = parseInt(document.getElementById('formOrders').value) || 0;
@@ -1285,44 +1169,23 @@
       }
       const searchShare = revenue > 0 ? parseFloat(((searchRevenue / revenue) * 100).toFixed(1)) : 0;
 
-      if (editIndex >= 0 && dataset[editIndex]) {
-        // 기존 주차 데이터 수정 업데이트
-        dataset[editIndex].week = document.getElementById('formWeekName').value;
-        dataset[editIndex].period = document.getElementById('formWeekPeriod').value;
-        dataset[editIndex].uv = uv;
-        dataset[editIndex].pv = pv;
-        dataset[editIndex].pvPerUv = pvPerUv;
-        dataset[editIndex].orders = orders;
-        dataset[editIndex].cvr = cvr;
-        dataset[editIndex].totalSearch = totalSearch;
-        dataset[editIndex].searchFail = searchFail;
-        dataset[editIndex].searchFailRate = searchFailRate;
-        dataset[editIndex].revenue = revenue;
-        dataset[editIndex].searchRevenue = searchRevenue;
-        dataset[editIndex].searchShare = searchShare;
-        dataset[editIndex].basketItems = basketItems;
-        alert(`[${dataset[editIndex].week}] 지표 수치가 성공적으로 수정되었습니다!`);
-      } else {
-        // 신규 주차 추가
-        const newEntry = {
-          week: document.getElementById('formWeekName').value,
-          period: document.getElementById('formWeekPeriod').value,
-          uv, pv, pvPerUv, orders, cvr,
-          totalSearch, searchFail, searchFailRate,
-          revenue, searchRevenue, searchShare,
-          basketItems,
-          bannerImages: [],
-          bannerItems: [],
-          summaryComment: "",
-          bannerComment: ""
-        };
-        dataset.push(newEntry);
-      }
+      const newEntry = {
+        week: document.getElementById('formWeekName').value,
+        period: document.getElementById('formWeekPeriod').value,
+        uv, pv, pvPerUv, orders, cvr,
+        totalSearch, searchFail, searchFailRate,
+        revenue, searchRevenue, searchShare,
+        basketItems,
+        bannerImages: [],
+        bannerItems: [],
+        summaryComment: "",
+        bannerComment: ""
+      };
 
+      dataset.push(newEntry);
       saveData();
       closeKpiModal();
       populateWeekSelector();
-      document.getElementById('weekSelector').value = editIndex >= 0 ? editIndex : (dataset.length - 1);
       onWeekChanged();
     }
 
@@ -1393,7 +1256,6 @@
       }
     }
 
-    // 주차 관리 모달: 수정 버튼 추가
     function openManageModal() {
       const list = document.getElementById('manageWeekList');
       if (dataset.length === 0) {
@@ -1403,16 +1265,13 @@
         for (let idx = dataset.length - 1; idx >= 0; idx--) {
           const d = dataset[idx];
           html += `
-          <div class="flex items-center justify-between p-3 text-xs hover:bg-slate-50 transition">
+          <div class="flex items-center justify-between p-3 text-xs">
             <div>
               <span class="font-bold text-slate-800">${d.week}</span>
               <span class="text-slate-400 ml-1">(${d.period})</span>
-              <span class="ml-2 text-slate-500">배너 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
+              <span class="ml-2 text-slate-500">배너 캡처 ${d.bannerImages ? d.bannerImages.length : 0}장</span>
             </div>
-            <div class="flex items-center space-x-2">
-              <button onclick="openEditModalWithIndex(${idx})" class="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 font-semibold">수정</button>
-              <button onclick="deleteWeek(${idx})" class="px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100 font-semibold">삭제</button>
-            </div>
+            <button onclick="deleteWeek(${idx})" class="text-red-500 hover:font-bold">삭제</button>
           </div>
         `;
         }
@@ -1441,6 +1300,120 @@
         populateWeekSelector();
         onWeekChanged();
         closeManageModal();
+      }
+    }
+
+    function renderKpiCards(curr, prev, visibleData) {
+      const container = document.getElementById('kpiCardsContainer');
+      const calcDiff = (c, p) => p ? (((c - p) / p) * 100).toFixed(1) : 0;
+      const calcPDiff = (c, p) => p ? (c - p).toFixed(1) : 0;
+
+      const cards = [
+        { title: "일평균 UV", value: `${(curr.uv / 10000).toFixed(1)}만`, subValue: `${curr.uv.toLocaleString()}명`, diff: prev ? calcDiff(curr.uv, prev.uv) : null, unit: "%", isGood: prev ? (curr.uv >= prev.uv) : true, sparkData: visibleData.map(d => d.uv) },
+        { title: "일평균 PV", value: `${(curr.pv / 1000000).toFixed(1)}백만`, subValue: `UV당 PV ${curr.pvPerUv.toFixed(1)}건`, diff: prev ? calcDiff(curr.pv, prev.pv) : null, unit: "%", isGood: prev ? (curr.pv >= prev.pv) : true, sparkData: visibleData.map(d => d.pv) },
+        { title: "구매전환율 (CVR)", value: `${curr.cvr}%`, subValue: `주문 ${curr.orders.toLocaleString()}건`, diff: prev ? calcPDiff(curr.cvr, prev.cvr) : null, unit: "%p", isGood: prev ? (curr.cvr >= prev.cvr) : true, sparkData: visibleData.map(d => d.cvr) },
+        { title: "검색 실패율", value: `${curr.searchFailRate}%`, subValue: `실패 ${curr.searchFail.toLocaleString()}건`, diff: prev ? calcPDiff(curr.searchFailRate, prev.searchFailRate) : null, unit: "%p", isGood: prev ? (curr.searchFailRate <= prev.searchFailRate) : true, sparkData: visibleData.map(d => d.searchFailRate) },
+        { title: "전체 주문금액", value: `${(curr.revenue / 100).toFixed(1)}억`, subValue: `${curr.revenue.toLocaleString()}백만원`, diff: prev ? calcDiff(curr.revenue, prev.revenue) : null, unit: "%", isGood: prev ? (curr.revenue >= prev.revenue) : true, sparkData: visibleData.map(d => d.revenue) }
+      ];
+
+      container.innerHTML = cards.map(c => {
+        let diffBadge = `<span class="text-xs text-slate-400 font-medium">비교 대상 없음</span>`;
+        if (c.diff !== null) {
+          const isPositive = parseFloat(c.diff) >= 0;
+          const sign = isPositive ? "▲" : "▼";
+          const colorClass = c.isGood ? "text-red-500 font-bold" : "text-blue-500 font-semibold";
+          diffBadge = `<span class="text-xs ${colorClass}">전주대비 ${sign} ${Math.abs(c.diff)}${c.unit}</span>`;
+        }
+
+        const sparkSvg = createSparklineSvg(c.sparkData, c.isGood ? '#3b82f6' : '#64748b');
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
+            <div>
+              <div class="text-xs font-semibold text-slate-600 mb-2">${c.title}</div>
+              <div class="text-2xl font-extrabold text-slate-900 tracking-tight">${c.value}</div>
+              <div class="flex items-center justify-between mt-1 text-[11px] text-slate-500">
+                <span>${c.subValue}</span>
+                ${diffBadge}
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between">
+              <span class="text-[10px] text-slate-400">선택 시점까지 추이</span>
+              <div class="w-24 h-6">${sparkSvg}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createSparklineSvg(data, color = '#2563eb') {
+      if (!data || data.length < 2) return '<div class="text-[10px] text-slate-300 text-center">-</div>';
+      const min = Math.min(...data);
+      const max = Math.max(...data);
+      const range = (max - min) || 1;
+      const width = 100;
+      const height = 24;
+      const points = data.map((val, idx) => {
+        const x = (idx / (data.length - 1)) * width;
+        const y = height - ((val - min) / range) * (height - 6) - 3;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      return `
+        <svg viewBox="0 0 100 24" class="w-full h-full">
+          <polyline fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
+        </svg>
+      `;
+    }
+
+    function renderFullMatrixTable(visibleData) {
+      const table = document.getElementById('fullMatrixTable');
+      if (!table || visibleData.length === 0) return;
+      let thead = `<tr class="bg-slate-50 text-slate-700 font-semibold border-b"><th class="py-3 px-4">지표명</th>`;
+      visibleData.forEach(d => { thead += `<th class="py-3 px-4 text-right">${d.week}</th>`; });
+      thead += `</tr>`;
+
+      const keys = [
+        { label: "일평균 UV (명)", k: "uv", fmt: n => n.toLocaleString() },
+        { label: "일평균 PV (건)", k: "pv", fmt: n => n.toLocaleString() },
+        { label: "UV당 PV", k: "pvPerUv", fmt: n => n.toFixed(1) },
+        { label: "주문건수 (건)", k: "orders", fmt: n => n.toLocaleString() },
+        { label: "구매전환율 (%)", k: "cvr", fmt: n => `${n.toFixed(1)}%` },
+        { label: "전체 검색수", k: "totalSearch", fmt: n => n.toLocaleString() },
+        { label: "검색 실패수", k: "searchFail", fmt: n => n.toLocaleString() },
+        { label: "검색 실패율 (%)", k: "searchFailRate", fmt: n => `${n.toFixed(1)}%` },
+        { label: "전체 주문금액 (백만)", k: "revenue", fmt: n => n.toLocaleString() },
+        { label: "건당수량 (개)", k: "basketItems", fmt: n => n.toFixed(1) }
+      ];
+
+      let tbody = "";
+      keys.forEach(row => {
+        tbody += `<tr class="border-b hover:bg-slate-50"><td class="py-2.5 px-4 font-medium text-slate-800">${row.label}</td>`;
+        visibleData.forEach(d => { tbody += `<td class="py-2.5 px-4 text-right text-slate-600">${row.fmt(d[row.k])}</td>`; });
+        tbody += `</tr>`;
+      });
+
+      table.innerHTML = `<thead>${thead}</thead><tbody>${tbody}</tbody>`;
+    }
+
+    function switchTab(tabId) {
+      ['summary', 'trends', 'banner', 'table'].forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        if (el) el.classList.toggle('hidden', t !== tabId);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = "px-4 py-2.5 text-blue-600 border-b-2 border-blue-600";
+          } else {
+            btn.className = "px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent";
+          }
+        }
+      });
+      if (tabId === 'banner') renderBannerTab();
+      if (tabId === 'trends') {
+        const sel = document.getElementById('weekSelector');
+        let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+        renderCharts(dataset.slice(0, currIdx + 1));
       }
     }
 
