@@ -64,11 +64,11 @@
   <!-- 메인 본문 -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-    <!-- 상단 탭 -->
+    <!-- 상단 탭: 순서 변경 반영 (1.요약 -> 2.트렌드 -> 3.메인배너 -> 4.비교표) -->
     <div class="flex items-center space-x-2 border-b border-slate-200 text-sm font-semibold">
       <button id="tabBtn-summary" class="px-4 py-2.5 text-blue-600 border-b-2 border-blue-600" onclick="switchTab('summary')">요약 대시보드</button>
-      <button id="tabBtn-banner" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('banner')">메인 배너구좌별 효율</button>
       <button id="tabBtn-trends" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('trends')">트렌드 심층 분석</button>
+      <button id="tabBtn-banner" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('banner')">메인 배너구좌별 효율</button>
       <button id="tabBtn-table" class="px-4 py-2.5 text-slate-500 hover:text-slate-800 border-b-2 border-transparent" onclick="switchTab('table')">전체 지표 비교표</button>
     </div>
 
@@ -83,23 +83,35 @@
 
     <!-- 탭 1: 요약 대시보드 -->
     <div id="tab-summary" class="space-y-6">
-      <section class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
+      
+      <!-- 위클리 핵심 비즈니스 인사이트 배너 (4대 항목 고도화 + 직접 수정/저장 가능) -->
+      <section class="bg-white rounded-2xl border border-indigo-200/90 p-5 shadow-xs relative bg-indigo-50/20">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-indigo-100 gap-2">
           <div class="flex items-center space-x-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold tracking-wide bg-indigo-50 text-indigo-700 border border-indigo-200">
-              ✨ WEEKLY KEY INSIGHT
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold tracking-wide bg-indigo-600 text-white shadow-xs">
+              ✨ WEEKLY KEY INSIGHT (주요 지표 종합 진단)
             </span>
             <span id="scriptPeriodBadge" class="text-xs text-slate-500 font-medium"></span>
+            <span class="text-[11px] text-slate-400 font-normal">| 텍스트를 클릭해 직접 수정할 수 있습니다.</span>
           </div>
-          <button onclick="copyInsightScript()" class="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200 transition">
-            <span id="copyBtnText">인사이트 요약 복사</span>
-          </button>
+          <div class="flex items-center space-x-2">
+            <button onclick="saveSummaryCommentManual()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
+              <span>💾 코멘트 저장</span>
+            </button>
+            <button onclick="copyInsightScript()" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium border border-slate-200 transition">
+              <span id="copyBtnText">요약 복사</span>
+            </button>
+          </div>
         </div>
-        <div id="insightContainer" class="text-sm leading-relaxed text-slate-700 space-y-2"></div>
+        <!-- 직접 수정 가능한 본문 박스 -->
+        <div id="insightContainer" contenteditable="true" class="editable-box text-xs leading-relaxed text-slate-800 p-3.5 rounded-xl border border-indigo-200/60 bg-white min-h-[90px] space-y-2.5">
+        </div>
       </section>
 
+      <!-- 상단 5대 핵심 KPI 카드 -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="kpiCardsContainer"></section>
 
+      <!-- 최근 주차 상세 지표 비교 테이블 -->
       <section class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
@@ -127,10 +139,32 @@
       </section>
     </div>
 
-    <!-- 탭 2: 메인 배너구좌별 효율 -->
+    <!-- 탭 2: 트렌드 심층 분석 차트 (2번째로 이동) -->
+    <div id="tab-trends" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <h3 class="text-sm font-bold text-slate-900 mb-3">트래픽 & 주문건수 추이</h3>
+          <div class="h-64"><canvas id="chartTraffic"></canvas></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <h3 class="text-sm font-bold text-slate-900 mb-3">구매전환율 & UV당 PV 상관관계</h3>
+          <div class="h-64"><canvas id="chartEfficiency"></canvas></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <h3 class="text-sm font-bold text-slate-900 mb-3">검색 실패율 및 검색 구매비중</h3>
+          <div class="h-64"><canvas id="chartSearch"></canvas></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+          <h3 class="text-sm font-bold text-slate-900 mb-3">전체 일평균 주문금액 추이 (백만원)</h3>
+          <div class="h-64"><canvas id="chartRevenue"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 탭 3: 메인 배너구좌별 효율 (3번째로 이동) -->
     <div id="tab-banner" class="space-y-6 hidden">
 
-      <!-- 1. 주간 메인배너 핵심 코멘트 분석 영역 (자동 작성 + 직접 수정 가능) -->
+      <!-- 배너 성과 진단 코멘트 (직접 수정/저장 가능) -->
       <section class="bg-white rounded-2xl border border-amber-200/90 p-5 shadow-xs relative bg-amber-50/20">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-amber-100 gap-2">
           <div class="flex items-center space-x-2">
@@ -147,7 +181,7 @@
         </div>
       </section>
 
-      <!-- 2. 주요 배너 항목별 실제 구조화 분석 테이블 ('배너 썸네일' 1:1 개별 업로드 및 확대 지원) -->
+      <!-- 주요 배너 구좌별 세부 실적 테이블 (배너 썸네일 1:1 개별 업로드 및 확대 지원) -->
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
@@ -176,7 +210,7 @@
         </div>
       </section>
 
-      <!-- 3. 구좌별 클릭수 vs 매출 차트 -->
+      <!-- 구좌별 클릭수 vs 매출 차트 -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -190,7 +224,7 @@
         </div>
       </div>
 
-      <!-- 4. 배너 효율 캡처 표 원본 뷰어 (최하단 배치 & 기본 접힘 아코디언 상태) -->
+      <!-- 배너 실적표 캡처 아코디언 (최하단 접힘 유지) -->
       <div id="bannerCaptureViewBox" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 bg-slate-50/70 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition" onclick="toggleBannerCaptureAccordion()">
           <div class="flex items-center space-x-2">
@@ -209,7 +243,6 @@
           </div>
         </div>
 
-        <!-- 아코디언 본문 (기본 hidden) -->
         <div id="bannerAccordionBody" class="hidden border-t border-slate-200 p-4 bg-white">
           <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-3 overflow-auto max-h-[650px] flex items-center justify-center min-h-[200px]">
             <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
@@ -223,28 +256,6 @@
         </div>
       </div>
 
-    </div>
-
-    <!-- 탭 3: 트렌드 심층 분석 차트 -->
-    <div id="tab-trends" class="space-y-6 hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <h3 class="text-sm font-bold text-slate-900 mb-3">트래픽 & 주문건수 추이</h3>
-          <div class="h-64"><canvas id="chartTraffic"></canvas></div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <h3 class="text-sm font-bold text-slate-900 mb-3">구매전환율 & UV당 PV 상관관계</h3>
-          <div class="h-64"><canvas id="chartEfficiency"></canvas></div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <h3 class="text-sm font-bold text-slate-900 mb-3">검색 실패율 및 검색 구매비중</h3>
-          <div class="h-64"><canvas id="chartSearch"></canvas></div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <h3 class="text-sm font-bold text-slate-900 mb-3">전체 일평균 주문금액 추이 (백만원)</h3>
-          <div class="h-64"><canvas id="chartRevenue"></canvas></div>
-        </div>
-      </div>
     </div>
 
     <!-- 탭 4: 전체 지표 비교표 -->
@@ -263,7 +274,7 @@
 
   </main>
 
-  <!-- [모달 1] 주요 KPI 등록 -->
+  <!-- [모달 1] 주요 KPI 등록 (OCR 자동 파싱 엔진) -->
   <div id="kpiModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -446,7 +457,7 @@
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
           <h3 class="text-base font-bold text-slate-900">등록된 주차 목록 관리</h3>
-          <p class="text-xs text-slate-500">순서는 항상 과거 → 최근 순으로 자동 정렬됩니다.</p>
+          <p class="text-xs text-slate-500">목록은 최신순으로 상위에 노출됩니다.</p>
         </div>
         <button onclick="closeManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
@@ -461,14 +472,14 @@
     </div>
   </div>
 
-  <!-- 통합 스크립트 로직 -->
+  <!-- 스크립트 로직 -->
   <script>
     let dataset = [];
     let tempBannerList = [];
     let currentUploadedKpiImage = null;
     let currentViewBannerImgIdx = 0;
-    let currentUploadItemIdx = null; // 개별 배너 썸네일 업로드 타깃 인덱스
-    let isCaptureAccordionOpen = false; // 하단 캡처 표 기본 접힘 상태
+    let currentUploadItemIdx = null;
+    let isCaptureAccordionOpen = false;
     let chartInstances = {};
 
     function parseDateWeight(periodStr, weekName) {
@@ -520,13 +531,14 @@
         return;
       }
 
-      dataset.forEach((d, idx) => {
+      for (let i = dataset.length - 1; i >= 0; i--) {
+        const d = dataset[i];
         const opt = document.createElement('option');
-        opt.value = idx;
+        opt.value = i;
         opt.textContent = `${d.week} (${d.period})`;
-        if (idx === dataset.length - 1) opt.selected = true;
+        if (i === dataset.length - 1) opt.selected = true;
         sel.appendChild(opt);
-      });
+      }
       sel.onchange = onWeekChanged;
     }
 
@@ -537,6 +549,7 @@
       document.getElementById('emptyState').classList.toggle('hidden', !isEmpty);
       document.getElementById('tab-summary').classList.toggle('hidden', isEmpty);
       document.getElementById('tab-trends').classList.toggle('hidden', true);
+      document.getElementById('tab-banner').classList.toggle('hidden', true);
       document.getElementById('tab-table').classList.toggle('hidden', true);
 
       if (!isEmpty) {
@@ -555,7 +568,9 @@
       const prev = visibleData.length >= 2 ? visibleData[visibleData.length - 2] : null;
 
       document.getElementById('scriptPeriodBadge').textContent = `집계 기준: ${curr.period}`;
-      document.getElementById('insightContainer').innerHTML = generateExecutiveInsight(curr, prev);
+      
+      // 요약 코멘트 렌더링 (저장본이 있으면 로드, 없으면 4대 항목 자동 생성)
+      renderSummaryComment(curr, prev);
 
       renderKpiCards(curr, prev, visibleData);
       renderWeeklyTable(curr, prev, visibleData);
@@ -564,8 +579,94 @@
     }
 
     // ========================================================
-    // 메인 배너 효율 탭 렌더링
+    // [요약 대시보드 코멘트] 4대 비즈니스 분석 항목 자동 생성 & 직접 수정
     // ========================================================
+    function renderSummaryComment(curr, prev) {
+      const commentBox = document.getElementById('insightContainer');
+      if (curr.summaryComment && curr.summaryComment.trim() !== '') {
+        commentBox.innerHTML = curr.summaryComment;
+        return;
+      }
+
+      if (!prev) {
+        commentBox.innerHTML = `
+          <div class="flex items-start space-x-2">
+            <span class="px-2 py-0.5 text-[11px] font-bold bg-indigo-50 text-indigo-700 rounded border border-indigo-200 shrink-0 mt-0.5">기본 현황</span>
+            <p class="text-xs text-slate-700"><strong>[${curr.week} 등록 완료]</strong> 일평균 UV ${(curr.uv/10000).toFixed(1)}만, PV ${(curr.pv/1000000).toFixed(1)}백만, 구매전환율 ${curr.cvr}%로 첫 주차가 기록되었습니다. 다음 주차가 등록되면 4대 진단 분석이 활성화됩니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const uvDiff = prev.uv ? (((curr.uv - prev.uv) / prev.uv) * 100) : 0;
+      const cvrDiff = curr.cvr - prev.cvr;
+      const revDiff = prev.revenue ? (((curr.revenue - prev.revenue) / prev.revenue) * 100) : 0;
+      const pvPerUvDiff = curr.pvPerUv - prev.pvPerUv;
+      const failDiff = curr.searchFailRate - prev.searchFailRate;
+      const basketDiff = curr.basketItems - prev.basketItems;
+
+      // 1. 트래픽 및 유입 품질
+      let trafficText = "";
+      if (uvDiff > 20 && pvPerUvDiff < 0) {
+        trafficText = `대형 행사 및 외부 유입 확대로 유입 트래픽(UV +${uvDiff.toFixed(1)}%)은 큰 폭 성장했으나, 체류 깊이(UV당 PV ${curr.pvPerUv.toFixed(1)}건, ${pvPerUvDiff.toFixed(1)}건)는 다소 희석되어 <strong>초기 이탈 방지 및 개인화 홈 동선 점검</strong>이 요구됩니다.`;
+      } else if (uvDiff < -10 && pvPerUvDiff > 1.0) {
+        trafficText = `프로모션 종료로 유입 모수(UV ${uvDiff.toFixed(1)}%)는 조정되었으나, 1인당 탐색 깊이(UV당 PV ${curr.pvPerUv.toFixed(1)}건, +${pvPerUvDiff.toFixed(1)}건)가 크게 상승하여 <strong>진성·목적형 구매자 중심</strong>으로 압축되었습니다.`;
+      } else {
+        trafficText = `일평균 트래픽(UV ${uvDiff >= 0 ? '+' : ''}${uvDiff.toFixed(1)}%)과 1인당 탐색량(UV당 PV ${curr.pvPerUv.toFixed(1)}건)이 견고한 평시 수준을 유지하고 있습니다.`;
+      }
+
+      // 2. 구매 전환 및 주문 성과
+      let convText = "";
+      if (cvrDiff >= 0.5) {
+        convText = `구매전환율이 <strong>${curr.cvr}%</strong>(WoW ▲${cvrDiff.toFixed(1)}%p)로 탄탄하게 우상향하며 결제 완주 단계까지의 높은 쇼핑 전환 효율을 증명했습니다.`;
+      } else if (cvrDiff <= -0.5) {
+        convText = `신규·라이트 유저 유입 확대로 구매전환율(CVR ${curr.cvr}%, ▼${Math.abs(cvrDiff).toFixed(1)}%p)이 소폭 분산되었으며, <strong>첫 구매 특가 및 첫바구니 혜택 강화</strong>가 권장됩니다.`;
+      } else {
+        convText = `구매전환율은 <strong>${curr.cvr}%</strong>(WoW ${cvrDiff >= 0 ? '+' : ''}${cvrDiff.toFixed(1)}%p)로 평시 타깃 방어선을 안정적으로 지켜내고 있습니다.`;
+      }
+
+      // 3. 검색 탐색 UX 및 품질
+      let searchText = "";
+      if (failDiff <= 0) {
+        searchText = `검색 실패율은 <strong>${curr.searchFailRate}%</strong>로 전주 대비 개선(▼${Math.abs(failDiff).toFixed(1)}%p)되었으며, 검색 유입 주문금액(${curr.searchRevenue}백만원, 비중 ${curr.searchShare}%) 또한 양호한 탐색 품질을 기록했습니다.`;
+      } else {
+        searchText = `검색 실패율(${curr.searchFailRate}%, ▲${failDiff.toFixed(1)}%p)이 소폭 상승하여 미결과 검색어 및 오타 교정·동의어 사전 보완이 권장됩니다.`;
+      }
+
+      // 4. 객단가 및 장바구니 규모
+      let basketText = `전체 일평균 주문금액은 <strong>${curr.revenue.toLocaleString()}백만원</strong>(WoW ${revDiff >= 0 ? '+' : ''}${revDiff.toFixed(1)}%)이며, 건당 구매수량은 <strong>${curr.basketItems}개</strong>(WoW ${basketDiff >= 0 ? '+' : ''}${basketDiff.toFixed(1)}개)로 객단가 방어선을 탄탄히 유지 중입니다.`;
+
+      commentBox.innerHTML = `
+        <div class="flex items-start space-x-2">
+          <span class="px-2 py-0.5 text-[11px] font-bold bg-indigo-50 text-indigo-700 rounded border border-indigo-200 shrink-0 mt-0.5">1. Traffic & UX</span>
+          <p class="text-xs text-slate-700">${trafficText}</p>
+        </div>
+        <div class="flex items-start space-x-2">
+          <span class="px-2 py-0.5 text-[11px] font-bold bg-emerald-50 text-emerald-700 rounded border border-emerald-200 shrink-0 mt-0.5">2. Conversion</span>
+          <p class="text-xs text-slate-700">${convText}</p>
+        </div>
+        <div class="flex items-start space-x-2">
+          <span class="px-2 py-0.5 text-[11px] font-bold bg-amber-50 text-amber-700 rounded border border-amber-200 shrink-0 mt-0.5">3. Search Quality</span>
+          <p class="text-xs text-slate-700">${searchText}</p>
+        </div>
+        <div class="flex items-start space-x-2">
+          <span class="px-2 py-0.5 text-[11px] font-bold bg-slate-100 text-slate-700 rounded border border-slate-200 shrink-0 mt-0.5">4. Basket & GMV</span>
+          <p class="text-xs text-slate-700">${basketText}</p>
+        </div>
+      `;
+    }
+
+    function saveSummaryCommentManual() {
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
+      if (dataset[currIdx]) {
+        dataset[currIdx].summaryComment = document.getElementById('insightContainer').innerHTML;
+        saveData();
+        alert("✨ 요약 대시보드 코멘트가 성공적으로 저장되었습니다!");
+      }
+    }
+
+    // 메인 배너 효율 탭 렌더링
     function renderBannerTab() {
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
@@ -574,20 +675,12 @@
       const curr = dataset[currIdx];
       const images = curr.bannerImages || [];
 
-      // 1. 코멘트 영역
       renderBannerComment(curr);
-
-      // 2. 주요 배너 구좌별 세부 실적 테이블 ('배너 썸네일' 1:1 업로드 기능 탑재)
       renderStructuredBannerTable(curr);
-
-      // 3. 슬롯 차트
       renderBannerSlotChart(curr);
-
-      // 4. 하단 캡처 표 아코디언 영역 세팅
       renderBannerCaptureAccordion(curr, images);
     }
 
-    // 1번 요청: 최하단 캡처 표 접힘(Accordion) 토글 제어
     function renderBannerCaptureAccordion(curr, images) {
       document.getElementById('bannerCaptureViewTitle').textContent = `[${curr.week}] 메인배너 효율 분석 표 캡처 (${images.length}장)`;
       const bannerImg = document.getElementById('bannerCaptureImg');
@@ -617,7 +710,6 @@
         noImg.classList.remove('hidden');
       }
 
-      // 아코디언 열림/닫힘 UI 동기화
       const body = document.getElementById('bannerAccordionBody');
       const arrow = document.getElementById('accordionArrow');
       const btnText = document.getElementById('accordionBtnText');
@@ -641,7 +733,6 @@
       }
     }
 
-    // 코멘트 영역
     function renderBannerComment(curr) {
       const commentBox = document.getElementById('bannerCommentBox');
       if (curr.bannerComment && curr.bannerComment.trim() !== '') {
@@ -668,12 +759,10 @@
       }
     }
 
-    // 2번 요청: '디자인' -> '배너 썸네일' 변경 및 개별 썸네일 업로드 기능 구현
     function renderStructuredBannerTable(curr) {
       const tbody = document.getElementById('mainBannerTableBody');
       if (!tbody) return;
 
-      // 주차별 배너 항목이 없으면 기본 10월 3주차 실적 장표 기본 세팅
       if (!curr.bannerItems || curr.bannerItems.length === 0) {
         curr.bannerItems = [
           { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: null },
@@ -725,7 +814,6 @@
       }).join('');
     }
 
-    // 개별 배너 썸네일 업로드 트리거 및 처리
     function triggerSingleBannerThumbUpload(itemIndex) {
       currentUploadItemIdx = itemIndex;
       const fileInput = document.getElementById('singleBannerThumbInput');
@@ -763,7 +851,6 @@
       }
     }
 
-    // 썸네일 확대 모달
     function openBannerZoomModal(title, imgSrc) {
       document.getElementById('zoomBannerTitle').textContent = title;
       document.getElementById('zoomBannerImage').src = imgSrc;
@@ -803,9 +890,6 @@
       });
     }
 
-    // ==========================================
-    // 기존 기능들 (KPI 모달, OCR, 주차 관리 등)
-    // ==========================================
     function openKpiModal() {
       document.getElementById('kpiDataForm').reset();
       clearKpiOcrImage();
@@ -938,6 +1022,7 @@
         basketItems,
         bannerImages: [],
         bannerItems: [],
+        summaryComment: "",
         bannerComment: ""
       };
 
@@ -1021,7 +1106,10 @@
       if (dataset.length === 0) {
         list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">등록된 주차가 없습니다.</p>`;
       } else {
-        list.innerHTML = dataset.map((d, idx) => `
+        let html = '';
+        for (let idx = dataset.length - 1; idx >= 0; idx--) {
+          const d = dataset[idx];
+          html += `
           <div class="flex items-center justify-between p-3 text-xs">
             <div>
               <span class="font-bold text-slate-800">${d.week}</span>
@@ -1030,7 +1118,9 @@
             </div>
             <button onclick="deleteWeek(${idx})" class="text-red-500 hover:font-bold">삭제</button>
           </div>
-        `).join('');
+        `;
+        }
+        list.innerHTML = html;
       }
       document.getElementById('manageModal').classList.remove('hidden');
     }
@@ -1056,22 +1146,6 @@
         onWeekChanged();
         closeManageModal();
       }
-    }
-
-    function generateExecutiveInsight(curr, prev) {
-      if (!prev) {
-        return `<p><strong>[${curr.week} 등록 완료]</strong> 일평균 UV ${(curr.uv/10000).toFixed(1)}만, PV ${(curr.pv/1000000).toFixed(1)}백만, 구매전환율 ${curr.cvr}%로 첫 주차가 기록되었습니다. 다음 주차가 등록되면 WoW 증감 분석이 활성화됩니다.</p>`;
-      }
-      const uvDiff = prev.uv ? (((curr.uv - prev.uv) / prev.uv) * 100) : 0;
-      const cvrDiff = curr.cvr - prev.cvr;
-      const revDiff = prev.revenue ? (((curr.revenue - prev.revenue) / prev.revenue) * 100) : 0;
-
-      return `
-        <div class="flex items-start space-x-2">
-          <span class="px-2 py-0.5 text-[11px] font-bold bg-indigo-50 text-indigo-700 rounded border border-indigo-200 shrink-0 mt-0.5">Core Insight</span>
-          <p class="text-xs text-slate-700">트래픽(UV ${uvDiff >= 0 ? '+' : ''}${uvDiff.toFixed(1)}%)과 전환율(CVR ${curr.cvr}%, ${cvrDiff >= 0 ? '+' : ''}${cvrDiff.toFixed(1)}%p), 주문금액(${revDiff >= 0 ? '+' : ''}${revDiff.toFixed(1)}%) 추이를 기록 중입니다.</p>
-        </div>
-      `;
     }
 
     function renderKpiCards(curr, prev, visibleData) {
@@ -1294,8 +1368,9 @@
       table.innerHTML = `<thead>${thead}</thead><tbody>${tbody}</tbody>`;
     }
 
+    // 4대 탭 전환 제어 (순서: summary -> trends -> banner -> table)
     function switchTab(tabId) {
-      ['summary', 'banner', 'trends', 'table'].forEach(t => {
+      ['summary', 'trends', 'banner', 'table'].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.toggle('hidden', t !== tabId);
         const btn = document.getElementById(`tabBtn-${t}`);
@@ -1320,7 +1395,7 @@
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.getElementById('copyBtnText');
         btn.textContent = "복사 완료!";
-        setTimeout(() => { btn.textContent = "인사이트 요약 복사"; }, 2000);
+        setTimeout(() => { btn.textContent = "요약 복사"; }, 2000);
       });
     }
 
@@ -1338,7 +1413,6 @@
       a.click();
     }
 
-    // 드래그 앤 드롭
     const kpiDropZone = document.getElementById('kpiOcrDropZone');
     kpiDropZone.addEventListener('click', () => document.getElementById('kpiOcrFileInput').click());
     kpiDropZone.addEventListener('dragover', (e) => { e.preventDefault(); kpiDropZone.classList.add('border-indigo-500', 'bg-indigo-50/50'); });
