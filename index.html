@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <!-- 상단 컨트롤러: 리뷰 주차 + 통합 데이터 관리(어드민) + 인쇄 -->
+      <!-- 상단 컨트롤러 -->
       <div class="flex items-center space-x-2.5">
         <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
           <span class="text-xs font-medium text-slate-500">리뷰 주차:</span>
@@ -73,7 +73,7 @@
       <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📊</div>
       <div class="space-y-1">
         <h3 class="text-base font-bold text-slate-900">등록된 주차 데이터가 없습니다</h3>
-        <p class="text-xs text-slate-500">상단 우측의 <strong>[⚙️ 주간 데이터 관리 / 등록]</strong> 버튼을 눌러 첫 주차 지표를 추가해 주세요.</p>
+        <p class="text-xs text-slate-500">상단 우측의 <strong>[⚙️ 주간 데이터 관리 / 등록]</strong> 버튼을 눌러 주차 지표를 추가해 주세요.</p>
       </div>
       <button onclick="requestAdminAccess(() => openUnifiedManageModal('kpi'))" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition">
         + 첫 주차 데이터 등록하기
@@ -82,8 +82,6 @@
 
     <!-- 탭 1: 요약 대시보드 -->
     <div id="tab-summary" class="space-y-6">
-      
-      <!-- 위클리 핵심 비즈니스 인사이트 배너 -->
       <section class="bg-white rounded-2xl border border-indigo-200/90 p-5 shadow-xs relative bg-indigo-50/20">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-3 border-b border-indigo-100 gap-2">
           <div class="flex items-center space-x-2">
@@ -106,10 +104,8 @@
         </div>
       </section>
 
-      <!-- 상단 5대 핵심 KPI 카드 -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="kpiCardsContainer"></section>
 
-      <!-- 주차별 지표 상세 현황 테이블 -->
       <section class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
@@ -179,21 +175,10 @@
         </div>
       </section>
 
-      <!-- 구좌 선택 서브 탭 & 권역 필터 바 -->
+      <!-- 구좌 선택 서브 탭 (동적 생성) & 권역 필터 바 -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <!-- 등록된 구좌에 맞춰 동적으로 버튼 렌더링 -->
         <div class="flex flex-wrap items-center gap-1.5" id="bannerSubTabGroup">
-          <button onclick="switchBannerSection('main')" id="subTab-main" class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition bg-amber-500 text-white shadow-xs">
-            1. 메인배너
-          </button>
-          <button onclick="switchBannerSection('topSwipe')" id="subTab-topSwipe" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200">
-            2. 상단스와이프 (퀵메뉴)
-          </button>
-          <button onclick="switchBannerSection('grid')" id="subTab-grid" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200">
-            3. 그리드배너
-          </button>
-          <button onclick="switchBannerSection('bottomSwipe')" id="subTab-bottomSwipe" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200">
-            4. 하단스와이프 (카테고리)
-          </button>
         </div>
 
         <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl text-xs border border-slate-200 self-start md:self-auto">
@@ -205,11 +190,11 @@
       </div>
 
       <!-- 선택된 구좌의 슬롯 차트 -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div id="bannerChartCard" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-base font-bold text-slate-900" id="bannerChartTitle">메인 롤링배너 구좌별(1번~6번) 클릭수 vs 기획전 주문금액</h3>
-            <p class="text-xs text-slate-500 mt-0.5" id="bannerChartSubtitle">상위 구좌 트래픽 및 매출 집중도 현황</p>
+            <h3 class="text-base font-bold text-slate-900" id="bannerChartTitle">구좌별 클릭수 vs 기획전 주문금액</h3>
+            <p class="text-xs text-slate-500 mt-0.5" id="bannerChartSubtitle">구좌 슬롯 단위 합산 트래픽 및 매출 집중도 현황</p>
           </div>
           <span class="text-xs text-slate-400">단위: 클릭수(건), 주문금액(만원)</span>
         </div>
@@ -222,10 +207,13 @@
       <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
-            <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">메인배너 세부 실적 및 배너 썸네일</h3>
-            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 원본 배너가 확대되며, <strong>[+등록]</strong> 버튼으로 파일 또는 이미지 URL을 등록할 수 있습니다.</p>
+            <h3 class="text-sm font-bold text-slate-900" id="mainBannerTableTitle">세부 실적 및 배너 썸네일</h3>
+            <p class="text-xs text-slate-500 mt-0.5">썸네일을 클릭하면 원본 배너가 확대되며, 엑셀 표를 붙여넣으면 자동 집계됩니다.</p>
           </div>
-          <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-medium" id="currentSectionBadge">메인배너</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-medium" id="currentSectionBadge">구좌</span>
+            <button onclick="requestAdminAccess(() => openUnifiedManageModal('banner'))" class="text-xs text-blue-600 hover:underline font-semibold">+ 실적 등록/수정</button>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs border-collapse">
@@ -247,13 +235,13 @@
         </div>
       </section>
 
-      <!-- 배너 실적표 캡처 아코디언 -->
+      <!-- 선택된 구좌 전용 캡처 표 이미지 뷰어 -->
       <div id="bannerCaptureViewBox" class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 bg-slate-50/70 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition" onclick="toggleBannerCaptureAccordion()">
           <div class="flex items-center space-x-2">
-            <span id="accordionArrow" class="text-xs font-bold text-slate-500 transition-transform duration-200">▶</span>
-            <h3 class="text-sm font-bold text-slate-900" id="bannerCaptureViewTitle">메인배너 효율 분석 표 캡처 원본</h3>
-            <span class="text-[11px] text-slate-500 font-normal">(대조용 원본 표 보기)</span>
+            <span id="accordionArrow" class="text-xs font-bold text-slate-500 transition-transform duration-200">▼</span>
+            <h3 class="text-sm font-bold text-slate-900" id="bannerCaptureViewTitle">구좌 효율 분석 표 캡처 원본</h3>
+            <span class="text-[11px] text-slate-500 font-normal">(해당 구좌 등록 표 이미지)</span>
           </div>
           <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
             <div id="bannerImgTabButtons" class="flex flex-wrap items-center gap-1.5"></div>
@@ -261,18 +249,18 @@
               + 캡처 이미지 등록/변경
             </button>
             <button onclick="toggleBannerCaptureAccordion()" class="px-2 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-50">
-              <span id="accordionBtnText">펼치기 ▼</span>
+              <span id="accordionBtnText">접기 ▲</span>
             </button>
           </div>
         </div>
 
-        <div id="bannerAccordionBody" class="hidden border-t border-slate-200 p-4 bg-white">
-          <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-3 overflow-auto max-h-[650px] flex items-center justify-center min-h-[200px]">
-            <img id="bannerCaptureImg" src="" alt="메인배너 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
+        <div id="bannerAccordionBody" class="border-t border-slate-200 p-4 bg-white">
+          <div id="bannerImageHolder" class="border border-slate-200 rounded-xl bg-slate-50 p-3 overflow-auto max-h-[750px] flex items-center justify-center min-h-[220px]">
+            <img id="bannerCaptureImg" src="" alt="구좌 효율 표" class="max-w-full object-contain rounded shadow-xs hidden">
             <div id="noBannerImgText" class="text-center py-10 space-y-2">
-              <p class="text-xs text-slate-500">선택된 주차에 등록된 메인배너 효율 캡처 이미지가 없습니다.</p>
+              <p class="text-xs text-slate-500">현재 구좌에 등록된 표 캡처 이미지가 없습니다.</p>
               <button onclick="requestAdminAccess(() => openUnifiedManageModal('banner'))" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-xs transition">
-                🖼️ 지금 배너 캡처 이미지 올리기
+                🖼️ 지금 표 캡처 이미지 올리기
               </button>
             </div>
           </div>
@@ -297,40 +285,34 @@
 
   </main>
 
-  <!-- ======================================================== -->
-  <!-- [신규 통합 모달]: 주간 데이터 관리 / 등록 센터 (어드민 보호) -->
-  <!-- ======================================================== -->
+  <!-- [통합 모달]: 주간 데이터 관리 / 등록 센터 (어드민 보호) -->
   <div id="unifiedManageModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col overflow-hidden">
       
-      <!-- 모달 상단 헤더 -->
       <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
           <h3 class="text-base font-bold text-slate-900">주간 데이터 관리 센터 (Admin)</h3>
-          <p class="text-xs text-slate-500 mt-0.5">주요 KPI 수치, 메인배너 실적표, 주차 삭제를 한곳에서 통합 관리합니다.</p>
+          <p class="text-xs text-slate-500 mt-0.5">주요 KPI 수치, 구좌별 실적표, 구좌 추가/삭제를 한곳에서 통합 관리합니다.</p>
         </div>
         <button onclick="closeUnifiedManageModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">✕</button>
       </div>
 
-      <!-- 모달 내부 서브 탭 바 -->
       <div class="flex items-center border-b border-slate-200 px-6 pt-2 bg-slate-50/50 text-xs font-bold space-x-4">
         <button id="modalTabBtn-kpi" onclick="switchManageModalTab('kpi')" class="pb-2.5 border-b-2 border-blue-600 text-blue-600 transition">
           1. 주요 KPI 수치 등록 / 수정
         </button>
         <button id="modalTabBtn-banner" onclick="switchManageModalTab('banner')" class="pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
-          2. 메인영역 배너 실적 등록
+          2. 배너 구좌별 실적 등록 (캡처/엑셀/구좌추가)
         </button>
         <button id="modalTabBtn-list" onclick="switchManageModalTab('list')" class="pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
           3. 주차 목록 & 데이터 완전 삭제
         </button>
       </div>
 
-      <!-- 모달 본문 (3개 탭 전환) -->
       <div class="p-6 overflow-y-auto space-y-4 flex-1">
 
         <!-- [모달 탭 1]: 주요 KPI 수치 등록/수정 -->
         <div id="modalSec-kpi" class="space-y-4">
-          <!-- OCR 드롭존 -->
           <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3.5 space-y-2">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-indigo-900 flex items-center space-x-1">
@@ -448,29 +430,72 @@
           </form>
         </div>
 
-        <!-- [모달 탭 2]: 메인영역 배너 실적 등록 -->
+        <!-- [모달 탭 2]: 배너 구좌별 실적 등록 (구좌별 캡처 & 엑셀 & 새 구좌 동적 추가 완벽 분리) -->
         <div id="modalSec-banner" class="space-y-4 hidden">
+          
+          <!-- 상단: 관리할 구좌 선택 및 신규 구좌 생성 바 -->
+          <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div class="flex items-center space-x-2">
+              <label class="text-xs font-bold text-slate-700">관리할 구좌 선택:</label>
+              <select id="modalTargetSectionSelect" onchange="onModalTargetSectionChanged()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white font-semibold text-blue-700 focus:outline-none cursor-pointer">
+              </select>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <!-- 코드 수정 없이 신규 구좌를 즉시 추가하는 버튼 -->
+              <button type="button" onclick="promptAddNewBannerSection()" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition">
+                + 새 구좌 추가 (예: 그리드 #2)
+              </button>
+              <button type="button" onclick="deleteCurrentBannerSection()" id="btnDeleteSection" class="px-2 py-1.5 text-red-500 hover:text-red-700 text-xs font-medium transition">
+                구좌 삭제
+              </button>
+            </div>
+          </div>
+
+          <!-- 1. 선택된 구좌 전용 표 캡처 등록란 -->
           <div class="bg-amber-50/40 border border-amber-200 rounded-xl p-3.5 space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-amber-900">🖼️ <span id="bannerTargetWeekTitle">-</span> 메인배너 효율 표 캡처 등록</span>
+              <span class="text-xs font-bold text-amber-900">📷 <span id="sectionCaptureTitleBadge">-</span> 표 캡처 등록</span>
               <span id="modalBannerCountText" class="text-xs text-amber-700 font-bold">0장 등록됨</span>
             </div>
             
-            <div id="modalBannerDropZone" class="border-2 border-dashed border-amber-300 rounded-xl p-4 text-center bg-white cursor-pointer hover:bg-amber-50/50 transition">
+            <div id="modalBannerDropZone" class="border-2 border-dashed border-amber-300 rounded-xl p-3.5 text-center bg-white cursor-pointer hover:bg-amber-50/50 transition">
               <input type="file" id="modalBannerInput" accept="image/*" multiple class="hidden" onchange="handleModalBannerImages(event)">
               <div class="space-y-1">
-                <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 표 캡처 이미지를 끌어다 놓으세요</p>
-                <p class="text-[11px] text-slate-400">여러 장의 실적표 캡처본(CFC, 전점 등)을 한 번에 선택할 수 있습니다</p>
+                <p class="text-xs font-bold text-amber-900">여기를 클릭하거나 해당 구좌 표 캡처 이미지를 끌어다 놓으세요</p>
+                <p class="text-[11px] text-slate-400">선택된 구좌 전용 실적표 이미지가 독립 저장됩니다</p>
               </div>
             </div>
 
-            <div id="modalBannerThumbnails" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-200 rounded-lg bg-slate-50">
-              <p class="col-span-3 text-center text-xs text-slate-400 py-6">선택된 이미지가 없습니다.</p>
+            <div id="modalBannerThumbnails" class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto p-1 border border-slate-200 rounded-lg bg-slate-50">
+              <p class="col-span-3 text-center text-xs text-slate-400 py-4">선택된 이미지가 없습니다.</p>
             </div>
 
-            <div class="flex items-center justify-end pt-2">
-              <button type="button" onclick="saveBannerImages()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">
-                배너 캡처 이미지 반영
+            <div class="flex items-center justify-end pt-1">
+              <button type="button" onclick="saveSectionBannerImages()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg shadow-sm">
+                현재 구좌 캡처 이미지 반영
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. 선택된 구좌 전용 엑셀 표 붙여넣기란 -->
+          <div class="bg-blue-50/40 border border-blue-200 rounded-xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs font-bold text-blue-900">📋 <span id="sectionPasteTitleBadge">-</span> 엑셀 표 붙여넣기</span>
+                <span class="text-[10px] bg-blue-100 text-blue-700 font-semibold px-1.5 py-0.5 rounded">구조화 동기화</span>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              사내 엑셀에서 <strong>[배너명, 노출, 클릭, CTR, 주문수, 주문금액]</strong> 열을 복사(Ctrl+C) 후 붙여넣으면 구조화 테이블과 슬롯 차트가 자동 갱신됩니다.
+            </p>
+
+            <textarea id="excelPasteArea" rows="4" placeholder="엑셀 복사본을 붙여넣으세요...&#10;예:&#10;[메인배너_1번] 261105_기획전(전점)	20,000	3,000	15.0%	2,000	50,000,000" class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"></textarea>
+
+            <div class="flex items-center justify-end space-x-2">
+              <button type="button" onclick="parseExcelPastedData()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
+                선택된 구좌에 즉시 적용
               </button>
             </div>
           </div>
@@ -496,7 +521,6 @@
 
       </div>
 
-      <!-- 모달 하단 닫기 -->
       <div class="px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex justify-end">
         <button type="button" onclick="closeUnifiedManageModal()" class="px-4 py-2 bg-white border border-slate-300 text-xs font-semibold rounded-lg text-slate-700 hover:bg-slate-50">
           닫기
@@ -600,66 +624,32 @@
   <!-- 스크립트 로직 -->
   <script>
     let dataset = [];
-    let tempBannerList = [];
+    let tempSectionImages = [];
     let currentUploadedKpiImage = null;
     let currentViewBannerImgIdx = 0;
     let currentUploadItemIdx = null;
-    let isCaptureAccordionOpen = false;
+    let isCaptureAccordionOpen = true;
     let chartInstances = {};
 
     let currentBannerSection = 'main';
     let currentBannerRegion = 'ALL';
 
-    // 관리자 인증 상태 변수
     let isAdminAuthenticated = false;
     let pendingAdminCallback = null;
 
-    const DEFAULT_BANNER_DATASETS = {
-      main: [
-        { slot: "1번", name: "[메인배너_1번] 261015_한우데이(전점)", region: "ISF", imp: 20703, click: 3578, ctr: 17.3, orders: 2568, rev: 86180351, cvr: 71.8, thumb: null },
-        { slot: "1번", name: "[메인배너_1번] 261019_한우데이(전점)", region: "ISF", imp: 79017, click: 14964, ctr: 18.9, orders: 2568, rev: 0, cvr: 17.2, thumb: null },
-        { slot: "2번", name: "[메인배너_2번] 261015_초신선(전점)", region: "ISF", imp: 16447, click: 2215, ctr: 13.5, orders: 1708, rev: 29643846, cvr: 77.1, thumb: null },
-        { slot: "2번", name: "[메인배너_2번] 261019_초신선(전점)", region: "ISF", imp: 64013, click: 7543, ctr: 11.8, orders: 1708, rev: 0, cvr: 22.6, thumb: null },
-        { slot: "3번", name: "[메인배너_3번] 261015_정육(CFC)", region: "CFC", imp: 12357, click: 1569, ctr: 12.7, orders: 1119, rev: 19002591, cvr: 71.3, thumb: null },
-        { slot: "3번", name: "[메인배너_3번] 261019_정육(전점)", region: "ISF", imp: 47677, click: 5464, ctr: 11.5, orders: 1119, rev: 0, cvr: 20.5, thumb: null },
-        { slot: "4번", name: "[메인배너_4번] 261015_밥상주치의(CFC)", region: "CFC", imp: 10042, click: 599, ctr: 6.0, orders: 37, rev: 601843, cvr: 6.2, thumb: null },
-        { slot: "4번", name: "[메인배너_4번] 261015_제타패스(구독)", region: "ISF", imp: 16000, click: 577, ctr: 3.6, orders: 56, rev: 1038548, cvr: 9.7, thumb: null },
-        { slot: "5번", name: "[메인배너_5번] 261019_코카콜라(광고)", region: "ISF", imp: 43008, click: 3083, ctr: 7.2, orders: 66, rev: 641426, cvr: 2.1, thumb: null },
-        { slot: "6번", name: "[메인배너_6번] 261015_오리온(광고)", region: "ISF", imp: 38547, click: 2150, ctr: 5.6, orders: 56, rev: 297115, cvr: 2.6, thumb: null }
-      ],
-      topSwipe: [
-        { slot: "1번", name: "[상단스와이프] 261015_N+1(전점)", region: "ISF", imp: 110301, click: 6045, ctr: 5.5, orders: 1003, rev: 18788001, cvr: 16.6, thumb: null },
-        { slot: "2번", name: "[상단스와이프] 261015_베스트(전점)", region: "ISF", imp: 110301, click: 2953, ctr: 2.7, orders: 566, rev: 8534409, cvr: 19.2, thumb: null },
-        { slot: "3번", name: "[상단스와이프] 261015_오늘좋은(전점)", region: "ISF", imp: 110301, click: 2751, ctr: 2.5, orders: 238, rev: 1593300, cvr: 8.6, thumb: null },
-        { slot: "4번", name: "[상단스와이프] 261015_요리하다(전점)", region: "ISF", imp: 110301, click: 2145, ctr: 1.9, orders: 145, rev: 1870563, cvr: 6.8, thumb: null },
-        { slot: "5번", name: "[상단스와이프] 261015_끝장채소(전점)", region: "ISF", imp: 110301, click: 1404, ctr: 1.3, orders: 434, rev: 2046421, cvr: 29.3, thumb: null },
-        { slot: "1번", name: "[상단스와이프] 261015_한정특가(CFC)", region: "CFC", imp: 20009, click: 2800, ctr: 14.0, orders: 147, rev: 1268850, cvr: 5.3, thumb: null },
-        { slot: "2번", name: "[상단스와이프] 261015_CFC HOT(CFC)", region: "CFC", imp: 20009, click: 840, ctr: 4.2, orders: 175, rev: 3046673, cvr: 20.8, thumb: null }
-      ],
-      grid: [
-        { slot: "1번", name: "[그리드_1번] 261015_롯데ON 혜택(전점)", region: "ISF", imp: 110301, click: 1577, ctr: 1.4, orders: 13, rev: 624252, cvr: 0.8, thumb: null },
-        { slot: "2번", name: "[그리드_2번] 261015_양평점 단독(전점)", region: "ISF", imp: 110301, click: 1257, ctr: 1.1, orders: 57, rev: 4508580, cvr: 5.9, thumb: null },
-        { slot: "3번", name: "[그리드_3번] 261015_행복한밥상(전점)", region: "ISF", imp: 110301, click: 1161, ctr: 1.1, orders: 43, rev: 604053, cvr: 3.7, thumb: null },
-        { slot: "4번", name: "[그리드_4번] 261015_CFC 전용팩(CFC)", region: "CFC", imp: 20009, click: 720, ctr: 3.6, orders: 88, rev: 1450200, cvr: 12.2, thumb: null },
-        { slot: "5번", name: "[그리드_5번] 261015_CFC 신선박스(CFC)", region: "CFC", imp: 20009, click: 590, ctr: 2.9, orders: 56, rev: 980400, cvr: 9.5, thumb: null }
-      ],
-      bottomSwipe: [
-        { slot: "1번", name: "[하단스와이프] 261015_초특가정육(전점)", region: "ISF", imp: 35000, click: 750, ctr: 2.1, orders: 120, rev: 1850000, cvr: 16.0, thumb: null },
-        { slot: "2번", name: "[하단스와이프] 261015_수산새벽배송(전점)", region: "ISF", imp: 35000, click: 620, ctr: 1.8, orders: 95, rev: 1420000, cvr: 15.3, thumb: null },
-        { slot: "3번", name: "[하단스와이프] 261015_제철과일전(전점)", region: "ISF", imp: 35000, click: 580, ctr: 1.7, orders: 88, rev: 920000, cvr: 15.1, thumb: null },
-        { slot: "4번", name: "[하단스와이프] 261015_CFC 베이커리(CFC)", region: "CFC", imp: 12000, click: 420, ctr: 3.5, orders: 54, rev: 480000, cvr: 12.8, thumb: null },
-        { slot: "5번", name: "[하단스와이프] 261015_CFC 즉석조리(CFC)", region: "CFC", imp: 12000, click: 380, ctr: 3.2, orders: 42, rev: 390000, cvr: 11.1, thumb: null }
-      ]
-    };
+    // 기본 표준 4대 구좌 정의 (코드 수정 없이 어드민에서 언제든 추가/삭제 가능)
+    const DEFAULT_SECTION_METADATA = [
+      { id: 'main', name: '메인배너' },
+      { id: 'topSwipe', name: '상단스와이프 (퀵메뉴)' },
+      { id: 'grid', name: '그리드배너' },
+      { id: 'bottomSwipe', name: '하단스와이프 (카테고리)' }
+    ];
 
     function goHome() {
       switchTab('summary');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ==========================================
-    // [어드민 비밀번호 인증 시스템 (초기비번 1234)]
-    // ==========================================
     function getAdminPassword() {
       return localStorage.getItem('zeta_kpi_admin_pwd') || '1234';
     }
@@ -713,9 +703,6 @@
       alert("관리자 비밀번호가 성공적으로 변경되었습니다.");
     }
 
-    // ==========================================
-    // [통합 데이터 관리 모달 제어]
-    // ==========================================
     function openUnifiedManageModal(initialTab = 'kpi') {
       document.getElementById('unifiedManageModal').classList.remove('hidden');
       switchManageModalTab(initialTab);
@@ -744,20 +731,123 @@
       if (tabKey === 'list') renderManageWeekList();
     }
 
+    // ==========================================
+    // [동적 구좌 관리 로직]: 구좌 목록 읽기, 추가, 삭제
+    // ==========================================
+    function getWeekSectionList(curr) {
+      if (!curr) return [...DEFAULT_SECTION_METADATA];
+      if (!curr.sectionMetadata || !Array.isArray(curr.sectionMetadata) || curr.sectionMetadata.length === 0) {
+        curr.sectionMetadata = [...DEFAULT_SECTION_METADATA];
+      }
+      return curr.sectionMetadata;
+    }
+
     function setupBannerManageTab() {
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
       const curr = dataset[currIdx];
-      const titleBadge = document.getElementById('bannerTargetWeekTitle');
+
+      const selectEl = document.getElementById('modalTargetSectionSelect');
+      selectEl.innerHTML = '';
 
       if (!curr) {
-        titleBadge.textContent = '등록된 주차 없음';
-        tempBannerList = [];
-      } else {
-        titleBadge.textContent = `[${curr.week}]`;
-        tempBannerList = curr.bannerImages ? [...curr.bannerImages] : [];
+        selectEl.innerHTML = '<option value="">등록된 주차 없음</option>';
+        return;
       }
+
+      const sections = getWeekSectionList(curr);
+      sections.forEach(sec => {
+        const opt = document.createElement('option');
+        opt.value = sec.id;
+        opt.textContent = sec.name;
+        if (sec.id === currentBannerSection) opt.selected = true;
+        selectEl.appendChild(opt);
+      });
+
+      onModalTargetSectionChanged();
+    }
+
+    function onModalTargetSectionChanged() {
+      const selectEl = document.getElementById('modalTargetSectionSelect');
+      const targetSecId = selectEl.value;
+      if (!targetSecId) return;
+
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      const curr = dataset[currIdx];
+      if (!curr) return;
+
+      const sections = getWeekSectionList(curr);
+      const targetSec = sections.find(s => s.id === targetSecId);
+      const secName = targetSec ? targetSec.name : targetSecId;
+
+      document.getElementById('sectionCaptureTitleBadge').textContent = `[${curr.week}] ${secName}`;
+      document.getElementById('sectionPasteTitleBadge').textContent = `[${secName}]`;
+
+      // 해당 구좌의 캡처 이미지 로드
+      if (!curr.sectionCaptures) curr.sectionCaptures = {};
+      tempSectionImages = curr.sectionCaptures[targetSecId] ? [...curr.sectionCaptures[targetSecId]] : [];
       renderModalBannerThumbnails();
+    }
+
+    // 신규 구좌 동적 추가 함수 (예: '그리드 #2', '블랙위크 기획전')
+    function promptAddNewBannerSection() {
+      const newName = prompt("추가할 새로운 배너 구좌 명칭을 입력하세요:\n(예: 그리드 #2, 서브 롤링배너, 중간 띠배너)");
+      if (!newName || newName.trim() === '') return;
+
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      const curr = dataset[currIdx];
+      if (!curr) {
+        alert("선택된 주차가 없습니다.");
+        return;
+      }
+
+      const cleanName = newName.trim();
+      const newId = 'sec_' + Date.now();
+
+      const sections = getWeekSectionList(curr);
+      sections.push({ id: newId, name: cleanName });
+      curr.sectionMetadata = sections;
+
+      if (!curr.bannerSections) curr.bannerSections = {};
+      curr.bannerSections[newId] = [];
+
+      if (!curr.sectionCaptures) curr.sectionCaptures = {};
+      curr.sectionCaptures[newId] = [];
+
+      saveData();
+      currentBannerSection = newId;
+
+      setupBannerManageTab();
+      renderBannerTab();
+      alert(`✨ 새 구좌 [${cleanName}]가 추가되었습니다! 이제 캡처나 엑셀 표를 등록할 수 있습니다.`);
+    }
+
+    // 구좌 삭제 함수
+    function deleteCurrentBannerSection() {
+      const selectEl = document.getElementById('modalTargetSectionSelect');
+      const targetSecId = selectEl.value;
+
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      const curr = dataset[currIdx];
+      if (!curr) return;
+
+      const sections = getWeekSectionList(curr);
+      const targetSec = sections.find(s => s.id === targetSecId);
+      if (!targetSec) return;
+
+      if (confirm(`정말 [${targetSec.name}] 구좌를 삭제하시겠습니까?\n해당 구좌의 모든 배너 실적과 캡처 이미지가 함께 제거됩니다.`)) {
+        curr.sectionMetadata = sections.filter(s => s.id !== targetSecId);
+        if (curr.bannerSections) delete curr.bannerSections[targetSecId];
+        if (curr.sectionCaptures) delete curr.sectionCaptures[targetSecId];
+
+        saveData();
+        currentBannerSection = curr.sectionMetadata[0]?.id || 'main';
+        setupBannerManageTab();
+        renderBannerTab();
+      }
     }
 
     function resetKpiFormToNew() {
@@ -804,12 +894,11 @@
       clearKpiOcrImage();
     }
 
-    // [주차 완전 삭제]: 주요 지표 + 매핑된 배너 데이터 + 캡처 표 + 코멘트 영구 삭제
     function deleteWeekCompletely(idx) {
       const targetWeek = dataset[idx];
       if (!targetWeek) return;
 
-      const msg = `정말 '${targetWeek.week}' 데이터를 완전히 삭제하시겠습니까?\n\n※ 포함된 주요 KPI 수치, 메인배너 실적 데이터, 표 캡처 이미지, 코멘트가 모두 영구 삭제됩니다.`;
+      const msg = `정말 '${targetWeek.week}' 데이터를 완전히 삭제하시겠습니까?\n\n※ 포함된 주요 KPI 수치, 모든 구좌별 배너 실적, 표 캡처 이미지, 코멘트가 모두 영구 삭제됩니다.`;
       if (confirm(msg)) {
         dataset.splice(idx, 1);
         saveData();
@@ -830,8 +919,11 @@
         let html = '';
         for (let idx = dataset.length - 1; idx >= 0; idx--) {
           const d = dataset[idx];
-          const bannerCount = (d.bannerSections?.main?.length || 0) + (d.bannerSections?.topSwipe?.length || 0) + (d.bannerSections?.grid?.length || 0) + (d.bannerSections?.bottomSwipe?.length || 0);
-          const captureCount = d.bannerImages ? d.bannerImages.length : 0;
+          const sections = getWeekSectionList(d);
+          let bannerCount = 0;
+          sections.forEach(s => {
+            bannerCount += (d.bannerSections?.[s.id]?.length || 0);
+          });
 
           html += `
             <div class="flex items-center justify-between p-3.5 text-xs hover:bg-slate-50 transition">
@@ -841,7 +933,7 @@
                   <span class="text-slate-400">(${d.period})</span>
                 </div>
                 <div class="text-[11px] text-slate-500 mt-0.5">
-                  UV ${(Number(d.uv)||0).toLocaleString()}명 | 배너 ${bannerCount}개 | 캡처 ${captureCount}장
+                  UV ${(Number(d.uv)||0).toLocaleString()}명 | 구좌 ${sections.length}개 | 배너 ${bannerCount}개
                 </div>
               </div>
               <div class="flex items-center space-x-2">
@@ -868,7 +960,85 @@
       }
     }
 
-    // 날짜 가중치 및 정렬 함수
+    function parseExcelPastedData() {
+      const text = document.getElementById('excelPasteArea').value.trim();
+      const selectEl = document.getElementById('modalTargetSectionSelect');
+      const targetSecId = selectEl.value;
+
+      if (!text) {
+        alert("붙여넣은 텍스트가 없습니다. 엑셀에서 표를 복사해 붙여넣어주세요.");
+        return;
+      }
+
+      const sel = document.getElementById('weekSelector');
+      let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
+      if (currIdx === -1 || !dataset[currIdx]) {
+        alert("선택된 주차가 없습니다. 먼저 주차를 등록해주세요.");
+        return;
+      }
+
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const parsedItems = [];
+
+      lines.forEach(line => {
+        const cells = line.split(/\t|\s{2,}/).map(c => c.trim()).filter(c => c.length > 0);
+        if (cells.length < 2) return;
+
+        const name = cells[0];
+        if (name.includes('배너명') || name.includes('총합계') || name.includes('소계')) return;
+
+        let slot = "1번";
+        const slotMatch = name.match(/_(\d+번)/);
+        if (slotMatch) {
+          slot = slotMatch[1];
+        } else {
+          const numMatch = name.match(/(\d+)번/);
+          if (numMatch) slot = `${numMatch[1]}번`;
+        }
+
+        const region = name.includes('CFC') ? 'CFC' : 'ISF';
+
+        const cleanNums = cells.slice(1).map(c => {
+          const clean = c.replace(/,/g, '').replace(/%/g, '').replace(/원/g, '').trim();
+          return parseFloat(clean);
+        }).filter(n => !isNaN(n));
+
+        const imp = cleanNums[0] || 0;
+        const click = cleanNums[1] || 0;
+        let ctr = cleanNums[2] || 0;
+        if (ctr > 100 && imp > 0) ctr = parseFloat(((click / imp) * 100).toFixed(1));
+
+        const orders = cleanNums[3] || 0;
+        const rev = cleanNums[4] || 0;
+        let cvr = cleanNums[5] || (click > 0 ? parseFloat(((orders / click) * 100).toFixed(1)) : 0);
+
+        parsedItems.push({
+          slot,
+          name,
+          region,
+          imp,
+          click,
+          ctr,
+          orders,
+          rev,
+          cvr,
+          thumb: null
+        });
+      });
+
+      if (parsedItems.length === 0) {
+        alert("유효한 표 데이터를 인식하지 못했습니다. 엑셀의 표 영역을 복사했는지 확인해주세요.");
+        return;
+      }
+
+      if (!dataset[currIdx].bannerSections) dataset[currIdx].bannerSections = {};
+      dataset[currIdx].bannerSections[targetSecId] = parsedItems;
+      saveData();
+      renderBannerTab();
+      document.getElementById('excelPasteArea').value = '';
+      alert(`✨ 총 ${parsedItems.length}개 배너 실적이 해당 구좌에 반영되었습니다!`);
+    }
+
     function parseDateWeight(periodStr, weekName) {
       let month = 0, day = 0, weekNum = 0;
       if (periodStr) {
@@ -1297,19 +1467,6 @@
 
     function switchBannerSection(sectionKey) {
       currentBannerSection = sectionKey;
-
-      const tabs = ['main', 'topSwipe', 'grid', 'bottomSwipe'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`subTab-${t}`);
-        if (btn) {
-          if (t === sectionKey) {
-            btn.className = "px-3.5 py-1.5 text-xs font-bold rounded-xl transition bg-amber-500 text-white shadow-xs";
-          } else {
-            btn.className = "px-3.5 py-1.5 text-xs font-semibold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200";
-          }
-        }
-      });
-
       renderBannerTab();
     }
 
@@ -1330,41 +1487,48 @@
       renderBannerTab();
     }
 
+    // ==========================================
+    // [메인 배너 효율 탭 렌더링]: 동적 구좌 서브 탭 렌더링 포함
+    // ==========================================
     function renderBannerTab() {
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
       if (isNaN(currIdx) || currIdx < 0 || currIdx >= dataset.length) return;
 
       const curr = dataset[currIdx];
-      const images = curr.bannerImages || [];
-
       renderBannerComment(curr);
 
-      ensureBannerDataStructure(curr);
-      const sectionData = curr.bannerSections[currentBannerSection] || [];
+      const sections = getWeekSectionList(curr);
+      // 만약 선택된 구좌가 삭제되었거나 목록에 없으면 첫 번째 구좌로 설정
+      if (!sections.some(s => s.id === currentBannerSection)) {
+        currentBannerSection = sections[0]?.id || 'main';
+      }
+
+      // 1. 상단 서브 탭 동적 렌더링
+      const tabContainer = document.getElementById('bannerSubTabGroup');
+      tabContainer.innerHTML = sections.map((sec, idx) => {
+        const isSelected = sec.id === currentBannerSection;
+        const btnClass = isSelected 
+          ? "px-3.5 py-1.5 text-xs font-bold rounded-xl transition bg-amber-500 text-white shadow-xs" 
+          : "px-3.5 py-1.5 text-xs font-semibold rounded-xl transition bg-slate-100 text-slate-600 hover:bg-slate-200";
+        return `<button onclick="switchBannerSection('${sec.id}')" class="${btnClass}">${idx + 1}. ${sec.name}</button>`;
+      }).join('');
+
+      // 2. 현재 선택된 구좌의 배너 데이터 및 캡처 이미지 추출
+      const sectionData = curr.bannerSections?.[currentBannerSection] || [];
+      const sectionImages = curr.sectionCaptures?.[currentBannerSection] || [];
       const filteredData = filterBannerDataByRegion(sectionData, currentBannerRegion);
 
-      renderStructuredBannerTable(filteredData);
-      renderBannerSlotChartBySection(filteredData);
-      renderBannerCaptureAccordion(curr, images);
-    }
+      // 3. 테이블 및 차트 렌더링
+      renderStructuredBannerTable(filteredData, sections);
+      renderBannerSlotChartBySection(filteredData, sections);
 
-    function ensureBannerDataStructure(curr) {
-      if (!curr.bannerSections) {
-        curr.bannerSections = {};
-      }
-      ['main', 'topSwipe', 'grid', 'bottomSwipe'].forEach(key => {
-        if (!curr.bannerSections[key] || !Array.isArray(curr.bannerSections[key]) || curr.bannerSections[key].length === 0) {
-          if (key === 'main' && curr.bannerItems && curr.bannerItems.length > 0) {
-            curr.bannerSections[key] = JSON.parse(JSON.stringify(curr.bannerItems));
-          } else {
-            curr.bannerSections[key] = JSON.parse(JSON.stringify(DEFAULT_BANNER_DATASETS[key]));
-          }
-        }
-      });
+      // 4. 해당 구좌의 캡처 표 원본 뷰어 렌더링
+      renderBannerCaptureAccordion(curr, sectionImages, sections);
     }
 
     function filterBannerDataByRegion(items, region) {
+      if (!items || !items.length) return [];
       if (region === 'ALL') return items;
       return items.filter(item => {
         const itemRegion = item.region || (item.name.includes('CFC') ? 'CFC' : 'ISF');
@@ -1372,26 +1536,28 @@
       });
     }
 
-    function renderStructuredBannerTable(bannerList) {
+    function renderStructuredBannerTable(bannerList, sections) {
       const tbody = document.getElementById('mainBannerTableBody');
       const tableTitle = document.getElementById('mainBannerTableTitle');
       const badge = document.getElementById('currentSectionBadge');
       if (!tbody) return;
 
-      const sectionNames = {
-        main: "메인배너",
-        topSwipe: "상단스와이프 (퀵메뉴)",
-        grid: "그리드배너",
-        bottomSwipe: "하단스와이프 (카테고리)"
-      };
-
-      const titleStr = sectionNames[currentBannerSection] || "배너 구좌";
+      const currentSecMeta = sections.find(s => s.id === currentBannerSection);
+      const titleStr = currentSecMeta ? currentSecMeta.name : "배너 구좌";
       const regionStr = currentBannerRegion === 'ALL' ? '전체' : (currentBannerRegion === 'CFC' ? 'CFC 전용' : '전점/ISF');
+
       tableTitle.textContent = `${titleStr} [${regionStr}] 세부 실적 (${bannerList.length}개)`;
       badge.textContent = titleStr;
 
-      if (bannerList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-slate-400">해당 조건에 등록된 배너가 없습니다.</td></tr>`;
+      if (!bannerList || bannerList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-12 text-slate-400 bg-slate-50/50">
+              <p class="font-medium text-xs text-slate-500 mb-1">[${titleStr}]에 등록된 세부 배너 데이터가 없습니다.</p>
+              <p class="text-[11px] text-slate-400">아래 <strong>[표 캡처 원본]</strong> 이미지를 확인하시거나, 우측 상단 <strong>[+ 실적 등록/수정]</strong>에서 엑셀 표를 붙여넣어 주세요.</p>
+            </td>
+          </tr>
+        `;
         return;
       }
 
@@ -1437,36 +1603,47 @@
       }).join('');
     }
 
-    function renderBannerSlotChartBySection(bannerList) {
+    function renderBannerSlotChartBySection(bannerList, sections) {
+      const chartCard = document.getElementById('bannerChartCard');
       const el = document.getElementById('chartBannerSlot');
-      const chartTitle = document.getElementById('bannerChartTitle');
-      const chartSubtitle = document.getElementById('bannerChartSubtitle');
-      if (!el || !window.Chart) return;
+      if (!chartCard || !el || !window.Chart) return;
       if (chartInstances['chartBannerSlot']) chartInstances['chartBannerSlot'].destroy();
 
-      const sectionNames = {
-        main: "메인배너",
-        topSwipe: "상단스와이프",
-        grid: "그리드배너",
-        bottomSwipe: "하단스와이프"
-      };
+      if (!bannerList || bannerList.length === 0) {
+        chartCard.classList.add('hidden');
+        return;
+      }
+      chartCard.classList.remove('hidden');
 
-      const titleStr = sectionNames[currentBannerSection] || "배너 구좌";
-      chartTitle.textContent = `${titleStr} 슬롯별 클릭수 vs 기획전 주문금액`;
-      chartSubtitle.textContent = `구좌 슬롯별 트래픽 집중도 및 매출 전환 기여도 비교`;
+      const currentSecMeta = sections.find(s => s.id === currentBannerSection);
+      const titleStr = currentSecMeta ? currentSecMeta.name : "배너 구좌";
+      document.getElementById('bannerChartTitle').textContent = `${titleStr} 구좌별 클릭수 vs 기획전 주문금액`;
 
-      const labels = bannerList.map(b => b.slot ? `${b.slot}` : b.name.slice(0, 8));
-      const clicks = bannerList.map(b => Number(b.click) || 0);
-      const revs = bannerList.map(b => Math.round((Number(b.rev) || 0) / 10000));
+      const slotMap = {};
+      bannerList.forEach(b => {
+        let slotKey = b.slot || "1번";
+        if (!slotMap[slotKey]) slotMap[slotKey] = { click: 0, rev: 0 };
+        slotMap[slotKey].click += (Number(b.click) || 0);
+        slotMap[slotKey].rev += (Number(b.rev) || 0);
+      });
+
+      const labels = Object.keys(slotMap).sort((a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, '')) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, '')) || 0;
+        return numA - numB;
+      });
+
+      const clicks = labels.map(s => slotMap[s].click);
+      const revs = labels.map(s => Math.round(slotMap[s].rev / 10000));
 
       const ctx = el.getContext('2d');
       chartInstances['chartBannerSlot'] = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels.length ? labels : ['1번', '2번', '3번'],
+          labels: labels.map(l => `${l} 구좌`),
           datasets: [
-            { label: '클릭수 (건)', data: clicks, backgroundColor: '#3b82f6', yAxisID: 'y', borderRadius: 6 },
-            { type: 'line', label: '기획전 주문금액 (만원)', data: revs, borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.3, yAxisID: 'y1' }
+            { label: '합산 클릭수 (건)', data: clicks, backgroundColor: '#3b82f6', yAxisID: 'y', borderRadius: 6 },
+            { type: 'line', label: '합산 주문금액 (만원)', data: revs, borderColor: '#ef4444', backgroundColor: '#ef4444', tension: 0.3, yAxisID: 'y1' }
           ]
         },
         options: {
@@ -1485,7 +1662,7 @@
       const sel = document.getElementById('weekSelector');
       let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
       const curr = dataset[currIdx];
-      const sectionData = curr.bannerSections[currentBannerSection] || [];
+      const sectionData = curr.bannerSections?.[currentBannerSection] || [];
       const filtered = filterBannerDataByRegion(sectionData, currentBannerRegion);
       const b = filtered[itemIndex];
 
@@ -1595,29 +1772,32 @@
       document.getElementById('bannerZoomModal').classList.add('hidden');
     }
 
-    function renderBannerCaptureAccordion(curr, images) {
+    function renderBannerCaptureAccordion(curr, sectionImages, sections) {
+      const currentSecMeta = sections.find(s => s.id === currentBannerSection);
+      const secName = currentSecMeta ? currentSecMeta.name : "구좌";
+
       const viewTitle = document.getElementById('bannerCaptureViewTitle');
-      if (viewTitle) viewTitle.textContent = `[${curr.week}] 메인배너 효율 분석 표 캡처 (${images.length}장)`;
+      if (viewTitle) viewTitle.textContent = `[${secName}] 효율 분석 표 캡처 (${sectionImages.length}장)`;
       const bannerImg = document.getElementById('bannerCaptureImg');
       const noImg = document.getElementById('noBannerImgText');
       const tabBtns = document.getElementById('bannerImgTabButtons');
 
       if (!tabBtns) return;
       tabBtns.innerHTML = '';
-      if (images.length > 0) {
+      if (sectionImages.length > 0) {
         bannerImg.classList.remove('hidden');
         noImg.classList.add('hidden');
-        if (currentViewBannerImgIdx >= images.length) currentViewBannerImgIdx = 0;
-        bannerImg.src = images[currentViewBannerImgIdx];
+        if (currentViewBannerImgIdx >= sectionImages.length) currentViewBannerImgIdx = 0;
+        bannerImg.src = sectionImages[currentViewBannerImgIdx];
 
-        images.forEach((_, idx) => {
+        sectionImages.forEach((_, idx) => {
           const btn = document.createElement('button');
           btn.className = `px-2 py-0.5 text-xs rounded-md font-semibold transition ${idx === currentViewBannerImgIdx ? 'bg-amber-600 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`;
           btn.textContent = `표 #${idx + 1}`;
           btn.onclick = (e) => {
             e.stopPropagation();
             currentViewBannerImgIdx = idx;
-            renderBannerCaptureAccordion(curr, images);
+            renderBannerCaptureAccordion(curr, sectionImages, sections);
           };
           tabBtns.appendChild(btn);
         });
@@ -1645,7 +1825,9 @@
       const sel = document.getElementById('weekSelector');
       let currIdx = sel && sel.value !== "" ? parseInt(sel.value) : (dataset.length - 1);
       if (dataset[currIdx]) {
-        renderBannerCaptureAccordion(dataset[currIdx], dataset[currIdx].bannerImages || []);
+        const sections = getWeekSectionList(dataset[currIdx]);
+        const sectionImages = dataset[currIdx].sectionCaptures?.[currentBannerSection] || [];
+        renderBannerCaptureAccordion(dataset[currIdx], sectionImages, sections);
       }
     }
 
@@ -1852,7 +2034,6 @@
         dataset[editIndex].searchRevenue = searchRevenue;
         dataset[editIndex].searchShare = searchShare;
         dataset[editIndex].basketItems = basketItems;
-        ensureBannerDataStructure(dataset[editIndex]);
         alert(`[${dataset[editIndex].week}] 지표 수치가 성공적으로 수정되었습니다!`);
       } else {
         const newEntry = {
@@ -1862,8 +2043,9 @@
           totalSearch, searchFail, searchFailRate,
           revenue, searchRevenue, searchShare,
           basketItems,
-          bannerImages: [],
-          bannerSections: JSON.parse(JSON.stringify(DEFAULT_BANNER_DATASETS)),
+          sectionMetadata: [...DEFAULT_SECTION_METADATA],
+          bannerSections: {},
+          sectionCaptures: {},
           summaryComment: "",
           bannerComment: ""
         };
@@ -1885,7 +2067,7 @@
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = function(e) {
-          tempBannerList.push(e.target.result);
+          tempSectionImages.push(e.target.result);
           renderModalBannerThumbnails();
         };
         reader.readAsDataURL(file);
@@ -1896,34 +2078,39 @@
       const container = document.getElementById('modalBannerThumbnails');
       const countText = document.getElementById('modalBannerCountText');
       if (!container) return;
-      countText.textContent = `${tempBannerList.length}장 등록됨`;
+      countText.textContent = `${tempSectionImages.length}장 등록됨`;
 
-      if (tempBannerList.length > 0) {
-        container.innerHTML = tempBannerList.map((src, idx) => `
+      if (tempSectionImages.length > 0) {
+        container.innerHTML = tempSectionImages.map((src, idx) => `
           <div class="relative group border border-slate-200 rounded-lg overflow-hidden bg-white p-1">
             <img src="${src}" class="w-full h-20 object-contain rounded">
             <span class="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">#${idx + 1}</span>
-            <button type="button" onclick="removeModalBannerThumb(${idx})" class="absolute top-1 right-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded opacity-80 hover:opacity-100">✕</button>
+            <button type="button" onclick="removeModalSectionImage(${idx})" class="absolute top-1 right-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded opacity-80 hover:opacity-100">✕</button>
           </div>
         `).join('');
       } else {
-        container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-6">선택된 이미지가 없습니다.</p>`;
+        container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-4">선택된 이미지가 없습니다.</p>`;
       }
     }
 
-    function removeModalBannerThumb(idx) {
-      tempBannerList.splice(idx, 1);
+    function removeModalSectionImage(idx) {
+      tempSectionImages.splice(idx, 1);
       renderModalBannerThumbnails();
     }
 
-    function saveBannerImages() {
+    function saveSectionBannerImages() {
+      const selectEl = document.getElementById('modalTargetSectionSelect');
+      const targetSecId = selectEl.value;
+      if (!targetSecId) return;
+
       const sel = document.getElementById('weekSelector');
       let currIdx = sel ? parseInt(sel.value) : (dataset.length - 1);
       if (dataset[currIdx]) {
-        dataset[currIdx].bannerImages = [...tempBannerList];
+        if (!dataset[currIdx].sectionCaptures) dataset[currIdx].sectionCaptures = {};
+        dataset[currIdx].sectionCaptures[targetSecId] = [...tempSectionImages];
         saveData();
         renderBannerTab();
-        alert("배너 실적표 캡처 이미지가 반영되었습니다!");
+        alert("해당 구좌의 실적표 캡처 이미지가 성공적으로 반영되었습니다!");
       }
     }
 
